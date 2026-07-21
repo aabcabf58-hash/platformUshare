@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zouzou App - Admin Center</title>
+
+  <script src="./theme.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  >
+  <link rel="stylesheet" href="./theme.css">
+</head>
+
+<body class="min-h-screen bg-gray-900 font-sans text-gray-100">
+  <header class="sticky top-0 z-50 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+    <div class="flex w-full flex-col items-center justify-between gap-4 xl:flex-row">
+      <div class="flex items-center gap-3">
+        <div class="rounded-lg bg-cyan-600 p-2 text-white">
+          <i class="fa-solid fa-screwdriver-wrench text-xl"></i>
+        </div>
+
+        <h1 class="text-xl font-bold text-cyan-400">
+          Zouzou App
+          <span class="text-base font-normal text-white">
+            | Admin Center
+          </span>
+        </h1>
+      </div>
+
+      <nav class="flex flex-wrap items-center justify-center gap-2">
+<button data-theme-toggle type="button" onclick="toggleTheme()" class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600"><i data-theme-icon class="fa-solid fa-sun"></i><span data-theme-label>Light Mode</span></button>
+<a href="./index.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-table"></i>Main Table</a><a href="./groups.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-object-group"></i>Groups</a><a href="./years.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-calendar-days"></i>Years</a><a href="./group-builder.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-layer-group"></i>Group Builder</a><a href="./refresh-all.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-arrows-rotate"></i>Refresh All</a><a href="./admin-center.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition bg-cyan-600 text-white"><i class="fa-solid fa-screwdriver-wrench"></i>Admin Center</a><button type="button" onclick="logout()" class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700"><i class="fa-solid fa-right-from-bracket"></i>Logout</button></nav>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-[1800px] px-3 py-5 sm:px-5">
+    <div
+      id="global-status"
+      class="mb-4 hidden rounded-xl border p-3 text-sm"
+    ></div>
+
+    <section class="mb-5 rounded-2xl border border-cyan-800 bg-cyan-900/20 p-5 shadow-xl">
+      <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-cyan-300">
+            Admin Center
+          </h2>
+
+          <p class="mt-2 max-w-5xl text-sm leading-6 text-gray-300">
+            صفحة الإدارة صارت مركّزة على المستخدمين. Get All Users يعرض كل users، وكل user جنبو أزرار Role / Password / Balance + / Balance -. قسم السنين انشال من هون.
+          </p>
+        </div>
+
+        <div class="rounded-xl border border-gray-700 bg-gray-900/60 px-4 py-3">
+          <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+            Current Role
+          </div>
+
+          <div id="current-role-label" class="mt-1 font-mono text-lg font-bold text-cyan-300">
+            -
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-5 grid grid-cols-1 gap-3 md:grid-cols-2">
+      <button
+        type="button"
+        onclick="scrollToTool('tool-users')"
+        class="rounded-2xl border border-gray-700 bg-gray-800 p-4 text-left shadow-lg transition hover:border-blue-600 hover:bg-gray-700/50"
+      >
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-users rounded-xl bg-blue-600 p-3 text-white"></i>
+          <div>
+            <div class="font-bold text-white">Get All Users</div>
+            <div class="text-xs text-gray-400">admin + super_admin</div>
+          </div>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        onclick="scrollToTool('tool-create-user')"
+        class="rounded-2xl border border-gray-700 bg-gray-800 p-4 text-left shadow-lg transition hover:border-green-600 hover:bg-gray-700/50"
+      >
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-user-plus rounded-xl bg-green-600 p-3 text-white"></i>
+          <div>
+            <div class="font-bold text-white">Create User</div>
+            <div class="text-xs text-gray-400">admin + super_admin</div>
+          </div>
+        </div>
+      </button>
+    </section>
+
+    <section class="space-y-4">
+      <article id="tool-users" data-role="admin,super_admin" class="tool-card overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
+        <button type="button" onclick="toggleTool(this)" class="flex w-full items-center justify-between gap-3 border-b border-gray-700 bg-gray-700/30 p-4 text-left">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-users rounded-xl bg-blue-600 p-3 text-white"></i>
+            <div>
+              <h3 class="font-bold text-white">Get All Users</h3>
+              <p class="text-xs text-gray-400">
+                كل user بيطلع بكرت لحالو، وأزرار الإدارة بتطلع فقط للـ super_admin.
+              </p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-up text-gray-400"></i>
+        </button>
+
+        <div class="tool-body p-4">
+          <div class="flex flex-col gap-3 border-b border-gray-700 pb-4 xl:flex-row xl:items-center xl:justify-between">
+            <div>
+              <p class="text-sm text-gray-400">
+                Load users من السيرفر، وبعدها بتعدل كل user من نفس الكرت.
+              </p>
+
+              <p id="super-admin-note" class="mt-1 hidden text-xs text-amber-300">
+                ملاحظة: أنت admin، لذلك أزرار role/password/balance مخفية. فقط super_admin بيشوفها.
+              </p>
+            </div>
+
+            <div class="flex flex-col gap-2 sm:flex-row">
+              <input
+                id="users-search-input"
+                type="search"
+                oninput="renderUsersList()"
+                placeholder="Search users..."
+                class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition focus:border-blue-500 sm:w-80"
+              >
+
+              <button onclick="runGetAllUsers()" class="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white transition hover:bg-blue-700">
+                <i class="fa-solid fa-download mr-1"></i>
+                Load Users
+              </button>
+            </div>
+          </div>
+
+          <div id="users-output" class="mt-4">
+            <div class="rounded-xl border border-dashed border-gray-600 p-10 text-center text-gray-500">
+              <i class="fa-solid fa-users mb-3 text-3xl text-blue-400"></i>
+              <p>Press Load Users to display user cards.</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article id="tool-create-user" data-role="admin,super_admin" class="tool-card overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
+        <button type="button" onclick="toggleTool(this)" class="flex w-full items-center justify-between gap-3 border-b border-gray-700 bg-gray-700/30 p-4 text-left">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-user-plus rounded-xl bg-green-600 p-3 text-white"></i>
+            <div>
+              <h3 class="font-bold text-white">Create User</h3>
+              <p class="text-xs text-gray-400">Allowed: admin + super_admin</p>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-down text-gray-400"></i>
+        </button>
+
+        <div class="tool-body hidden p-4">
+          <form onsubmit="runCreateUser(event)" class="grid grid-cols-1 gap-3 lg:grid-cols-4">
+            <input id="create-name" type="text" placeholder="name_user" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-green-500">
+            <input id="create-phone" type="text" placeholder="numberphone" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-green-500">
+            <input id="create-password" type="password" placeholder="password" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-green-500">
+
+            <select id="create-role" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-bold text-white outline-none focus:border-green-500">
+              <option value="client">client</option>
+              <option value="admin">admin</option>
+              <option value="super_admin">super_admin</option>
+            </select>
+
+            <button type="submit" class="lg:col-span-4 rounded-xl bg-green-600 px-5 py-3 font-bold text-white transition hover:bg-green-700">
+              <i class="fa-solid fa-plus mr-1"></i>
+              Create User
+            </button>
+          </form>
+
+          <div id="create-user-output" class="mt-4"></div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script src="./config.js"></script>
+  <script src="./auth.js"></script>
+
+  <script>
+    requireRole(["admin", "super_admin"]);
+
+    /*
+      حط الـAPIs هون.
+      خليه endpoint فقط، مش full URL.
+      مثال:
+      GET_ALL_USERS: "/api/users/getAllUsers"
+    */
+    const ADMIN_APIS = {
+      GET_ALL_USERS: "",
+      CREATE_USER: "",
+      EDIT_USER_ROLE: "",
+      EDIT_USER_PASSWORD: "",
+      ADD_BALANCE: "",
+    };
+
+    let allUsersData = [];
+
+    const currentUser = getUser() || parseJwtPayload(getToken()) || {};
+    const currentRole = normalizeRole(currentUser.role);
+    const isSuperAdmin = currentRole === "super_admin";
+
+    document.getElementById("current-role-label").textContent =
+      currentRole || "-";
+
+    if (!isSuperAdmin) {
+      document
+        .getElementById("super-admin-note")
+        ?.classList.remove("hidden");
+    }
+
+    applyRoleVisibility();
+
+    function applyRoleVisibility() {
+      document.querySelectorAll("[data-role]").forEach((section) => {
+        const allowed = section.dataset.role
+          .split(",")
+          .map((role) => role.trim().toLowerCase());
+
+        if (!allowed.includes(currentRole)) {
+          section.classList.add("hidden");
+        }
+      });
+    }
+
+    function getApiUrl(key) {
+      const path = ADMIN_APIS[key];
+
+      if (!path) {
+        throw new Error(
+          `API placeholder is empty for ${key}. Fill it inside ADMIN_APIS.`
+        );
+      }
+
+      if (path.startsWith("http")) {
+        return path;
+      }
+
+      return `${getApiBaseUrl()}${path}`;
+    }
+
+    async function sendAdminRequest(key, options = {}) {
+      const response = await fetch(
+        getApiUrl(key),
+        {
+          method: options.method || "GET",
+          headers: authHeaders(options.headers || {}),
+          body: options.body
+            ? JSON.stringify(options.body)
+            : undefined,
+        }
+      );
+
+      const text = await response.text();
+      let data = null;
+
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch (error) {
+        data = {
+          raw: text,
+        };
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+          data.error ||
+          `Server returned ${response.status}`
+        );
+      }
+
+      return data;
+    }
+
+    function toggleTool(button) {
+      const article = button.closest(".tool-card");
+      const body = article.querySelector(".tool-body");
+      const icon = button.querySelector(".fa-chevron-down, .fa-chevron-up");
+
+      body.classList.toggle("hidden");
+
+      if (icon) {
+        icon.classList.toggle("fa-chevron-down");
+        icon.classList.toggle("fa-chevron-up");
+      }
+    }
+
+    function scrollToTool(id) {
+      const el = document.getElementById(id);
+
+      if (el) {
+        el.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }
+
+    function showStatus(message, type = "info") {
+      const box = document.getElementById("global-status");
+
+      const classes = {
+        info: "border-blue-800 bg-blue-900/20 text-blue-300",
+        success: "border-green-800 bg-green-900/20 text-green-300",
+        error: "border-red-800 bg-red-900/20 text-red-300",
+      };
+
+      box.className =
+        `mb-4 rounded-xl border p-3 text-sm ${classes[type] || classes.info}`;
+
+      box.textContent = message;
+      box.classList.remove("hidden");
+    }
+
+    async function runGetAllUsers() {
+      try {
+        showStatus("Loading users...", "info");
+
+        const data = await sendAdminRequest("GET_ALL_USERS");
+
+        allUsersData =
+          Array.isArray(data?.data)
+            ? data.data
+            : Array.isArray(data)
+              ? data
+              : [];
+
+        renderUsersList();
+
+        showStatus(
+          `${allUsersData.length} user(s) loaded successfully.`,
+          "success"
+        );
+      } catch (error) {
+        allUsersData = [];
+        renderError("users-output", error);
+        showStatus(error.message, "error");
+      }
+    }
+
+    function renderUsersList() {
+      const container = document.getElementById("users-output");
+      const query = String(
+        document.getElementById("users-search-input")?.value ?? ""
+      )
+        .trim()
+        .toLowerCase();
+
+      const visibleUsers = allUsersData.filter((user) => {
+        if (!query) {
+          return true;
+        }
+
+        return JSON.stringify(user)
+          .toLowerCase()
+          .includes(query);
+      });
+
+      if (allUsersData.length === 0) {
+        container.innerHTML = `
+          <div class="rounded-xl border border-dashed border-gray-600 p-10 text-center text-gray-500">
+            <i class="fa-solid fa-users mb-3 text-3xl text-blue-400"></i>
+            <p>No users loaded yet.</p>
+          </div>
+        `;
+        return;
+      }
+
+      if (visibleUsers.length === 0) {
+        container.innerHTML = `
+          <div class="rounded-xl border border-gray-700 bg-gray-900 p-8 text-center text-gray-500">
+            <i class="fa-solid fa-magnifying-glass mb-3 text-3xl text-blue-400"></i>
+            <p>No users match your search.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="mb-3 flex items-center justify-between gap-2 rounded-xl border border-gray-700 bg-gray-900 px-4 py-3">
+          <div class="text-sm text-gray-300">
+            Showing
+            <span class="font-bold text-blue-300">${visibleUsers.length}</span>
+            /
+            <span class="font-bold text-cyan-300">${allUsersData.length}</span>
+            users
+          </div>
+
+          <button
+            type="button"
+            onclick="runGetAllUsers()"
+            class="rounded-lg bg-gray-700 px-3 py-2 text-xs font-bold text-white transition hover:bg-gray-600"
+          >
+            <i class="fa-solid fa-rotate mr-1"></i>
+            Reload
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          ${visibleUsers.map(renderUserCard).join("")}
+        </div>
+      `;
+    }
+
+    function renderUserCard(user) {
+      const numberphone = getUserPhone(user);
+      const name = user.name_user || user.name || "-";
+      const role = normalizeRole(user.role || "-");
+      const balance = user.balance ?? user.user_balance ?? user.wallet_balance ?? "-";
+      const id = user.id ?? "-";
+
+      return `
+        <article class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-lg">
+          <div class="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_auto] xl:items-center">
+            <div class="min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <div class="whitespace-nowrap font-mono text-xl font-bold text-white">
+                  ${escapeHtml(numberphone || "-")}
+                </div>
+
+                <span class="rounded-lg border border-blue-800 bg-blue-900/20 px-2.5 py-1 text-xs font-bold text-blue-300">
+                  ${escapeHtml(role || "-")}
+                </span>
+
+                <span class="rounded-lg border border-gray-700 bg-gray-900 px-2.5 py-1 text-xs font-bold text-gray-300">
+                  ID: ${escapeHtml(id)}
+                </span>
+              </div>
+
+              <div class="mt-2 grid grid-cols-1 gap-2 md:grid-cols-3">
+                ${renderMiniInfo("Name", name, "text-green-300")}
+                ${renderMiniInfo("Balance", balance, "text-orange-300")}
+                ${renderMiniInfo("Raw Role", user.role ?? "-", "text-purple-300")}
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 xl:justify-end">
+              ${renderUserActions(numberphone, role)}
+            </div>
+          </div>
+
+          <details class="mt-3 rounded-xl border border-gray-700 bg-gray-900/70 p-3">
+            <summary class="cursor-pointer text-xs font-bold text-gray-400">
+              Raw user data
+            </summary>
+
+            <pre class="mt-3 max-h-[300px] overflow-auto rounded-lg bg-gray-950 p-3 text-xs text-gray-300">${escapeHtml(JSON.stringify(user, null, 2))}</pre>
+          </details>
+        </article>
+      `;
+    }
+
+    function renderUserActions(numberphone, role) {
+      if (!isSuperAdmin) {
+        return `
+          <span class="rounded-xl border border-amber-800 bg-amber-900/20 px-4 py-2 text-xs font-bold text-amber-300">
+            Super admin actions hidden
+          </span>
+        `;
+      }
+
+      const safePhone = escapeJsString(numberphone || "");
+      const safeRole = escapeJsString(role || "client");
+
+      return `
+        <button
+          type="button"
+          onclick="editUserRole('${safePhone}', '${safeRole}')"
+          class="rounded-xl bg-purple-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-purple-700"
+        >
+          <i class="fa-solid fa-user-shield mr-1"></i>
+          Role
+        </button>
+
+        <button
+          type="button"
+          onclick="editUserPassword('${safePhone}')"
+          class="rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-amber-700"
+        >
+          <i class="fa-solid fa-key mr-1"></i>
+          Password
+        </button>
+
+        <button
+          type="button"
+          onclick="changeUserBalance('${safePhone}', 'add')"
+          class="rounded-xl bg-green-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-green-700"
+        >
+          <i class="fa-solid fa-plus mr-1"></i>
+          Balance
+        </button>
+
+        <button
+          type="button"
+          onclick="changeUserBalance('${safePhone}', 'subtract')"
+          class="rounded-xl bg-red-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-red-700"
+        >
+          <i class="fa-solid fa-minus mr-1"></i>
+          Balance
+        </button>
+      `;
+    }
+
+    async function editUserRole(numberphone, currentRoleValue) {
+      if (!numberphone) {
+        alert("Missing numberphone");
+        return;
+      }
+
+      const newRole = prompt(
+        "Enter new role: client / admin / super_admin",
+        currentRoleValue || "client"
+      );
+
+      if (!newRole) {
+        return;
+      }
+
+      try {
+        showStatus("Updating user role...", "info");
+
+        await sendAdminRequest(
+          "EDIT_USER_ROLE",
+          {
+            method: "PUT",
+            body: {
+              numberphone,
+              role: newRole.trim(),
+            },
+          }
+        );
+
+        showStatus("Role updated successfully.", "success");
+        await runGetAllUsers();
+      } catch (error) {
+        showStatus(error.message, "error");
+        alert(error.message);
+      }
+    }
+
+    async function editUserPassword(numberphone) {
+      if (!numberphone) {
+        alert("Missing numberphone");
+        return;
+      }
+
+      const newPassword = prompt(
+        `Enter new password for ${numberphone}`
+      );
+
+      if (!newPassword) {
+        return;
+      }
+
+      try {
+        showStatus("Updating user password...", "info");
+
+        await sendAdminRequest(
+          "EDIT_USER_PASSWORD",
+          {
+            method: "PUT",
+            body: {
+              numberphone,
+              password: newPassword,
+            },
+          }
+        );
+
+        showStatus("Password updated successfully.", "success");
+      } catch (error) {
+        showStatus(error.message, "error");
+        alert(error.message);
+      }
+    }
+
+    async function changeUserBalance(numberphone, operation) {
+      if (!numberphone) {
+        alert("Missing numberphone");
+        return;
+      }
+
+      const rawAmount = prompt(
+        operation === "add"
+          ? `Amount to ADD for ${numberphone}`
+          : `Amount to SUBTRACT from ${numberphone}`
+      );
+
+      if (!rawAmount) {
+        return;
+      }
+
+      const amount = Number(rawAmount);
+
+      if (!Number.isFinite(amount) || amount <= 0) {
+        alert("Amount must be a positive number");
+        return;
+      }
+
+      const note = prompt("Note optional", "") || "";
+
+      const finalAmount =
+        operation === "subtract"
+          ? -Math.abs(amount)
+          : Math.abs(amount);
+
+      try {
+        showStatus("Updating balance...", "info");
+
+        await sendAdminRequest(
+          "ADD_BALANCE",
+          {
+            method: "POST",
+            body: {
+              numberphone,
+              amount: finalAmount,
+              operation,
+              note,
+            },
+          }
+        );
+
+        showStatus("Balance updated successfully.", "success");
+        await runGetAllUsers();
+      } catch (error) {
+        showStatus(error.message, "error");
+        alert(error.message);
+      }
+    }
+
+    async function runCreateUser(event) {
+      event.preventDefault();
+
+      const body = {
+        name_user: getInputValue("create-name"),
+        numberphone: getInputValue("create-phone"),
+        password: getInputValue("create-password"),
+        role: getInputValue("create-role"),
+      };
+
+      try {
+        showStatus("Creating user...", "info");
+
+        const data = await sendAdminRequest(
+          "CREATE_USER",
+          {
+            method: "POST",
+            body,
+          }
+        );
+
+        renderOutput("create-user-output", data, "Create User Result");
+        showStatus("User created successfully.", "success");
+
+        document.getElementById("create-name").value = "";
+        document.getElementById("create-phone").value = "";
+        document.getElementById("create-password").value = "";
+
+        if (allUsersData.length > 0) {
+          await runGetAllUsers();
+        }
+      } catch (error) {
+        renderError("create-user-output", error);
+        showStatus(error.message, "error");
+      }
+    }
+
+    function renderMiniInfo(label, value, valueClass = "text-white") {
+      return `
+        <div class="min-w-0 rounded-xl border border-gray-700 bg-gray-900 px-3 py-2">
+          <div class="truncate text-[10px] font-bold uppercase tracking-wide text-gray-500">
+            ${escapeHtml(label)}
+          </div>
+          <div class="mt-1 truncate font-mono text-sm font-bold ${valueClass}" title="${escapeHtml(value)}">
+            ${escapeHtml(value ?? "-")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderOutput(containerId, data, title = "Result") {
+      const container = document.getElementById(containerId);
+
+      container.innerHTML = `
+        <div class="rounded-xl border border-gray-700 bg-gray-900 p-3">
+          <div class="mb-3 font-bold text-white">${escapeHtml(title)}</div>
+          <pre class="max-h-[420px] overflow-auto rounded-lg bg-gray-950 p-3 text-xs text-gray-300">${escapeHtml(JSON.stringify(data, null, 2))}</pre>
+        </div>
+      `;
+    }
+
+    function renderError(containerId, error) {
+      const container = document.getElementById(containerId);
+
+      container.innerHTML = `
+        <div class="rounded-xl border border-red-800 bg-red-900/20 p-3 text-sm text-red-300">
+          ${escapeHtml(error.message || String(error))}
+        </div>
+      `;
+    }
+
+    function getUserPhone(user) {
+      return String(
+        user.numberphone ??
+        user.phone ??
+        user.mobile ??
+        user.mobile_number ??
+        ""
+      ).trim();
+    }
+
+    function getInputValue(id) {
+      return String(
+        document.getElementById(id)?.value ?? ""
+      ).trim();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeJsString(value) {
+      return String(value ?? "")
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'")
+        .replaceAll("\n", "\\n")
+        .replaceAll("\r", "\\r");
+    }
+  </script>
+</body>
+</html>

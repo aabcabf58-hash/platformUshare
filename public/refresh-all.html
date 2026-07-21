@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zouzou App - Filtered Refresh All</title>
+
+    <script src="./theme.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+    <link rel="stylesheet" href="./theme.css">
+</head>
+
+<body class="min-h-screen bg-gray-900 font-sans text-gray-100">
+    <header class="sticky top-0 z-50 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+        <div class="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
+            <div class="flex items-center gap-3">
+                <div class="rounded-lg bg-blue-600 p-2 text-white">
+                    <i class="fa-solid fa-arrows-rotate text-xl"></i>
+                </div>
+
+                <h1 class="text-xl font-bold text-blue-400">
+                    Zouzou App
+                    <span class="text-base font-normal text-white">
+                        | Filtered Refresh All
+                    </span>
+                </h1>
+            </div>
+
+            <nav class="flex flex-wrap items-center justify-center gap-2">
+<button data-theme-toggle type="button" onclick="toggleTheme()" class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600"><i data-theme-icon class="fa-solid fa-sun"></i><span data-theme-label>Light Mode</span></button>
+<a href="./index.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-table"></i>Main Table</a><a href="./groups.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-object-group"></i>Groups</a><a href="./years.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-calendar-days"></i>Years</a><a href="./group-builder.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-layer-group"></i>Group Builder</a><a href="./refresh-all.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition bg-blue-600 text-white"><i class="fa-solid fa-arrows-rotate"></i>Refresh All</a><a href="./admin-center.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-screwdriver-wrench"></i>Admin Center</a><button type="button" onclick="logout()" class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700"><i class="fa-solid fa-right-from-bracket"></i>Logout</button></nav>
+        </div>
+    </header>
+
+    <main class="mx-auto w-full max-w-[1700px] px-3 py-5 sm:px-5">
+        <div
+            id="global-status"
+            class="mb-4 hidden rounded-xl border p-3 text-sm"
+        ></div>
+<section class="mb-4 rounded-2xl border border-blue-800 bg-blue-900/10 p-3"><button id="reload-data-button" type="button" onclick="loadLinesData()" class="rounded-xl bg-gray-700 px-4 py-2 text-sm font-medium text-white"><i class="fa-solid fa-database mr-1"></i>Reload Data</button></section>
+
+        <section class="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
+                <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Total Lines
+                </div>
+                <div id="total-lines-count" class="mt-2 text-3xl font-bold text-white">0</div>
+            </div>
+
+            <div class="rounded-2xl border border-green-800 bg-green-900/20 p-4 shadow-xl">
+                <div class="text-xs font-semibold uppercase tracking-wide text-green-500">
+                    Will Refresh
+                </div>
+                <div id="included-lines-count" class="mt-2 text-3xl font-bold text-green-300">0</div>
+            </div>
+
+            <div class="rounded-2xl border border-red-800 bg-red-900/20 p-4 shadow-xl">
+                <div class="text-xs font-semibold uppercase tracking-wide text-red-500">
+                    Excluded
+                </div>
+                <div id="excluded-lines-count" class="mt-2 text-3xl font-bold text-red-300">0</div>
+            </div>
+
+            <div class="rounded-2xl border border-blue-800 bg-blue-900/20 p-4 shadow-xl">
+                <div class="text-xs font-semibold uppercase tracking-wide text-blue-500">
+                    Completed
+                </div>
+                <div id="completed-lines-count" class="mt-2 text-3xl font-bold text-blue-300">0</div>
+            </div>
+        </section>
+
+        <section class="mb-4 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
+            <div class="mb-4 flex flex-col gap-2 border-b border-gray-700 pb-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-white">
+                        Exclusion Conditions
+                    </h2>
+                    <p class="mt-1 text-sm text-gray-400">
+                        A number will not be refreshed when it matches any enabled condition.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    onclick="resetConditions()"
+                    class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-600"
+                >
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                    Reset Conditions
+                </button>
+            </div>
+
+            <div class="grid gap-3 xl:grid-cols-2">
+                <label class="rounded-xl border border-gray-700 bg-gray-900/50 p-4">
+                    <div class="flex items-start gap-3">
+                        <input
+                            id="exclude-recent-enabled"
+                            type="checkbox"
+                            checked
+                            onchange="applyConditions()"
+                            class="mt-1 h-4 w-4 cursor-pointer rounded accent-blue-500"
+                        >
+
+                        <div class="min-w-0 flex-1">
+                            <div class="font-semibold text-white">
+                                Exclude recently updated numbers
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                Exclude numbers whose Last Update is less than the selected duration.
+                            </p>
+
+                            <div class="mt-3 flex flex-col gap-2 sm:flex-row">
+                                <input
+                                    id="recent-value-input"
+                                    type="number"
+                                    min="1"
+                                    max="100000"
+                                    value="30"
+                                    oninput="applyConditions()"
+                                    class="w-full rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 font-mono text-white outline-none focus:border-blue-500 sm:w-36"
+                                >
+
+                                <select
+                                    id="recent-unit-select"
+                                    onchange="applyConditions()"
+                                    class="w-full cursor-pointer rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 font-semibold text-white outline-none focus:border-blue-500 sm:w-40"
+                                >
+                                    <option value="minutes" selected>Minutes</option>
+                                    <option value="hours">Hours</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+
+                <label class="rounded-xl border border-gray-700 bg-gray-900/50 p-4">
+                    <div class="flex items-start gap-3">
+                        <input
+                            id="include-prefix-enabled"
+                            type="checkbox"
+                            onchange="applyConditions()"
+                            class="mt-1 h-4 w-4 cursor-pointer rounded accent-blue-500"
+                        >
+
+                        <div class="min-w-0 flex-1">
+                            <div class="font-semibold text-white">
+                                Refresh only numbers starting with
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                Only numbers matching one of these prefixes will be refreshed. Enter prefixes separated by commas, spaces, or new lines.
+                            </p>
+
+                            <textarea
+                                id="included-prefixes-input"
+                                rows="2"
+                                oninput="applyConditions()"
+                                placeholder="Example: 03, 701, 76 (only these prefixes will refresh)"
+                                class="mt-3 w-full resize-y rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 font-mono text-white outline-none focus:border-blue-500"
+                            ></textarea>
+                        </div>
+                    </div>
+                </label>
+
+                <label class="rounded-xl border border-gray-700 bg-gray-900/50 p-4">
+                    <div class="flex items-start gap-3">
+                        <input
+                            id="exclude-active-enabled"
+                            type="checkbox"
+                            onchange="applyConditions()"
+                            class="mt-1 h-4 w-4 cursor-pointer rounded accent-green-500"
+                        >
+
+                        <div>
+                            <div class="font-semibold text-green-300">
+                                Exclude Active service numbers
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                Active means the line currently has service data, bundle data, dates, or secondary lines.
+                            </p>
+                        </div>
+                    </div>
+                </label>
+
+                <label class="rounded-xl border border-gray-700 bg-gray-900/50 p-4">
+                    <div class="flex items-start gap-3">
+                        <input
+                            id="exclude-expired-enabled"
+                            type="checkbox"
+                            onchange="applyConditions()"
+                            class="mt-1 h-4 w-4 cursor-pointer rounded accent-red-500"
+                        >
+
+                        <div>
+                            <div class="font-semibold text-red-300">
+                                Exclude Expired service numbers
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                Expired uses the same service-data test used by the main table.
+                            </p>
+                        </div>
+                    </div>
+                </label>
+
+                <label class="rounded-xl border border-gray-700 bg-gray-900/50 p-4">
+                    <div class="font-semibold text-orange-300">
+                        Check result filter
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Choose Failed only to refresh numbers whose latest saved check was unsuccessful.
+                    </p>
+
+                    <select
+                        id="check-result-filter-select"
+                        onchange="applyConditions()"
+                        class="mt-3 w-full cursor-pointer rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 font-semibold text-white outline-none focus:border-orange-500"
+                    >
+                        <option value="all" selected>All check results</option>
+                        <option value="failed">Failed checks only</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="mt-4 grid gap-3 border-t border-gray-700 pt-4 md:grid-cols-2 xl:grid-cols-4">
+                <div>
+                    <label for="concurrency-input" class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">
+                        Concurrent Requests
+                    </label>
+                    <input
+                        id="concurrency-input"
+                        type="number"
+                        min="1"
+                        max="20"
+                        value="10"
+                        class="w-full rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 font-mono text-white outline-none focus:border-blue-500"
+                    >
+                </div>
+
+                <div>
+                    <label for="request-timeout-input" class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">
+                        Timeout Per Request (seconds)
+                    </label>
+                    <input
+                        id="request-timeout-input"
+                        type="number"
+                        min="30"
+                        max="600"
+                        value="120"
+                        class="w-full rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 font-mono text-white outline-none focus:border-blue-500"
+                    >
+                </div>
+
+                <div class="md:col-span-2 xl:col-span-2">
+                    <label for="preview-search-input" class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">
+                        Preview Search
+                    </label>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input
+                            id="preview-search-input"
+                            type="search"
+                            oninput="renderPreviewTable()"
+                            placeholder="Search phone, status, group, or exclusion reason..."
+                            class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2.5 pl-11 pr-4 text-white outline-none focus:border-blue-500"
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 flex flex-col gap-3 border-t border-gray-700 pt-4 lg:flex-row lg:items-center lg:justify-between">
+                <div class="text-sm text-gray-400">
+                    The page refreshes only the green eligible numbers. Each number is sent as a separate request.
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button
+                        id="stop-refresh-button"
+                        type="button"
+                        onclick="requestStopRefresh()"
+                        disabled
+                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        <i class="fa-solid fa-stop"></i>
+                        Stop After Current Batch
+                    </button>
+
+                    <button
+                        id="start-refresh-button"
+                        type="button"
+                        onclick="startFilteredRefresh()"
+                        disabled
+                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-bold text-white shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        <i class="fa-solid fa-play"></i>
+                        Start Filtered Refresh
+                        (<span id="start-refresh-count">0</span>)
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
+            <div class="flex flex-col gap-2 border-b border-gray-700 p-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h2 class="font-bold text-white">Refresh Preview</h2>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Green rows will refresh. When the prefix filter is enabled, only matching prefixes stay green; all others are excluded in red.
+                    </p>
+                </div>
+
+                <div class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-2 text-sm text-gray-300">
+                    Visible rows:
+                    <span id="visible-preview-count" class="font-bold text-blue-300">0</span>
+                </div>
+            </div>
+
+            <div class="max-h-[62vh] overflow-auto">
+                <table class="w-full min-w-[1050px] border-collapse text-left text-sm">
+                    <thead class="sticky top-0 z-10 bg-gray-800 shadow">
+                        <tr class="border-b border-gray-700 text-gray-300">
+                            <th class="p-3">Phone</th>
+                            <th class="p-3">Group</th>
+                            <th class="p-3">Service</th>
+                            <th class="p-3">Last Update</th>
+                            <th class="p-3">Decision</th>
+                            <th class="p-3">Reason</th>
+                            <th class="p-3">Result</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="preview-table-body" class="divide-y divide-gray-700/60">
+                        <tr>
+                            <td colspan="7" class="p-10 text-center text-gray-500">
+                                <i class="fa-solid fa-spinner fa-spin mb-3 text-2xl text-blue-400"></i>
+                                <p>Loading numbers...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script src="./config.js"></script>
+    <script src="./auth.js"></script>
+    <script>
+        requireRole(["admin", "super_admin"]);
+    </script>
+
+    <script>
+        const API_BASE_URL =
+            window.APP_CONFIG?.API_BASE_URL ||
+            'https://abdd-production.up.railway.app';
+
+        const FETCH_DATA_API =
+            `${API_BASE_URL}/api/ushare/getAllnumbers`;
+
+        const REFRESH_ALFA_API =
+            `${API_BASE_URL}/api/ushare/check-number`;
+
+        const PENDING_REFRESH_STORAGE_KEY =
+            'zouzou_pending_refresh_numbers';
+
+        let linesData = [];
+        let evaluatedLines = [];
+        let isRefreshing = false;
+        let stopRequested = false;
+        let completedCount = 0;
+        const refreshResults = new Map();
+
+        function getElement(id) {
+            return document.getElementById(id);
+        }
+
+        async function loadLinesData() {
+            if (isRefreshing) {
+                return;
+            }
+
+            setLoadingState(true);
+            showStatus('Loading all numbers from the server...', 'info');
+
+            try {
+                const response = await fetch(FETCH_DATA_API, { headers: authHeaders() });
+                const result = await readJsonResponse(response);
+
+                if (!response.ok) {
+                    throw new Error(
+                        result.message ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                if (!result.success || !Array.isArray(result.data)) {
+                    throw new Error(
+                        result.message ||
+                        'The server returned an invalid response.'
+                    );
+                }
+
+                linesData = result.data;
+                completedCount = 0;
+                refreshResults.clear();
+                applyConditions();
+
+                showStatus(
+                    `${linesData.length} number(s) loaded. Review the exclusions before starting.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error('Refresh page data loading error:', error);
+                linesData = [];
+                evaluatedLines = [];
+                updateSummary();
+                renderPreviewTable();
+                showStatus(
+                    `Unable to load numbers: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        function setLoadingState(loading) {
+            const button = getElement('reload-data-button');
+
+            if (!button) {
+                return;
+            }
+
+            button.disabled = loading;
+            button.innerHTML = loading
+                ? '<i class="fa-solid fa-spinner fa-spin"></i> Loading...'
+                : '<i class="fa-solid fa-database"></i> Reload Data';
+        }
+
+        function resetConditions() {
+            getElement('exclude-recent-enabled').checked = true;
+            getElement('recent-value-input').value = '30';
+            getElement('recent-unit-select').value = 'minutes';
+            getElement('include-prefix-enabled').checked = false;
+            getElement('included-prefixes-input').value = '';
+            getElement('exclude-active-enabled').checked = false;
+            getElement('exclude-expired-enabled').checked = false;
+            getElement('check-result-filter-select').value = 'all';
+            getElement('concurrency-input').value = '10';
+            getElement('request-timeout-input').value = '120';
+            applyConditions();
+        }
+
+        function applyConditions() {
+            const conditions = readConditions();
+
+            evaluatedLines = linesData.map((line) => {
+                const reasons = getExclusionReasons(line, conditions);
+
+                return {
+                    line,
+                    excluded: reasons.length > 0,
+                    reasons,
+                    serviceStatus: isExpiredServiceLine(line)
+                        ? 'Expired'
+                        : 'Active'
+                };
+            });
+
+            updateSummary();
+            renderPreviewTable();
+        }
+
+        function readConditions() {
+            const recentValue = Math.max(
+                1,
+                Number.parseFloat(
+                    getElement('recent-value-input')?.value || '1'
+                ) || 1
+            );
+
+            const recentUnit =
+                getElement('recent-unit-select')?.value === 'hours'
+                    ? 'hours'
+                    : 'minutes';
+
+            return {
+                excludeRecent:
+                    getElement('exclude-recent-enabled')?.checked === true,
+                recentValue,
+                recentUnit,
+                recentMilliseconds:
+                    recentValue *
+                    (recentUnit === 'hours' ? 3600000 : 60000),
+                includePrefixes:
+                    getElement('include-prefix-enabled')?.checked === true,
+                prefixes: parsePrefixes(
+                    getElement('included-prefixes-input')?.value
+                ),
+                excludeActive:
+                    getElement('exclude-active-enabled')?.checked === true,
+                excludeExpired:
+                    getElement('exclude-expired-enabled')?.checked === true,
+                checkResultFilter:
+                    getElement('check-result-filter-select')?.value === 'failed'
+                        ? 'failed'
+                        : 'all'
+            };
+        }
+
+        function parsePrefixes(value) {
+            return Array.from(
+                new Set(
+                    String(value ?? '')
+                        .split(/[\s,;|]+/)
+                        .map((item) => item.replace(/\D/g, ''))
+                        .filter(Boolean)
+                )
+            );
+        }
+
+        function getExclusionReasons(line, conditions) {
+            const reasons = [];
+            const phone = normalizePhone(line?.numberphone);
+
+            if (conditions.excludeRecent) {
+                const timestamp = getUpdatedAtTimestamp(line);
+
+                if (
+                    timestamp > 0 &&
+                    Math.max(0, Date.now() - timestamp) <
+                        conditions.recentMilliseconds
+                ) {
+                    reasons.push(
+                        `Last Update is less than ${formatConditionDuration(
+                            conditions.recentValue,
+                            conditions.recentUnit
+                        )}`
+                    );
+                }
+            }
+
+            if (conditions.includePrefixes) {
+                if (conditions.prefixes.length === 0) {
+                    reasons.push('No allowed starting prefix was entered');
+                } else {
+                    const matchedPrefix = conditions.prefixes.find(
+                        (prefix) => phone.startsWith(prefix)
+                    );
+
+                    if (!matchedPrefix) {
+                        reasons.push(
+                            `Does not start with: ${conditions.prefixes.join(', ')}`
+                        );
+                    }
+                }
+            }
+
+            const expired = isExpiredServiceLine(line);
+
+            if (conditions.excludeActive && !expired) {
+                reasons.push('Active service');
+            }
+
+            if (conditions.excludeExpired && expired) {
+                reasons.push('Expired service');
+            }
+
+            if (
+                conditions.checkResultFilter === 'failed' &&
+                !isFailedCheckLine(line)
+            ) {
+                reasons.push('Latest check was not failed');
+            }
+
+            if (!phone) {
+                reasons.push('Missing phone number');
+            }
+
+            return reasons;
+        }
+
+        function formatConditionDuration(value, unit) {
+            const numericValue = Number(value);
+            const singular = numericValue === 1;
+
+            if (unit === 'hours') {
+                return `${numericValue} ${singular ? 'hour' : 'hours'}`;
+            }
+
+            return `${numericValue} ${singular ? 'minute' : 'minutes'}`;
+        }
+
+        function updateSummary() {
+            const included = evaluatedLines.filter(
+                (item) => !item.excluded
+            ).length;
+
+            const excluded = evaluatedLines.length - included;
+
+            getElement('total-lines-count').textContent =
+                String(linesData.length);
+            getElement('included-lines-count').textContent =
+                String(included);
+            getElement('excluded-lines-count').textContent =
+                String(excluded);
+            getElement('completed-lines-count').textContent =
+                String(completedCount);
+            getElement('start-refresh-count').textContent =
+                String(included);
+
+            const startButton = getElement('start-refresh-button');
+
+            if (startButton) {
+                startButton.disabled =
+                    isRefreshing || included === 0;
+            }
+        }
+
+        function renderPreviewTable() {
+            const tbody = getElement('preview-table-body');
+            const query = String(
+                getElement('preview-search-input')?.value ?? ''
+            )
+                .trim()
+                .toLowerCase();
+
+            const visibleItems = evaluatedLines.filter((item) => {
+                if (!query) {
+                    return true;
+                }
+
+                const searchableText = [
+                    item.line?.numberphone,
+                    item.line?.group_id,
+                    item.line?.line_type,
+                    item.serviceStatus,
+                    getSavedCheckStatus(item.line),
+                    item.excluded ? 'excluded' : 'will refresh',
+                    item.reasons.join(' '),
+                    refreshResults.get(
+                        normalizePhone(item.line?.numberphone)
+                    )?.message
+                ]
+                    .join(' ')
+                    .toLowerCase();
+
+                return searchableText.includes(query);
+            });
+
+            getElement('visible-preview-count').textContent =
+                String(visibleItems.length);
+
+            if (visibleItems.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="p-10 text-center text-gray-500">
+                            No numbers match the current preview search.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = visibleItems
+                .map((item) => renderPreviewRow(item))
+                .join('');
+        }
+
+        function renderPreviewRow(item) {
+            const line = item.line;
+            const phone = normalizePhone(line?.numberphone);
+            const result = refreshResults.get(phone);
+
+            const rowClass = item.excluded
+                ? 'bg-red-950/15'
+                : 'bg-green-950/10';
+
+            const decisionHtml = item.excluded
+                ? `
+                    <span class="inline-flex items-center gap-1 rounded-lg border border-red-700 bg-red-500/10 px-2.5 py-1 text-xs font-bold text-red-300">
+                        <i class="fa-solid fa-ban"></i>
+                        EXCLUDED
+                    </span>
+                `
+                : `
+                    <span class="inline-flex items-center gap-1 rounded-lg border border-green-700 bg-green-500/10 px-2.5 py-1 text-xs font-bold text-green-300">
+                        <i class="fa-solid fa-check"></i>
+                        WILL REFRESH
+                    </span>
+                `;
+
+            const serviceHtml = item.serviceStatus === 'Active'
+                ? '<span class="font-bold text-green-400">ACTIVE</span>'
+                : '<span class="font-bold text-red-400">EXPIRED</span>';
+
+            const reasonsHtml = item.reasons.length > 0
+                ? item.reasons
+                    .map(
+                        (reason) =>
+                            `<div class="mb-1 rounded-md bg-red-500/10 px-2 py-1 text-xs text-red-300">${escapeHtml(reason)}</div>`
+                    )
+                    .join('')
+                : '<span class="text-xs text-gray-500">No exclusion matched</span>';
+
+            let resultHtml = '<span class="text-xs text-gray-500">Not started</span>';
+
+            if (result?.status === 'running') {
+                resultHtml = `
+                    <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-300">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        Refreshing...
+                    </span>
+                `;
+            } else if (result?.status === 'success') {
+                resultHtml = `
+                    <span class="inline-flex items-center gap-1 text-xs font-bold text-green-300">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Success
+                    </span>
+                `;
+            } else if (result?.status === 'failed') {
+                resultHtml = `
+                    <div class="text-xs font-bold text-red-300">
+                        <i class="fa-solid fa-circle-xmark mr-1"></i>
+                        Failed
+                    </div>
+                    <div class="mt-1 max-w-[300px] break-words text-[11px] text-red-400">
+                        ${escapeHtml(result.message || 'Unknown error')}
+                    </div>
+                `;
+            }
+
+            return `
+                <tr class="${rowClass}" data-phone="${escapeHtml(phone)}">
+                    <td class="p-3 font-mono font-bold text-white">
+                        ${escapeHtml(phone || '-')}
+                    </td>
+                    <td class="p-3 font-mono text-indigo-300">
+                        ${escapeHtml(formatGroupId(line?.group_id))}
+                    </td>
+                    <td class="p-3">${serviceHtml}</td>
+                    <td class="p-3">
+                        <div class="font-semibold text-blue-300">
+                            ${escapeHtml(formatRelativeUpdate(line))}
+                        </div>
+                        <div class="mt-1 text-[10px] text-gray-500">
+                            ${escapeHtml(formatDateTime(getUpdatedAtValue(line)))}
+                        </div>
+                    </td>
+                    <td class="p-3">${decisionHtml}</td>
+                    <td class="p-3">${reasonsHtml}</td>
+                    <td class="p-3">${resultHtml}</td>
+                </tr>
+            `;
+        }
+
+        async function startFilteredRefresh() {
+            if (isRefreshing) {
+                return;
+            }
+
+            const jobs = evaluatedLines
+                .filter((item) => !item.excluded)
+                .map((item) => item.line);
+
+            if (jobs.length === 0) {
+                showStatus(
+                    'No numbers are eligible after applying the exclusion conditions.',
+                    'error'
+                );
+                return;
+            }
+
+            const confirmed = confirm(
+                `Refresh ${jobs.length} eligible number(s)? Excluded numbers will not be sent.`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const concurrency = clampInteger(
+                getElement('concurrency-input')?.value,
+                1,
+                20,
+                10
+            );
+
+            const timeoutSeconds = clampInteger(
+                getElement('request-timeout-input')?.value,
+                30,
+                600,
+                120
+            );
+
+            isRefreshing = true;
+            stopRequested = false;
+            completedCount = 0;
+            refreshResults.clear();
+            setRefreshControls(true);
+            updateSummary();
+            renderPreviewTable();
+
+            let successCount = 0;
+            let failedCount = 0;
+            const failedNumbers = [];
+
+            try {
+                for (
+                    let startIndex = 0;
+                    startIndex < jobs.length;
+                    startIndex += concurrency
+                ) {
+                    if (stopRequested) {
+                        break;
+                    }
+
+                    const batch = jobs.slice(
+                        startIndex,
+                        startIndex + concurrency
+                    );
+
+                    batch.forEach((line) => {
+                        refreshResults.set(
+                            normalizePhone(line.numberphone),
+                            {
+                                status: 'running',
+                                message: ''
+                            }
+                        );
+                    });
+
+                    renderPreviewTable();
+
+                    const batchNumber =
+                        Math.floor(startIndex / concurrency) + 1;
+                    const totalBatches =
+                        Math.ceil(jobs.length / concurrency);
+
+                    showStatus(
+                        `Running batch ${batchNumber}/${totalBatches}. Completed ${completedCount}/${jobs.length}.`,
+                        'info'
+                    );
+
+                    const settledResults = await Promise.allSettled(
+                        batch.map((line) =>
+                            refreshLine(line, timeoutSeconds * 1000)
+                        )
+                    );
+
+                    settledResults.forEach((settled, index) => {
+                        const line = batch[index];
+                        const phone = normalizePhone(line.numberphone);
+                        completedCount += 1;
+
+                        if (
+                            settled.status === 'fulfilled' &&
+                            settled.value.success
+                        ) {
+                            successCount += 1;
+                            refreshResults.set(phone, {
+                                status: 'success',
+                                message: 'Refreshed successfully.'
+                            });
+                        } else {
+                            failedCount += 1;
+                            const message =
+                                settled.status === 'fulfilled'
+                                    ? settled.value.message
+                                    : settled.reason?.message ||
+                                      'Unexpected refresh error.';
+
+                            failedNumbers.push(phone);
+                            refreshResults.set(phone, {
+                                status: 'failed',
+                                message
+                            });
+                        }
+                    });
+
+                    updateSummary();
+                    renderPreviewTable();
+                }
+
+                const stoppedText = stopRequested
+                    ? ' Refresh stopped after the current batch.'
+                    : '';
+
+                const failedText = failedNumbers.length > 0
+                    ? ` Failed numbers: ${failedNumbers.join(', ')}.`
+                    : '';
+
+                showStatus(
+                    `Filtered refresh finished. Successful: ${successCount}, Failed: ${failedCount}, Completed: ${completedCount}/${jobs.length}.${stoppedText}${failedText}`,
+                    failedCount === 0 && !stopRequested
+                        ? 'success'
+                        : failedCount > 0
+                            ? 'error'
+                            : 'info'
+                );
+            } finally {
+                isRefreshing = false;
+                setRefreshControls(false);
+                updateSummary();
+            }
+        }
+
+        function requestStopRefresh() {
+            if (!isRefreshing) {
+                return;
+            }
+
+            stopRequested = true;
+            getElement('stop-refresh-button').disabled = true;
+            showStatus(
+                'Stop requested. The current batch will finish, and no new batch will start.',
+                'info'
+            );
+        }
+
+        function setRefreshControls(running) {
+            getElement('start-refresh-button').disabled = running;
+            getElement('stop-refresh-button').disabled = !running;
+            getElement('reload-data-button').disabled = running;
+
+            [
+                'exclude-recent-enabled',
+                'recent-value-input',
+                'recent-unit-select',
+                'include-prefix-enabled',
+                'included-prefixes-input',
+                'exclude-active-enabled',
+                'exclude-expired-enabled',
+                'check-result-filter-select',
+                'concurrency-input',
+                'request-timeout-input'
+            ].forEach((id) => {
+                const element = getElement(id);
+                if (element) {
+                    element.disabled = running;
+                }
+            });
+        }
+
+        async function refreshLine(line, timeoutMilliseconds) {
+            const phone = normalizePhone(line?.numberphone);
+
+            if (!phone) {
+                return {
+                    success: false,
+                    message: 'Phone number is missing.'
+                };
+            }
+
+            markRefreshPending(phone, true, line);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(
+                () => controller.abort(),
+                timeoutMilliseconds
+            );
+
+            try {
+                const response = await fetch(REFRESH_ALFA_API, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        numberphone: phone
+                    }),
+                    signal: controller.signal
+                });
+
+                const result = await readJsonResponse(response);
+
+                if (!response.ok || result.success === false) {
+                    const message = [
+                        result.message,
+                        result.error
+                    ]
+                        .filter(Boolean)
+                        .join(': ');
+
+                    return {
+                        success: false,
+                        message:
+                            message ||
+                            `Server returned ${response.status}`
+                    };
+                }
+
+                return {
+                    success: true,
+                    message: 'Refreshed successfully.'
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    message:
+                        error.name === 'AbortError'
+                            ? `No response within ${Math.round(
+                                timeoutMilliseconds / 1000
+                            )} seconds.`
+                            : error.message
+                };
+            } finally {
+                clearTimeout(timeoutId);
+                markRefreshPending(phone, false);
+            }
+        }
+
+        function loadPendingRefreshes() {
+            try {
+                const raw = localStorage.getItem(
+                    PENDING_REFRESH_STORAGE_KEY
+                );
+                const parsed = raw ? JSON.parse(raw) : {};
+
+                return parsed && typeof parsed === 'object'
+                    ? parsed
+                    : {};
+            } catch {
+                return {};
+            }
+        }
+
+        function markRefreshPending(phone, pending, line = null) {
+            const normalizedPhone = normalizePhone(phone);
+
+            if (!normalizedPhone) {
+                return;
+            }
+
+            const pendingRefreshes = loadPendingRefreshes();
+
+            if (pending) {
+                pendingRefreshes[normalizedPhone] = {
+                    startedAt: Date.now(),
+                    previousUpdatedAt: String(
+                        getUpdatedAtValue(line) ?? ''
+                    )
+                };
+            } else {
+                delete pendingRefreshes[normalizedPhone];
+            }
+
+            try {
+                localStorage.setItem(
+                    PENDING_REFRESH_STORAGE_KEY,
+                    JSON.stringify(pendingRefreshes)
+                );
+            } catch (error) {
+                console.error(
+                    'Unable to save pending refresh state:',
+                    error
+                );
+            }
+        }
+
+        function getSavedCheckStatus(line) {
+            const rawStatus =
+                line?.check_status ??
+                line?.checkStatus ??
+                line?.last_check_status ??
+                line?.lastCheckStatus ??
+                line?.refresh_status ??
+                line?.refreshStatus ??
+                line?.status_check ??
+                line?.statusCheck ??
+                '';
+
+            if (line?.check_success === false || line?.checkSuccess === false) {
+                return 'failed';
+            }
+
+            if (line?.last_check_success === false || line?.lastCheckSuccess === false) {
+                return 'failed';
+            }
+
+            if (line?.check_error || line?.last_check_error || line?.checkError || line?.lastCheckError) {
+                return 'failed';
+            }
+
+            return String(rawStatus).trim().toLowerCase();
+        }
+
+        function isFailedCheckLine(line) {
+            const status = getSavedCheckStatus(line);
+
+            return [
+                'failed',
+                'fail',
+                'error',
+                'unsuccessful',
+                'false'
+            ].includes(status);
+        }
+
+        function isNullServiceValue(value) {
+            if (value === null || value === undefined) {
+                return true;
+            }
+
+            const text = String(value).trim().toLowerCase();
+
+            return (
+                text === '' ||
+                text === 'null' ||
+                text === 'undefined' ||
+                text === '-' ||
+                text === 'n/a'
+            );
+        }
+
+        function isEmptyNumericServiceValue(value) {
+            if (isNullServiceValue(value)) {
+                return true;
+            }
+
+            const text = String(value)
+                .trim()
+                .toLowerCase()
+                .replace(/\s*gb\s*/g, '');
+
+            const numericValue = Number.parseFloat(text);
+
+            return (
+                Number.isFinite(numericValue) &&
+                numericValue === 0
+            );
+        }
+
+        function getSecondaryData(line, index) {
+            return {
+                number:
+                    line?.[`secondary_number_${index}`] ??
+                    line?.[`secondary${index}_number`] ??
+                    line?.[`secondary_${index}_number`] ??
+                    '',
+                used:
+                    line?.[`secondary_used_${index}`] ??
+                    line?.[`secondary${index}_used`] ??
+                    line?.[`secondary_${index}_used`] ??
+                    0,
+                total:
+                    line?.[`secondary_total_${index}`] ??
+                    line?.[`secondary${index}_total`] ??
+                    line?.[`secondary_${index}_total`] ??
+                    0,
+                status:
+                    line?.[`secondary_status_${index}`] ??
+                    line?.[`secondary${index}_status`] ??
+                    line?.[`secondary_${index}_status`] ??
+                    ''
+            };
+        }
+
+        function isSecondaryServiceEmpty(line, index) {
+            const secondary = getSecondaryData(line, index);
+
+            return (
+                isNullServiceValue(secondary.number) &&
+                isNullServiceValue(secondary.status) &&
+                isEmptyNumericServiceValue(secondary.used) &&
+                isEmptyNumericServiceValue(secondary.total)
+            );
+        }
+
+        function isExpiredServiceLine(line) {
+            const primaryUserIsEmpty = [
+                line?.primary_user,
+                line?.main_bundle_total
+            ].every(isEmptyNumericServiceValue);
+
+            const totalSharedBundleIsEmpty = [
+                line?.total_shared_bundle,
+                line?.total_bundle_used,
+                line?.total_bundle_total,
+                line?.total_shared_bundle_used,
+                line?.total_shared_bundle_total,
+                line?.total_shared_used,
+                line?.total_shared_total,
+                line?.shared_bundle_used,
+                line?.shared_bundle_total,
+                line?.total_shared_bundle_consumption,
+                line?.total_bundle_consumption,
+                line?.shared_bundle_consumption
+            ].every(isEmptyNumericServiceValue);
+
+            const serviceDatesAreEmpty =
+                isNullServiceValue(line?.subscription_date) &&
+                isNullServiceValue(line?.service_validity);
+
+            const secondaryLinesAreEmpty =
+                isSecondaryServiceEmpty(line, 1) &&
+                isSecondaryServiceEmpty(line, 2) &&
+                isSecondaryServiceEmpty(line, 3);
+
+            return (
+                primaryUserIsEmpty &&
+                totalSharedBundleIsEmpty &&
+                serviceDatesAreEmpty &&
+                secondaryLinesAreEmpty
+            );
+        }
+
+        function getUpdatedAtValue(line) {
+            return (
+                line?.updated_at ??
+                line?.updatedAt ??
+                line?.last_updated_at ??
+                line?.lastUpdatedAt ??
+                null
+            );
+        }
+
+        function getUpdatedAtTimestamp(line) {
+            const value = getUpdatedAtValue(line);
+
+            if (!value) {
+                return 0;
+            }
+
+            const date = new Date(value);
+
+            return Number.isNaN(date.getTime())
+                ? 0
+                : date.getTime();
+        }
+
+        function formatRelativeUpdate(line) {
+            const timestamp = getUpdatedAtTimestamp(line);
+
+            if (!timestamp) {
+                return 'Never updated';
+            }
+
+            const minutes = Math.max(
+                0,
+                Math.floor((Date.now() - timestamp) / 60000)
+            );
+
+            if (minutes < 1) {
+                return 'Just now';
+            }
+
+            if (minutes < 60) {
+                return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+            }
+
+            const hours = Math.floor(minutes / 60);
+
+            if (hours < 24) {
+                return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+            }
+
+            const days = Math.floor(hours / 24);
+            return `${days} day${days === 1 ? '' : 's'} ago`;
+        }
+
+        function formatDateTime(value) {
+            if (!value) {
+                return '-';
+            }
+
+            const date = new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return String(value);
+            }
+
+            return date.toLocaleString('en-GB', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatGroupId(value) {
+            const text = String(value ?? '').trim();
+
+            return (
+                text &&
+                text !== '0' &&
+                text.toLowerCase() !== 'null'
+            )
+                ? text
+                : '-';
+        }
+
+        function normalizePhone(value) {
+            return String(value ?? '')
+                .trim()
+                .replace(/\s+/g, '')
+                .replace(/-/g, '');
+        }
+
+        function clampInteger(value, min, max, fallback) {
+            const parsed = Number.parseInt(value, 10);
+
+            if (!Number.isFinite(parsed)) {
+                return fallback;
+            }
+
+            return Math.min(max, Math.max(min, parsed));
+        }
+
+        async function readJsonResponse(response) {
+            const text = await response.text();
+
+            if (!text) {
+                return {};
+            }
+
+            try {
+                return JSON.parse(text);
+            } catch {
+                throw new Error(
+                    'The server returned a non-JSON response.'
+                );
+            }
+        }
+
+        function showStatus(message, type) {
+            const status = getElement('global-status');
+
+            status.className =
+                'mb-4 block rounded-xl border p-3 text-sm';
+
+            if (type === 'success') {
+                status.classList.add(
+                    'border-green-500',
+                    'bg-green-900/40',
+                    'text-green-300'
+                );
+            } else if (type === 'info') {
+                status.classList.add(
+                    'border-blue-500',
+                    'bg-blue-900/40',
+                    'text-blue-300'
+                );
+            } else {
+                status.classList.add(
+                    'border-red-500',
+                    'bg-red-900/40',
+                    'text-red-300'
+                );
+            }
+
+            status.textContent = message;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        window.addEventListener('load', loadLinesData);
+    </script>
+</body>
+</html>

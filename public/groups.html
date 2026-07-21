@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zouzou App - Groups</title>
+
+    <script src="./theme.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+    <link rel="stylesheet" href="./theme.css">
+
+    <style>
+        /* Server response box: light-mode colors */
+        html.light-mode #global-status[data-status-type="info"] {
+            background-color: #eff6ff !important;
+            border-color: #2563eb !important;
+            color: #1e3a8a !important;
+        }
+
+        html.light-mode #global-status[data-status-type="success"] {
+            background-color: #f0fdf4 !important;
+            border-color: #16a34a !important;
+            color: #14532d !important;
+        }
+
+        html.light-mode #global-status[data-status-type="error"] {
+            background-color: #fef2f2 !important;
+            border-color: #dc2626 !important;
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gray-900 font-sans text-gray-100">
+    <header class="sticky top-0 z-50 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+        <div class="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
+            <div class="flex items-center gap-3">
+                <div class="rounded-lg bg-indigo-600 p-2 text-white">
+                    <i class="fa-solid fa-object-group text-xl"></i>
+                </div>
+
+                <h1 class="text-xl font-bold text-indigo-400">
+                    Zouzou App
+                    <span class="text-base font-normal text-white">
+                        | Groups View
+                    </span>
+                </h1>
+            </div>
+
+            <nav class="flex flex-wrap items-center justify-center gap-2">
+<button data-theme-toggle type="button" onclick="toggleTheme()" class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600"><i data-theme-icon class="fa-solid fa-sun"></i><span data-theme-label>Light Mode</span></button>
+<a href="./index.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-table"></i>Main Table</a><a href="./groups.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition bg-indigo-600 text-white"><i class="fa-solid fa-object-group"></i>Groups</a><a href="./years.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-calendar-days"></i>Years</a><a href="./group-builder.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-layer-group"></i>Group Builder</a><a href="./refresh-all.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-arrows-rotate"></i>Refresh All</a><a href="./admin-center.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-screwdriver-wrench"></i>Admin Center</a><button type="button" onclick="logout()" class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700"><i class="fa-solid fa-right-from-bracket"></i>Logout</button></nav>
+        </div>
+    </header>
+
+    <main class="w-full max-w-none px-2 py-4 sm:px-4">
+        <section class="sticky top-[88px] z-40 mb-4 grid grid-cols-1 gap-3 bg-gray-900/95 py-2 backdrop-blur lg:grid-cols-2">
+            <div
+                id="global-status"
+                class="col-span-full hidden w-full whitespace-pre-wrap break-words rounded-xl border p-3 text-sm shadow-xl"
+            ></div>
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:divide-x sm:divide-gray-700">
+                    <div class="sm:pr-4">
+                        <div class="text-xs font-semibold uppercase text-gray-500">Total Groups</div>
+                        <div id="total-groups" class="mt-1 text-3xl font-bold text-indigo-300">0</div>
+                    </div>
+
+                    <div class="sm:px-4">
+                        <div class="text-xs font-semibold uppercase text-gray-500">Total Lines</div>
+                        <div id="total-lines" class="mt-1 text-3xl font-bold text-blue-300">0</div>
+                    </div>
+
+                    <div class="min-w-0 sm:pl-4">
+                        <label for="group-name-search" class="text-xs font-semibold uppercase text-gray-500">
+                            Group Name
+                        </label>
+
+                        <div class="relative mt-1">
+                            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400"></i>
+                            <input
+                                id="group-name-search"
+                                type="search"
+                                oninput="searchGroupNames()"
+                                onkeydown="handleGroupNameSearchKeydown(event)"
+                                placeholder="Search group names..."
+                                autocomplete="off"
+                                class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2.5 pl-9 pr-9 text-sm font-semibold text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                title="Search inside the group-name list"
+                            >
+                            <button
+                                id="clear-group-name-search"
+                                type="button"
+                                onclick="clearGroupNameSearch()"
+                                class="absolute right-2 top-1/2 hidden h-7 w-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg text-gray-400 transition hover:bg-gray-700 hover:text-white"
+                                title="Clear group-name search"
+                            >
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
+                        </div>
+
+                        <div class="relative mt-2">
+                            <i class="fa-solid fa-object-group pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400"></i>
+                            <select
+                                id="group-name-filter"
+                                onchange="applyGroupNameFilter()"
+                                class="w-full cursor-pointer appearance-none rounded-xl border border-gray-600 bg-gray-900 py-2.5 pl-9 pr-9 text-sm font-semibold text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                title="Show all groups or only one selected group"
+                            >
+                                <option value="">All Groups</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500"></i>
+                        </div>
+
+                        <div id="group-name-search-result" class="mt-1 truncate text-[10px] text-indigo-300">
+                            All group names are available.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-3 shadow-xl">
+                <div class="flex gap-2"><div class="relative flex-1"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i><input id="group-search-input" type="search" oninput="applyGroupSearch()" placeholder="Search phone number, group ID, type, balance, validity, or any value..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-11 pr-4 text-sm text-white outline-none focus:border-indigo-500"></div><button id="clear-group-search-button" type="button" onclick="clearGroupSearch()" disabled class="rounded-xl bg-gray-700 px-4 py-3 text-sm text-white disabled:opacity-50"><i class="fa-solid fa-xmark"></i></button></div>
+                <div class="mt-2 text-xs text-indigo-300">Showing <span id="visible-groups-count" class="font-bold">0</span> / <span id="all-groups-count" class="font-bold">0</span> groups</div>
+            </div>
+        </section>
+        <section class="mb-4 rounded-2xl border border-indigo-800 bg-indigo-900/10 p-3 shadow-xl">
+            <div class="mb-2 text-xs font-bold uppercase text-indigo-400">Group Management Actions</div>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="loadGroupsData()" class="rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white"><i class="fa-solid fa-rotate mr-1"></i>Refresh Groups</button>
+                <button id="copy-all-groups-button" type="button" onclick="copyAllGroups()" disabled class="rounded-xl bg-purple-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"><i class="fa-solid fa-copy mr-1"></i>Copy All</button>
+                <button id="move-selected-lines-button" type="button" onclick="moveSelectedGroupLines()" disabled class="rounded-xl bg-amber-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"><i class="fa-solid fa-right-left mr-1"></i>Move Selected (<span id="selected-group-lines-count">0</span>)</button>
+                <button id="remove-selected-lines-button" type="button" onclick="removeSelectedGroupLines()" disabled class="rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"><i class="fa-solid fa-user-minus mr-1"></i>Remove Selected</button>
+                <button type="button" onclick="clearSelectedGroupLines()" class="rounded-xl bg-gray-700 px-3 py-2 text-sm font-medium text-white"><i class="fa-solid fa-square-minus mr-1"></i>Clear Selection</button>
+            </div>
+        </section>
+
+        <section
+            id="groups-grid"
+            class="space-y-4"
+        >
+            <div class="col-span-full rounded-2xl border border-gray-700 bg-gray-800 p-10 text-center text-gray-500">
+                <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-indigo-400"></i>
+                <p>Loading groups...</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="./config.js"></script>
+    <script src="./auth.js"></script>
+    <script>
+        if (typeof requireRole === 'function') {
+            requireRole(['admin', 'super_admin']);
+        }
+    </script>
+
+    <script>
+        const API_BASE_URL =
+            window.APP_CONFIG?.API_BASE_URL ||
+            'https://abdd-production.up.railway.app';
+
+        const FETCH_DATA_API =
+            `${API_BASE_URL}/api/ushare/getAllnumbers`;
+
+        const REFRESH_ALFA_API =
+            `${API_BASE_URL}/api/ushare/check-number`;
+
+        const EDIT_GROUP_API =
+            `${API_BASE_URL}/api/ushare/editGroup`;
+
+        const CREATE_YEAR_API =
+            `${API_BASE_URL}/api/ushare/createYears`;
+
+        function getJsonHeaders() {
+            if (typeof authHeaders === 'function') {
+                return authHeaders();
+            }
+
+            return {
+                'Content-Type': 'application/json'
+            };
+        }
+
+        let linesData = [];
+        let groupedLines = [];
+        let groupSearchQuery = '';
+        let selectedGroupName = '';
+        let groupNameSearchQuery = '';
+        const selectedGroupLinePhones = new Set();
+
+        const GROUP_REFRESH_CONCURRENCY = 4;
+        const GROUP_REFRESH_TIMEOUT_MS = 300000;
+
+        async function loadGroupsData() {
+            showStatus('Loading groups from the server...', 'info');
+
+            const grid = document.getElementById('groups-grid');
+
+            grid.innerHTML = `
+                <div class="col-span-full rounded-2xl border border-gray-700 bg-gray-800 p-10 text-center text-gray-500">
+                    <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-indigo-400"></i>
+                    <p>Loading groups...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(
+                    FETCH_DATA_API,
+                    { headers: getJsonHeaders() }
+                );
+                const result = await readJsonResponse(response);
+
+                if (!response.ok) {
+                    throw new Error(
+                        result.message ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                if (!result.success || !Array.isArray(result.data)) {
+                    throw new Error(
+                        result.message ||
+                        'The server returned an invalid response.'
+                    );
+                }
+
+                linesData = result.data;
+                buildGroups(linesData);
+                renderGroups();
+
+                showStatus(
+                    `${groupedLines.length} group(s) loaded successfully.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error('Groups loading error:', error);
+
+                groupedLines = [];
+                selectedGroupName = '';
+                updateGroupNameFilterOptions();
+                updateSummary();
+
+                grid.innerHTML = `
+                    <div class="col-span-full rounded-2xl border border-red-800 bg-red-900/20 p-10 text-center text-red-300">
+                        <i class="fa-solid fa-triangle-exclamation mb-3 text-3xl"></i>
+                        <p class="font-semibold">Unable to load groups.</p>
+                        <p class="mt-2 text-sm">${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+
+                showStatus(
+                    `Unable to load groups: ${error.message}`,
+                    'error'
+                );
+            }
+        }
+
+        function buildGroups(data) {
+            const groupsMap = new Map();
+
+            const assignedLines = data.filter((line) => {
+                const groupId = String(
+                    line.group_id ?? ''
+                ).trim();
+
+                return (
+                    groupId !== '' &&
+                    groupId !== '0' &&
+                    groupId.toLowerCase() !== 'null'
+                );
+            });
+
+            assignedLines.forEach((line) => {
+                const groupKey = String(
+                    line.group_id
+                ).trim();
+
+                if (!groupsMap.has(groupKey)) {
+                    groupsMap.set(groupKey, []);
+                }
+
+                groupsMap.get(groupKey).push(line);
+            });
+
+            linesData = assignedLines;
+
+            groupedLines = Array.from(groupsMap.entries())
+                .sort(([firstGroup], [secondGroup]) => {
+                    return compareValues(
+                        getGroupSortValue(firstGroup),
+                        getGroupSortValue(secondGroup)
+                    );
+                })
+                .map(([groupId, groupLines]) => {
+                    return [
+                        groupId,
+                        [...groupLines].sort((firstLine, secondLine) => {
+                            return (
+                                getNumber(firstLine.validity) -
+                                getNumber(secondLine.validity)
+                            );
+                        })
+                    ];
+                });
+
+            updateGroupNameFilterOptions();
+            updateSummary();
+        }
+
+        function updateGroupNameFilterOptions() {
+            const select = document.getElementById('group-name-filter');
+            const resultText = document.getElementById('group-name-search-result');
+
+            if (!select) {
+                return;
+            }
+
+            const selectedStillExists = groupedLines.some(
+                ([groupId]) => String(groupId) === selectedGroupName
+            );
+
+            if (selectedGroupName && !selectedStillExists) {
+                selectedGroupName = '';
+            }
+
+            const cleanSearch = String(groupNameSearchQuery ?? '')
+                .trim()
+                .toLowerCase();
+
+            const matchingGroups = cleanSearch
+                ? groupedLines.filter(([groupId]) =>
+                    String(groupId).toLowerCase().includes(cleanSearch)
+                )
+                : groupedLines;
+
+            select.innerHTML = '';
+
+            const allOption = document.createElement('option');
+            allOption.value = '';
+            allOption.textContent = `All Groups (${groupedLines.length})`;
+            select.appendChild(allOption);
+
+            if (
+                selectedGroupName &&
+                !matchingGroups.some(
+                    ([groupId]) => String(groupId) === selectedGroupName
+                )
+            ) {
+                const selectedGroup = groupedLines.find(
+                    ([groupId]) => String(groupId) === selectedGroupName
+                );
+
+                if (selectedGroup) {
+                    const selectedOption = document.createElement('option');
+                    selectedOption.value = String(selectedGroup[0]);
+                    selectedOption.textContent = `${selectedGroup[0]} (${selectedGroup[1].length}) — Selected`;
+                    select.appendChild(selectedOption);
+                }
+            }
+
+            matchingGroups.forEach(([groupId, groupLinesList]) => {
+                const option = document.createElement('option');
+                option.value = String(groupId);
+                option.textContent = `${groupId} (${groupLinesList.length})`;
+                select.appendChild(option);
+            });
+
+            if (cleanSearch && matchingGroups.length === 0) {
+                const noResultsOption = document.createElement('option');
+                noResultsOption.value = '__NO_RESULTS__';
+                noResultsOption.textContent = 'No matching group names';
+                noResultsOption.disabled = true;
+                select.appendChild(noResultsOption);
+            }
+
+            select.value = selectedGroupName;
+
+            if (resultText) {
+                resultText.textContent = cleanSearch
+                    ? `${matchingGroups.length} matching group(s) from ${groupedLines.length}.`
+                    : `${groupedLines.length} group name(s) available.`;
+            }
+        }
+
+        function searchGroupNames() {
+            const input = document.getElementById('group-name-search');
+            const clearButton = document.getElementById('clear-group-name-search');
+
+            groupNameSearchQuery = String(input?.value ?? '').trim();
+
+            if (clearButton) {
+                clearButton.classList.toggle(
+                    'hidden',
+                    groupNameSearchQuery.length === 0
+                );
+                clearButton.classList.toggle(
+                    'flex',
+                    groupNameSearchQuery.length > 0
+                );
+            }
+
+            updateGroupNameFilterOptions();
+        }
+
+        function clearGroupNameSearch() {
+            const input = document.getElementById('group-name-search');
+
+            groupNameSearchQuery = '';
+
+            if (input) {
+                input.value = '';
+            }
+
+            searchGroupNames();
+            input?.focus();
+        }
+
+        function handleGroupNameSearchKeydown(event) {
+            if (event.key !== 'Enter') {
+                return;
+            }
+
+            const select = document.getElementById('group-name-filter');
+            const firstMatchingOption = Array.from(select?.options ?? [])
+                .find((option) =>
+                    !option.disabled &&
+                    option.value &&
+                    option.value !== '__NO_RESULTS__'
+                );
+
+            if (!firstMatchingOption) {
+                return;
+            }
+
+            event.preventDefault();
+            select.value = firstMatchingOption.value;
+            applyGroupNameFilter();
+        }
+
+        function applyGroupNameFilter() {
+            const select = document.getElementById('group-name-filter');
+            const selectedValue = String(select?.value ?? '').trim();
+
+            if (selectedValue === '__NO_RESULTS__') {
+                return;
+            }
+
+            selectedGroupName = selectedValue;
+            renderGroups();
+        }
+
+        function getVisibleGroups() {
+            let visibleGroups = groupedLines;
+
+            if (selectedGroupName) {
+                visibleGroups = visibleGroups.filter(
+                    ([groupId]) => String(groupId) === selectedGroupName
+                );
+            }
+
+            if (!groupSearchQuery) {
+                return visibleGroups;
+            }
+
+            return visibleGroups.filter(
+                ([groupId, groupLines]) => {
+                    const searchableText = [
+                        groupId,
+                        ...groupLines.map(
+                            (line) => JSON.stringify(line)
+                        )
+                    ]
+                        .join(' ')
+                        .toLowerCase();
+
+                    return searchableText.includes(
+                        groupSearchQuery
+                    );
+                }
+            );
+        }
+
+        function applyGroupSearch() {
+            const input =
+                document.getElementById(
+                    'group-search-input'
+                );
+
+            const clearButton =
+                document.getElementById(
+                    'clear-group-search-button'
+                );
+
+            groupSearchQuery =
+                String(input?.value ?? '')
+                    .trim()
+                    .toLowerCase();
+
+            if (clearButton) {
+                clearButton.disabled =
+                    groupSearchQuery.length === 0;
+            }
+
+            renderGroups();
+        }
+
+        function clearGroupSearch() {
+            const input =
+                document.getElementById(
+                    'group-search-input'
+                );
+
+            if (input) {
+                input.value = '';
+            }
+
+            groupSearchQuery = '';
+            renderGroups();
+            input?.focus();
+        }
+
+        function renderGroups() {
+            const grid = document.getElementById('groups-grid');
+            const visibleGroups = getVisibleGroups();
+
+            const visibleCount =
+                document.getElementById(
+                    'visible-groups-count'
+                );
+
+            const allCount =
+                document.getElementById(
+                    'all-groups-count'
+                );
+
+            if (visibleCount) {
+                visibleCount.textContent =
+                    String(visibleGroups.length);
+            }
+
+            if (allCount) {
+                allCount.textContent =
+                    String(groupedLines.length);
+            }
+
+            if (groupedLines.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full rounded-xl border border-gray-700 bg-gray-800 p-8 text-center text-gray-500">
+                        <i class="fa-solid fa-object-group mb-3 text-3xl text-indigo-400"></i>
+                        <p>No groups are available.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (visibleGroups.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full rounded-xl border border-gray-700 bg-gray-800 p-8 text-center text-gray-500">
+                        <i class="fa-solid fa-magnifying-glass mb-3 text-3xl text-indigo-400"></i>
+                        <p class="font-semibold">No group matches your search.</p>
+                        <p class="mt-1 text-xs">
+                            Search checks every value inside every line.
+                        </p>
+                    </div>
+                `;
+
+                document.getElementById(
+                    'copy-all-groups-button'
+                ).disabled = true;
+
+                return;
+            }
+
+            grid.innerHTML = visibleGroups
+                .map(([groupId, groupLines], groupIndex) => {
+                    return `
+                        <article class="w-full overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-lg">
+                            <div class="border-b border-gray-700 bg-gray-700/40 p-3">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="min-w-0">
+                                        <div class="text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                                            Group ID
+                                        </div>
+
+                                        <div class="mt-0.5 truncate font-mono text-xl font-bold text-indigo-300" title="${escapeHtml(groupId)}">
+                                            ${escapeHtml(groupId)}
+                                        </div>
+                                    </div>
+
+                                    <div class="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                                        <button
+                                            type="button"
+                                            onclick="refreshGroup('${escapeJsString(groupId)}', this)"
+                                            class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg bg-blue-600 px-2 text-[11px] font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                            title="Refresh only this group"
+                                        >
+                                            <i class="fa-solid fa-rotate"></i>
+                                            Refresh
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onclick="renameGroup(${groupIndex}, this)"
+                                            class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg bg-amber-600 px-2 text-[11px] font-semibold text-white transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                            title="Change group name or ID"
+                                        >
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                            Edit
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onclick="copyGroup(${groupIndex})"
+                                            class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg bg-purple-600 px-2 text-[11px] font-semibold text-white transition hover:bg-purple-700"
+                                            title="Copy Group"
+                                        >
+                                            <i class="fa-solid fa-copy"></i>
+                                            Copy
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            onclick="deleteGroup(${groupIndex}, this)"
+                                            class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg bg-red-600 px-2 text-[11px] font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                            title="Delete Group"
+                                        >
+                                            <i class="fa-solid fa-trash"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="mt-2 grid grid-cols-2 gap-2">
+                                    <div class="flex items-center justify-between rounded-lg bg-gray-900/50 px-2.5 py-1.5">
+                                        <span class="text-[10px] uppercase text-gray-500">
+                                            Lines
+                                        </span>
+
+                                        <span class="font-mono text-sm font-bold text-white">
+                                            ${groupLines.length}
+                                        </span>
+                                    </div>
+
+                                    <div class="flex items-center justify-between rounded-lg bg-gray-900/50 px-2.5 py-1.5">
+                                        <span class="text-[10px] uppercase text-gray-500">
+                                            Type
+                                        </span>
+
+                                        <span class="font-mono text-xs font-bold text-green-300">
+                                            YEAR ACTION
+                                        </span>
+                                    </div>
+                                </div>
+
+                                ${renderYearControls(groupId, groupLines)}
+                            </div>
+
+                            <div class="max-h-[72vh] space-y-1 overflow-y-auto p-2">
+                                ${groupLines
+                                    .map(
+                                        (line) =>
+                                            renderLineCard(
+                                                line,
+                                                groupId
+                                            )
+                                    )
+                                    .join('')}
+                            </div>
+                        </article>
+                    `;
+                })
+                .join('');
+
+            document.getElementById(
+                'copy-all-groups-button'
+            ).disabled = visibleGroups.length === 0;
+            updateSelectedGroupLinesUi();
+        }
+
+        function renderLineCard(line, groupId) {
+            const emergencyActive =
+                isEmergencyActive(line.emergency_status);
+
+            const subscriptionDate =
+                formatDate(line.subscription_date);
+
+            const expiryDate =
+                formatDate(line.service_validity);
+
+            const updatedAt =
+                formatDateTime(getUpdatedAtValue(line));
+
+            const primaryUser =
+                formatEmptyValue(line.primary_user);
+
+            const totalSharedBundle =
+                formatTotalSharedBundle(line);
+
+            const ushareNote =
+                getUShareNote(line);
+
+            return `
+                <div class="rounded-lg border border-gray-700 bg-gray-900/50 p-2 shadow">
+                    <div class="grid grid-cols-1 gap-2 xl:grid-cols-[28px_190px_1fr_auto] xl:items-start">
+                        <label class="flex h-7 items-center justify-center"><input type="checkbox" data-group-line-select value="${escapeHtml(line.numberphone || '')}" onchange="toggleGroupLineSelection('${escapeJsString(line.numberphone || '')}', this.checked)" ${selectedGroupLinePhones.has(String(line.numberphone || '')) ? 'checked' : ''} class="h-4 w-4 cursor-pointer accent-indigo-500"></label>
+                        <div class="min-w-0">
+                            <div
+                                class="whitespace-nowrap overflow-hidden text-ellipsis font-mono text-sm font-bold text-white"
+                                title="${escapeHtml(line.numberphone || '-')}"
+                            >
+                                ${escapeHtml(line.numberphone || '-')}
+                            </div>
+
+                            <div class="mt-1 flex flex-nowrap gap-1 overflow-hidden">
+                                <span class="shrink-0 rounded border border-blue-700 bg-blue-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-blue-300">
+                                    ${escapeHtml(line.line_type ?? '-')}
+                                </span>
+
+                                <span class="min-w-0 truncate rounded border border-indigo-700 bg-indigo-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-indigo-300" title="${escapeHtml(groupId)}">
+                                    ${escapeHtml(groupId)}
+                                </span>
+
+                                <span class="shrink-0 rounded border ${
+                                    emergencyActive
+                                        ? 'border-green-700 bg-green-500/10 text-green-400'
+                                        : 'border-red-700 bg-red-500/10 text-red-400'
+                                } px-1.5 py-0.5 text-[9px] font-semibold">
+                                    ${emergencyActive ? 'EMG ON' : 'EMG OFF'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-8">
+                            ${renderMiniInfo('Balance', `$${formatNumber(line.balance)}`, 'text-green-400')}
+                            ${renderMiniInfo('Validity', `${line.validity ?? 0} days`, 'text-orange-300')}
+                            ${renderMiniInfo('Primary', primaryUser, 'text-purple-300')}
+                            ${renderMiniInfo('Bundle', totalSharedBundle, 'text-cyan-300')}
+                            ${renderMiniInfo('Sub Date', subscriptionDate, 'text-blue-300')}
+                            ${renderMiniInfo('Service', expiryDate, 'text-orange-300')}
+                            ${renderMiniInfo('Update', updatedAt, 'text-gray-300')}
+                            ${renderMiniInfo('Note', ushareNote, 'text-amber-300')}
+                        </div>
+
+                        <div class="flex shrink-0 items-center gap-1">
+                            <button
+                                type="button"
+                                onclick="refreshSingleLine(
+                                    '${escapeJsString(line.numberphone || '')}',
+                                    this
+                                )"
+                                class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded border border-blue-700 bg-blue-500/10 text-blue-300 transition hover:bg-blue-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                                title="Refresh only this number"
+                            >
+                                <i class="fa-solid fa-rotate text-[10px]"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="changeLineGroup(
+                                    '${escapeJsString(line.numberphone || '')}',
+                                    '${escapeJsString(groupId)}',
+                                    this
+                                )"
+                                class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded border border-amber-700 bg-amber-500/10 text-amber-300 transition hover:bg-amber-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                                title="Change this number's group"
+                            >
+                                <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="copyLine('${escapeJsString(line.numberphone || '')}')"
+                                class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded border border-purple-700 bg-purple-500/10 text-purple-300 transition hover:bg-purple-600 hover:text-white"
+                                title="Copy phone number and balance"
+                            >
+                                <i class="fa-solid fa-copy text-[10px]"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="removeLineFromGroup(
+                                    '${escapeJsString(line.numberphone || '')}',
+                                    '${escapeJsString(groupId)}',
+                                    this
+                                )"
+                                class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded border border-red-700 bg-red-500/10 text-red-300 transition hover:bg-red-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                                title="Remove only this number from the group"
+                            >
+                                <i class="fa-solid fa-user-minus text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-1 grid grid-cols-1 gap-1 md:grid-cols-3">
+                        ${renderSecondaryMini(line, 1)}
+                        ${renderSecondaryMini(line, 2)}
+                        ${renderSecondaryMini(line, 3)}
+                    </div>
+                </div>
+            `;
+        }
+
+
+        function updateSelectedGroupLinesUi() {
+            const count = selectedGroupLinePhones.size;
+            const countEl = document.getElementById('selected-group-lines-count');
+            if (countEl) countEl.textContent = String(count);
+            ['move-selected-lines-button','remove-selected-lines-button'].forEach((id)=>{ const el=document.getElementById(id); if(el) el.disabled=count===0; });
+        }
+        function toggleGroupLineSelection(phone, checked) { const value=String(phone||'').trim(); if(!value)return; checked?selectedGroupLinePhones.add(value):selectedGroupLinePhones.delete(value); updateSelectedGroupLinesUi(); }
+        function clearSelectedGroupLines(){ selectedGroupLinePhones.clear(); document.querySelectorAll('[data-group-line-select]').forEach(el=>el.checked=false); updateSelectedGroupLinesUi(); }
+        async function updateSelectedLinesGroup(groupId){
+            const numberphones=[...selectedGroupLinePhones]; if(!numberphones.length)return;
+            const response=await fetch(EDIT_GROUP_API,{method:'PUT',headers:getJsonHeaders(),body:JSON.stringify({numberphones,group_id:groupId})});
+            const result=await readJsonResponse(response); if(!response.ok||result.success===false) throw new Error(result.message||result.error||`Server returned ${response.status}`);
+            clearSelectedGroupLines(); await loadGroupsData();
+        }
+        async function moveSelectedGroupLines(){ const target=prompt('Enter the target group ID or group name:'); if(target===null||!String(target).trim())return; try{ await updateSelectedLinesGroup(String(target).trim()); showStatus('Selected numbers moved successfully.','success'); }catch(error){showStatus(error.message,'error');} }
+        async function removeSelectedGroupLines(){ if(!confirm(`Remove ${selectedGroupLinePhones.size} selected number(s) from their groups?`))return; try{ await updateSelectedLinesGroup(0); showStatus('Selected numbers removed from groups.','success'); }catch(error){showStatus(error.message,'error');} }
+
+        function renderMiniInfo(label, value, valueClass = 'text-white') {
+            return `
+                <div class="min-w-0 rounded border border-gray-700 bg-gray-800 px-2 py-1">
+                    <div class="truncate text-[8px] font-semibold uppercase tracking-wide text-gray-500">
+                        ${escapeHtml(label)}
+                    </div>
+                    <div class="truncate font-mono text-[11px] font-bold leading-4 ${valueClass}" title="${escapeHtml(value)}">
+                        ${escapeHtml(formatEmptyValue(value))}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSecondaryMini(line, index) {
+            const secondary = getSecondaryData(line, index);
+            const hasNumber = !isEmptyValue(secondary.number);
+            const hasStatus = !isEmptyValue(secondary.status);
+            const used = formatNumber(secondary.used);
+            const total = formatNumber(secondary.total);
+
+            return `
+                <div class="min-w-0 rounded border border-gray-700 bg-gray-800 px-2 py-1">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="min-w-0">
+                            <div class="text-[8px] font-semibold uppercase tracking-wide text-gray-500">
+                                Secondary ${index}
+                            </div>
+
+                            <div class="whitespace-nowrap overflow-hidden text-ellipsis font-mono text-[11px] font-bold leading-4 ${hasNumber ? 'text-indigo-300' : 'text-gray-500'}" title="${escapeHtml(secondary.number || '-')}">
+                                ${escapeHtml(hasNumber ? secondary.number : '-')}
+                            </div>
+                        </div>
+
+                        <div class="shrink-0 text-right">
+                            <div class="font-mono text-[10px] leading-4 text-orange-300">
+                                ${escapeHtml(used)} / ${escapeHtml(total)} GB
+                            </div>
+
+                            <span class="rounded border ${
+                                hasStatus
+                                    ? 'border-green-700 bg-green-500/10 text-green-300'
+                                    : 'border-gray-700 bg-gray-900/60 text-gray-500'
+                            } px-1 py-0.5 text-[9px] font-semibold">
+                                ${escapeHtml(hasStatus ? secondary.status : '-')}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getSecondaryData(line, index) {
+            return {
+                number:
+                    line[`secondary_number_${index}`] ??
+                    line[`secondary${index}_number`] ??
+                    line[`secondary_${index}_number`] ??
+                    '',
+
+                used:
+                    line[`secondary_used_${index}`] ??
+                    line[`secondary${index}_used`] ??
+                    line[`secondary_${index}_used`] ??
+                    0,
+
+                total:
+                    line[`secondary_total_${index}`] ??
+                    line[`secondary${index}_total`] ??
+                    line[`secondary_${index}_total`] ??
+                    0,
+
+                status:
+                    line[`secondary_status_${index}`] ??
+                    line[`secondary${index}_status`] ??
+                    line[`secondary_${index}_status`] ??
+                    ''
+            };
+        }
+
+        function isEmptyValue(value) {
+            const text = String(value ?? '').trim().toLowerCase();
+            return (
+                text === '' ||
+                text === 'null' ||
+                text === 'undefined' ||
+                text === '-'
+            );
+        }
+
+        function formatEmptyValue(value) {
+            return isEmptyValue(value) ? '-' : String(value).trim();
+        }
+
+        function getUpdatedAtValue(line) {
+            return (
+                line?.updated_at ??
+                line?.updatedAt ??
+                line?.last_updated_at ??
+                line?.lastUpdate ??
+                null
+            );
+        }
+
+        function formatDateTime(value) {
+            if (isEmptyValue(value)) {
+                return '-';
+            }
+
+            const date = new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return String(value);
+            }
+
+            return date.toLocaleString();
+        }
+
+        function formatTotalSharedBundle(line) {
+            const direct =
+                line.total_shared_bundle_consumption ??
+                line.total_bundle_consumption ??
+                line.shared_bundle_consumption ??
+                line.total_shared_bundle;
+
+            if (!isEmptyValue(direct)) {
+                return String(direct);
+            }
+
+            const used =
+                line.total_bundle_used ??
+                line.total_shared_bundle_used ??
+                line.total_shared_used ??
+                line.shared_bundle_used;
+
+            const total =
+                line.total_bundle_total ??
+                line.total_shared_bundle_total ??
+                line.total_shared_total ??
+                line.shared_bundle_total ??
+                line.main_bundle_total;
+
+            if (isEmptyValue(used) && isEmptyValue(total)) {
+                return '-';
+            }
+
+            return `${formatNumber(used)} / ${formatNumber(total)} GB`;
+        }
+
+        function getUShareNote(line) {
+            return formatEmptyValue(
+                line.ushare_note ??
+                line.note_ushare ??
+                line.noteUshare ??
+                line.ushareNote ??
+                line.note ??
+                '-'
+            );
+        }
+
+        function updateSummary() {
+            document.getElementById('total-groups').textContent =
+                String(groupedLines.length);
+
+            document.getElementById('total-lines').textContent =
+                String(linesData.length);
+
+            document.getElementById(
+                'copy-all-groups-button'
+            ).disabled = linesData.length === 0;
+
+            const allCount =
+                document.getElementById(
+                    'all-groups-count'
+                );
+
+            if (allCount) {
+                allCount.textContent =
+                    String(groupedLines.length);
+            }
+        }
+
+        function formatCopyLine(line) {
+            return `${line.numberphone} - $${formatNumber(line.balance)}`;
+        }
+
+        async function copyLine(phone) {
+            const line = linesData.find(
+                (item) =>
+                    String(item.numberphone) === String(phone)
+            );
+
+            if (!line) {
+                showStatus('Line not found.', 'error');
+                return;
+            }
+
+            const copied = await copyText(
+                formatCopyLine(line)
+            );
+
+            showStatus(
+                copied
+                    ? `${line.numberphone} was copied.`
+                    : 'Unable to copy the line.',
+                copied ? 'success' : 'error'
+            );
+        }
+
+        async function copyGroup(groupIndex) {
+            const group =
+                getVisibleGroups()[groupIndex];
+
+            if (!group) {
+                showStatus('Group not found.', 'error');
+                return;
+            }
+
+            const [groupId, groupLines] = group;
+
+            const copied = await copyText(
+                groupLines.map(formatCopyLine).join('\n')
+            );
+
+            showStatus(
+                copied
+                    ? `Group ${groupId} was copied.`
+                    : 'Unable to copy the group.',
+                copied ? 'success' : 'error'
+            );
+        }
+
+        function findGroupById(groupId) {
+            return groupedLines.find(
+                ([currentGroupId]) =>
+                    String(currentGroupId) ===
+                    String(groupId)
+            );
+        }
+
+
+        function getGroupDomKey(groupId) {
+            const text = String(groupId ?? '');
+            let hash = 0;
+
+            for (let index = 0; index < text.length; index += 1) {
+                hash = ((hash << 5) - hash) + text.charCodeAt(index);
+                hash |= 0;
+            }
+
+            return `group_${Math.abs(hash)}`;
+        }
+
+        function renderYearControls(groupId, groupLines) {
+            const key = getGroupDomKey(groupId);
+
+            return `
+                <div class="mt-2 rounded-xl border border-green-800 bg-green-900/20 p-2">
+                    <div class="mb-2 flex items-center justify-between gap-2">
+                        <div>
+                            <div class="text-[10px] font-bold uppercase tracking-wide text-green-400">
+                                Create Year
+                            </div>
+                            <div class="mt-0.5 text-xs text-gray-300">
+                                No frontend lock. The server will validate the group rules.
+                            </div>
+                        </div>
+
+                        <button
+                            id="create-year-${key}"
+                            type="button"
+                            onclick="createYearFromGroup('${escapeJsString(groupId)}', this)"
+                            class="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-green-600 px-3 py-2 text-[11px] font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                            title="Create a year from this group"
+                        >
+                            <i class="fa-solid fa-calendar-plus"></i>
+                            Create Year
+                        </button>
+                    </div>
+
+                    <div class="text-[10px] text-gray-500">
+                        Current lines: ${groupLines.length}. Any rejected condition will come from the server.
+                    </div>
+                </div>
+            `;
+        }
+
+        async function createYearFromGroup(groupId, buttonElement) {
+            const cleanGroupId = String(groupId ?? '').trim();
+
+            if (!cleanGroupId) {
+                showStatus(
+                    'Group ID is missing.',
+                    'error'
+                );
+                return;
+            }
+
+            const giveBalance = prompt(
+                `Enter give_balance / split text for year from group "${cleanGroupId}":`,
+                ''
+            );
+
+            if (giveBalance === null) {
+                return;
+            }
+
+            const originalHtml = buttonElement?.innerHTML || '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Creating...
+                `;
+            }
+
+            showStatus(
+                `Sending group ${cleanGroupId} to server to create year...`,
+                'info'
+            );
+
+            try {
+                const response = await fetch(
+                    CREATE_YEAR_API,
+                    {
+                        method: 'POST',
+                        headers: getJsonHeaders(),
+                        body: JSON.stringify({
+                            group_id: cleanGroupId,
+                            source_group_id: cleanGroupId,
+                            give_balance: String(giveBalance).trim()
+                        })
+                    }
+                );
+
+                const result = await readJsonResponse(response);
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(
+                        result.message ||
+                        result.error ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                showStatus(
+                    `Year request succeeded for group ${cleanGroupId}.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error('Create year error:', error);
+
+                showStatus(
+                    `Unable to create year from ${cleanGroupId}: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                if (buttonElement && buttonElement.isConnected) {
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        async function ensureGroupCanBeEdited(groupId) {
+            return true;
+        }
+
+        async function changeLineGroup(
+            numberphone,
+            currentGroupId,
+            buttonElement
+        ) {
+            const cleanPhone =
+                String(numberphone ?? '').trim();
+
+            const cleanCurrentGroupId =
+                String(currentGroupId ?? '').trim();
+
+            if (!cleanPhone) {
+                showStatus(
+                    'Phone number was not found.',
+                    'error'
+                );
+                return;
+            }
+
+            const enteredGroupId = prompt(
+                `Enter the new group name or ID for ${cleanPhone}:`,
+                cleanCurrentGroupId
+            );
+
+            if (enteredGroupId === null) {
+                return;
+            }
+
+            const newGroupId =
+                String(enteredGroupId).trim();
+
+            if (
+                !newGroupId ||
+                newGroupId === '0' ||
+                newGroupId.toLowerCase() === 'null'
+            ) {
+                showStatus(
+                    'Please enter a valid group name or ID.',
+                    'error'
+                );
+                return;
+            }
+
+            if (newGroupId === cleanCurrentGroupId) {
+                showStatus(
+                    `${cleanPhone} is already in group ${newGroupId}.`,
+                    'info'
+                );
+                return;
+            }
+
+            if (
+                !(await ensureGroupCanBeEdited(cleanCurrentGroupId)) ||
+                !(await ensureGroupCanBeEdited(newGroupId))
+            ) {
+                return;
+            }
+
+            const existingGroup = groupedLines.find(
+                ([groupId]) =>
+                    String(groupId) === newGroupId
+            );
+
+            const confirmed = confirm(
+                existingGroup
+                    ? `Move ${cleanPhone} from group "${cleanCurrentGroupId}" to the existing group "${newGroupId}"?`
+                    : `Move ${cleanPhone} from group "${cleanCurrentGroupId}" to the new group "${newGroupId}"?`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const originalHtml =
+                buttonElement?.innerHTML || '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin text-[10px]"></i>
+                `;
+            }
+
+            showStatus(
+                `Moving ${cleanPhone} to group ${newGroupId}...`,
+                'info'
+            );
+
+            try {
+                const response = await fetch(
+                    EDIT_GROUP_API,
+                    {
+                        method: 'PUT',
+                        headers: getJsonHeaders(),
+                        body: JSON.stringify({
+                            numberphones: [cleanPhone],
+                            group_id: newGroupId
+                        })
+                    }
+                );
+
+                const result =
+                    await readJsonResponse(response);
+
+                if (
+                    !response.ok ||
+                    result.success === false
+                ) {
+                    throw new Error(
+                        result.message ||
+                        result.error ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                await loadGroupsData();
+
+                showStatus(
+                    `${cleanPhone} was moved from group ${cleanCurrentGroupId} to ${newGroupId}.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error(
+                    'Change line group error:',
+                    error
+                );
+
+                showStatus(
+                    `Unable to change the group for ${cleanPhone}: ${error.message}`,
+                    'error'
+                );
+
+                if (
+                    buttonElement &&
+                    buttonElement.isConnected
+                ) {
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        async function removeLineFromGroup(
+            numberphone,
+            groupId,
+            buttonElement
+        ) {
+            const cleanPhone =
+                String(numberphone ?? '').trim();
+
+            if (!cleanPhone) {
+                showStatus(
+                    'Phone number was not found.',
+                    'error'
+                );
+                return;
+            }
+
+            if (!(await ensureGroupCanBeEdited(groupId))) {
+                return;
+            }
+
+            const confirmed = confirm(
+                `Remove ${cleanPhone} from group "${groupId}" only?`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const originalHtml =
+                buttonElement?.innerHTML || '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin text-[10px]"></i>
+                `;
+            }
+
+            showStatus(
+                `Removing ${cleanPhone} from group ${groupId}...`,
+                'info'
+            );
+
+            try {
+                const response = await fetch(
+                    EDIT_GROUP_API,
+                    {
+                        method: 'PUT',
+                        headers: getJsonHeaders(),
+                        body: JSON.stringify({
+                            numberphones: [
+                                cleanPhone
+                            ],
+                            group_id: '0'
+                        })
+                    }
+                );
+
+                const result =
+                    await readJsonResponse(
+                        response
+                    );
+
+                if (
+                    !response.ok ||
+                    result.success === false
+                ) {
+                    throw new Error(
+                        result.message ||
+                        result.error ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                await loadGroupsData();
+
+                showStatus(
+                    `${cleanPhone} was removed from group ${groupId}.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error(
+                    'Remove line from group error:',
+                    error
+                );
+
+                showStatus(
+                    `Unable to remove ${cleanPhone}: ${error.message}`,
+                    'error'
+                );
+
+                if (
+                    buttonElement &&
+                    buttonElement.isConnected
+                ) {
+                    buttonElement.disabled =
+                        false;
+
+                    buttonElement.innerHTML =
+                        originalHtml;
+                }
+            }
+        }
+
+        async function refreshAlfaLine(line) {
+            const numberphone =
+                String(
+                    line?.numberphone ?? ''
+                ).trim();
+
+            if (!numberphone) {
+                throw new Error(
+                    'Phone number is missing.'
+                );
+            }
+
+            const controller =
+                new AbortController();
+
+            const timeoutId =
+                setTimeout(
+                    () =>
+                        controller.abort(),
+                    GROUP_REFRESH_TIMEOUT_MS
+                );
+
+            try {
+                const response = await fetch(
+                    REFRESH_ALFA_API,
+                    {
+                        method: 'POST',
+                        headers: getJsonHeaders(),
+                        body: JSON.stringify({
+                            numberphone
+                        }),
+                        signal:
+                            controller.signal
+                    }
+                );
+
+                const result =
+                    await readJsonResponse(
+                        response
+                    );
+
+                if (
+                    !response.ok ||
+                    result.success === false
+                ) {
+                    throw new Error(
+                        [
+                            result.message,
+                            result.error
+                        ]
+                            .filter(Boolean)
+                            .join(': ') ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                return {
+                    success: true,
+                    numberphone
+                };
+            } catch (error) {
+                if (
+                    error.name ===
+                    'AbortError'
+                ) {
+                    throw new Error(
+                        `Refresh timed out for ${numberphone}.`
+                    );
+                }
+
+                throw error;
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        async function refreshSingleLine(
+            numberphone,
+            buttonElement
+        ) {
+            const cleanPhone =
+                String(numberphone ?? '').trim();
+
+            const line = linesData.find(
+                (item) =>
+                    String(
+                        item?.numberphone ?? ''
+                    ).trim() === cleanPhone
+            );
+
+            if (!line) {
+                showStatus(
+                    `Number ${cleanPhone} was not found.`,
+                    'error'
+                );
+                return;
+            }
+
+            const originalHtml =
+                buttonElement?.innerHTML || '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin text-[10px]"></i>
+                `;
+            }
+
+            showStatus(
+                `Refreshing ${cleanPhone}...`,
+                'info'
+            );
+
+            try {
+                await refreshAlfaLine(line);
+                await loadGroupsData();
+
+                showStatus(
+                    `${cleanPhone} refreshed successfully.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error(
+                    `Single number refresh error for ${cleanPhone}:`,
+                    error
+                );
+
+                showStatus(
+                    `Unable to refresh ${cleanPhone}: ${error.message}`,
+                    'error'
+                );
+
+                if (
+                    buttonElement &&
+                    buttonElement.isConnected
+                ) {
+                    buttonElement.disabled =
+                        false;
+
+                    buttonElement.innerHTML =
+                        originalHtml;
+                }
+            }
+        }
+
+        async function refreshGroup(
+            groupId,
+            buttonElement
+        ) {
+            const group =
+                findGroupById(groupId);
+
+            if (!group) {
+                showStatus(
+                    `Group ${groupId} was not found.`,
+                    'error'
+                );
+                return;
+            }
+
+            const [, groupLines] =
+                group;
+
+            if (
+                !Array.isArray(groupLines) ||
+                groupLines.length === 0
+            ) {
+                showStatus(
+                    `Group ${groupId} has no numbers.`,
+                    'error'
+                );
+                return;
+            }
+
+            const confirmed = confirm(
+                `Refresh all ${groupLines.length} number(s) in group "${groupId}"?`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const originalHtml =
+                buttonElement?.innerHTML || '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+            }
+
+            let completed = 0;
+            let successCount = 0;
+            const failedLines = [];
+
+            try {
+                for (
+                    let startIndex = 0;
+                    startIndex <
+                    groupLines.length;
+                    startIndex +=
+                        GROUP_REFRESH_CONCURRENCY
+                ) {
+                    const batch =
+                        groupLines.slice(
+                            startIndex,
+                            startIndex +
+                                GROUP_REFRESH_CONCURRENCY
+                        );
+
+                    if (buttonElement) {
+                        buttonElement.innerHTML = `
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            ${completed}/${groupLines.length}
+                        `;
+                    }
+
+                    showStatus(
+                        `Refreshing group ${groupId}: ${completed}/${groupLines.length} completed...`,
+                        'info'
+                    );
+
+                    const batchResults =
+                        await Promise.allSettled(
+                            batch.map(
+                                refreshAlfaLine
+                            )
+                        );
+
+                    batchResults.forEach(
+                        (
+                            refreshResult,
+                            resultIndex
+                        ) => {
+                            const line =
+                                batch[
+                                    resultIndex
+                                ];
+
+                            completed += 1;
+
+                            if (
+                                refreshResult.status ===
+                                'fulfilled'
+                            ) {
+                                successCount += 1;
+                            } else {
+                                failedLines.push({
+                                    numberphone:
+                                        String(
+                                            line?.numberphone ??
+                                            '-'
+                                        ),
+                                    message:
+                                        refreshResult
+                                            .reason
+                                            ?.message ||
+                                        'Unknown error'
+                                });
+                            }
+                        }
+                    );
+                }
+
+                await loadGroupsData();
+
+                if (
+                    failedLines.length === 0
+                ) {
+                    showStatus(
+                        `Group ${groupId} refreshed successfully: ${successCount}/${groupLines.length}.`,
+                        'success'
+                    );
+                } else {
+                    console.error(
+                        `Group ${groupId} refresh failures:`,
+                        failedLines
+                    );
+
+                    showStatus(
+                        `Group ${groupId}: ${successCount} refreshed, ${failedLines.length} failed. Check the console for details.`,
+                        successCount > 0
+                            ? 'info'
+                            : 'error'
+                    );
+                }
+            } catch (error) {
+                console.error(
+                    'Refresh group error:',
+                    error
+                );
+
+                showStatus(
+                    `Unable to refresh group ${groupId}: ${error.message}`,
+                    'error'
+                );
+
+                if (
+                    buttonElement &&
+                    buttonElement.isConnected
+                ) {
+                    buttonElement.disabled =
+                        false;
+
+                    buttonElement.innerHTML =
+                        originalHtml;
+                }
+            }
+        }
+
+        async function renameGroup(groupIndex, buttonElement) {
+            const group =
+                getVisibleGroups()[groupIndex];
+
+            if (!group) {
+                showStatus('Group not found.', 'error');
+                return;
+            }
+
+            const [currentGroupId, groupLines] = group;
+            const numberphones = groupLines
+                .map((line) =>
+                    String(line?.numberphone ?? '').trim()
+                )
+                .filter(Boolean);
+
+            if (numberphones.length === 0) {
+                showStatus(
+                    `Group ${currentGroupId} has no valid phone numbers.`,
+                    'error'
+                );
+                return;
+            }
+
+            if (!(await ensureGroupCanBeEdited(currentGroupId))) {
+                return;
+            }
+
+            const enteredGroupId = prompt(
+                `Enter the new name or ID for group "${currentGroupId}":`,
+                currentGroupId
+            );
+
+            if (enteredGroupId === null) {
+                return;
+            }
+
+            const newGroupId = String(enteredGroupId).trim();
+
+            if (
+                !newGroupId ||
+                newGroupId === '0' ||
+                newGroupId.toLowerCase() === 'null'
+            ) {
+                showStatus(
+                    'Please enter a valid group name or ID.',
+                    'error'
+                );
+                return;
+            }
+
+            if (newGroupId === String(currentGroupId)) {
+                showStatus(
+                    'The new group name is the same as the current one.',
+                    'info'
+                );
+                return;
+            }
+
+            if (!(await ensureGroupCanBeEdited(newGroupId))) {
+                return;
+            }
+
+            const existingGroup = groupedLines.find(
+                ([groupId]) =>
+                    String(groupId) === newGroupId
+            );
+
+            if (existingGroup) {
+                const mergeConfirmed = confirm(
+                    `Group "${newGroupId}" already exists. Move these ${numberphones.length} line(s) into it?`
+                );
+
+                if (!mergeConfirmed) {
+                    return;
+                }
+            } else {
+                const renameConfirmed = confirm(
+                    `Change group "${currentGroupId}" to "${newGroupId}" for ${numberphones.length} line(s)?`
+                );
+
+                if (!renameConfirmed) {
+                    return;
+                }
+            }
+
+            const originalHtml =
+                buttonElement?.innerHTML || '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Saving...
+                `;
+            }
+
+            showStatus(
+                `Changing group ${currentGroupId} to ${newGroupId}...`,
+                'info'
+            );
+
+            try {
+                const response = await fetch(
+                    EDIT_GROUP_API,
+                    {
+                        method: 'PUT',
+                        headers: getJsonHeaders(),
+                        body: JSON.stringify({
+                            numberphones,
+                            group_id: newGroupId
+                        })
+                    }
+                );
+
+                const result =
+                    await readJsonResponse(response);
+
+                if (
+                    !response.ok ||
+                    result.success === false
+                ) {
+                    throw new Error(
+                        result.message ||
+                        result.error ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                await loadGroupsData();
+
+                showStatus(
+                    existingGroup
+                        ? `Group ${currentGroupId} was merged into ${newGroupId}.`
+                        : `Group ${currentGroupId} was changed to ${newGroupId}.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error('Rename group error:', error);
+
+                showStatus(
+                    `Unable to change group ${currentGroupId}: ${error.message}`,
+                    'error'
+                );
+
+                if (
+                    buttonElement &&
+                    buttonElement.isConnected
+                ) {
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        async function deleteGroup(groupIndex, buttonElement) {
+            const group =
+                getVisibleGroups()[groupIndex];
+
+            if (!group) {
+                showStatus('Group not found.', 'error');
+                return;
+            }
+
+            const [groupId, groupLines] = group;
+            const numberphones = groupLines.map(
+                (line) => String(line.numberphone)
+            );
+
+            if (!(await ensureGroupCanBeEdited(groupId))) {
+                return;
+            }
+
+            const confirmed = confirm(
+                `Delete group "${groupId}" and remove ${numberphones.length} line(s) from it?`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const originalHtml = buttonElement.innerHTML;
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Deleting...
+            `;
+
+            showStatus(
+                `Deleting group ${groupId}...`,
+                'info'
+            );
+
+            try {
+                const response = await fetch(
+                    EDIT_GROUP_API,
+                    {
+                        method: 'PUT',
+                        headers: getJsonHeaders(),
+                        body: JSON.stringify({
+                            numberphones,
+                            group_id: '0'
+                        })
+                    }
+                );
+
+                const result =
+                    await readJsonResponse(response);
+
+                if (
+                    !response.ok ||
+                    result.success === false
+                ) {
+                    throw new Error(
+                        result.message ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                showStatus(
+                    `Group ${groupId} was deleted successfully.`,
+                    'success'
+                );
+
+                await loadGroupsData();
+            } catch (error) {
+                console.error('Delete group error:', error);
+
+                showStatus(
+                    `Unable to delete group ${groupId}: ${error.message}`,
+                    'error'
+                );
+
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = originalHtml;
+            }
+        }
+
+        async function copyAllGroups() {
+            const visibleGroups = getVisibleGroups();
+
+            if (visibleGroups.length === 0) {
+                showStatus('There are no visible groups to copy.', 'error');
+                return;
+            }
+
+            const text = visibleGroups
+                .map(([groupId, groupLines]) => {
+                    const title = `Group ${groupId}`;
+
+                    return [
+                        title,
+                        ...groupLines.map(formatCopyLine)
+                    ].join('\n');
+                })
+                .join('\n\n');
+
+            const copied = await copyText(text);
+
+            showStatus(
+                copied
+                    ? 'All groups were copied.'
+                    : 'Unable to copy all groups.',
+                copied ? 'success' : 'error'
+            );
+        }
+
+        async function copyText(text) {
+            try {
+                if (
+                    navigator.clipboard &&
+                    window.isSecureContext
+                ) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                }
+
+                const textarea =
+                    document.createElement('textarea');
+
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+
+                const copied =
+                    document.execCommand('copy');
+
+                textarea.remove();
+                return copied;
+            } catch (error) {
+                console.error('Copy error:', error);
+                return false;
+            }
+        }
+
+        function isEmergencyActive(value) {
+            return (
+                value === true ||
+                value === 1 ||
+                value === '1' ||
+                String(value).toLowerCase() === 'true'
+            );
+        }
+
+        function formatDate(value) {
+            if (!value) {
+                return '-';
+            }
+
+            const dateOnlyMatch = String(value).match(
+                /^(\d{4})-(\d{2})-(\d{2})/
+            );
+
+            if (dateOnlyMatch) {
+                const [, year, month, day] = dateOnlyMatch;
+
+                return `${Number(day)}/${Number(month)}/${year}`;
+            }
+
+            const date = new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return String(value);
+            }
+
+            return [
+                date.getDate(),
+                date.getMonth() + 1,
+                date.getFullYear()
+            ].join('/');
+        }
+
+        function formatNumber(value) {
+            const number = Number.parseFloat(value);
+
+            if (!Number.isFinite(number)) {
+                return '0';
+            }
+
+            return Number.isInteger(number)
+                ? String(number)
+                : number.toFixed(2);
+        }
+
+        function getNumber(value) {
+            const number = Number.parseFloat(value);
+            return Number.isFinite(number) ? number : 0;
+        }
+
+        function getGroupSortValue(value) {
+            const number = Number(value);
+
+            if (
+                value !== null &&
+                value !== '' &&
+                Number.isFinite(number)
+            ) {
+                return number;
+            }
+
+            return String(value ?? '').toLowerCase();
+        }
+
+        function compareValues(firstValue, secondValue) {
+            if (
+                typeof firstValue === 'number' &&
+                typeof secondValue === 'number'
+            ) {
+                return firstValue - secondValue;
+            }
+
+            return String(firstValue ?? '').localeCompare(
+                String(secondValue ?? ''),
+                'en',
+                {
+                    numeric: true,
+                    sensitivity: 'base'
+                }
+            );
+        }
+
+        async function readJsonResponse(response) {
+            const text = await response.text();
+
+            if (!text) {
+                return {};
+            }
+
+            try {
+                return JSON.parse(text);
+            } catch {
+                throw new Error(
+                    'The server returned a non-JSON response.'
+                );
+            }
+        }
+
+        function showStatus(message, type) {
+            const status =
+                document.getElementById('global-status');
+
+            status.className =
+                'col-span-full block w-full whitespace-pre-wrap break-words rounded-xl border p-3 text-sm shadow-xl';
+
+            status.dataset.statusType =
+                type === 'info' || type === 'success'
+                    ? type
+                    : 'error';
+
+            if (type === 'info') {
+                status.classList.add(
+                    'border-blue-500',
+                    'bg-blue-900/40',
+                    'text-blue-300'
+                );
+            } else if (type === 'success') {
+                status.classList.add(
+                    'border-green-500',
+                    'bg-green-900/40',
+                    'text-green-300'
+                );
+            } else {
+                status.classList.add(
+                    'border-red-500',
+                    'bg-red-900/40',
+                    'text-red-300'
+                );
+            }
+
+            status.textContent = message;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function escapeJsString(value) {
+            return String(value ?? '')
+                .replaceAll('\\', '\\\\')
+                .replaceAll("'", "\\'");
+        }
+
+        window.addEventListener('load', loadGroupsData);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zouzou App - Years</title>
+
+    <script src="./theme.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+    <link rel="stylesheet" href="./theme.css">
+</head>
+
+<body class="min-h-screen bg-gray-900 font-sans text-gray-100">
+    <header class="sticky top-0 z-50 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+        <div class="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
+            <div class="flex items-center gap-3">
+                <div class="rounded-lg bg-green-600 p-2 text-white">
+                    <i class="fa-solid fa-calendar-days text-xl"></i>
+                </div>
+
+                <h1 class="text-xl font-bold text-green-400">
+                    Zouzou App
+                    <span class="text-base font-normal text-white">
+                        | Years View
+                    </span>
+                </h1>
+            </div>
+
+            <nav class="flex flex-wrap items-center justify-center gap-2">
+<button data-theme-toggle type="button" onclick="toggleTheme()" class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600"><i data-theme-icon class="fa-solid fa-sun"></i><span data-theme-label>Light Mode</span></button>
+<a href="./index.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-table"></i>Main Table</a><a href="./groups.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-object-group"></i>Groups</a><a href="./years.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition bg-green-600 text-white"><i class="fa-solid fa-calendar-days"></i>Years</a><a href="./group-builder.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-layer-group"></i>Group Builder</a><a href="./refresh-all.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-arrows-rotate"></i>Refresh All</a><a href="./admin-center.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-screwdriver-wrench"></i>Admin Center</a><button type="button" onclick="logout()" class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700"><i class="fa-solid fa-right-from-bracket"></i>Logout</button></nav>
+        </div>
+    </header>
+
+    <main class="w-full max-w-none px-2 py-4 sm:px-4">
+        <div
+            id="global-status"
+            class="mb-4 hidden rounded-xl border p-3 text-sm"
+        ></div>
+
+        <section class="sticky top-[88px] z-40 mb-4 grid grid-cols-1 gap-3 bg-gray-900/95 py-2 backdrop-blur lg:grid-cols-2">
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl"><div class="grid grid-cols-3 divide-x divide-gray-700"><div class="pr-3"><div class="text-[10px] font-semibold uppercase text-gray-500">Total Years</div><div id="total-years" class="mt-1 text-3xl font-bold text-green-300">0</div></div><div class="px-3"><div class="text-[10px] font-semibold uppercase text-gray-500">Visible</div><div id="visible-years" class="mt-1 text-3xl font-bold text-blue-300">0</div></div><div class="pl-3"><div class="text-[10px] font-semibold uppercase text-gray-500">Numbers</div><div id="total-year-numbers" class="mt-1 text-3xl font-bold text-indigo-300">0</div></div></div></div>
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-3 shadow-xl">
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input id="years-search-input" type="search" oninput="applyYearsSearch()" placeholder="Search year, group, status, split text, phone number, balance, or total received..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-11 pr-4 text-sm text-white outline-none focus:border-green-500">
+                    </div>
+                    <button id="clear-years-search-button" type="button" onclick="clearYearsSearch()" disabled class="rounded-xl bg-gray-700 px-4 py-3 text-white disabled:opacity-50"><i class="fa-solid fa-xmark"></i></button>
+                    <button type="button" onclick="loadYearsData()" class="rounded-xl bg-blue-600 px-4 py-3 text-white"><i class="fa-solid fa-rotate"></i></button>
+                </div>
+
+                <div class="mt-3 grid grid-cols-1 gap-2 border-t border-gray-700 pt-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <div>
+                        <label for="created-from-filter" class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                            Created From
+                        </label>
+                        <input id="created-from-filter" type="datetime-local" onchange="applyYearsSearch()" class="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-xs text-white outline-none focus:border-green-500">
+                    </div>
+
+                    <div>
+                        <label for="created-to-filter" class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                            Created To
+                        </label>
+                        <input id="created-to-filter" type="datetime-local" onchange="applyYearsSearch()" class="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-xs text-white outline-none focus:border-green-500">
+                    </div>
+
+                    <div>
+                        <label for="checked-from-filter" class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                            Checked From
+                        </label>
+                        <input id="checked-from-filter" type="datetime-local" onchange="applyYearsSearch()" class="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-xs text-white outline-none focus:border-blue-500">
+                    </div>
+
+                    <div>
+                        <label for="checked-to-filter" class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                            Checked To
+                        </label>
+                        <div class="flex gap-2">
+                            <input id="checked-to-filter" type="datetime-local" onchange="applyYearsSearch()" class="min-w-0 flex-1 rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-xs text-white outline-none focus:border-blue-500">
+                            <button type="button" onclick="clearDateFilters()" class="rounded-lg bg-gray-700 px-3 py-2 text-xs font-bold text-white hover:bg-gray-600" title="Clear date filters">
+                                <i class="fa-solid fa-filter-circle-xmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="years-grid" class="space-y-4">
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-10 text-center text-gray-500">
+                <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-green-400"></i>
+                <p>Loading years...</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="./config.js"></script>
+    <script src="./auth.js"></script>
+    <script>
+        if (typeof requireRole === 'function') {
+            requireRole(['admin', 'super_admin']);
+        }
+    </script>
+
+    <script>
+        const API_BASE_URL =
+            window.APP_CONFIG?.API_BASE_URL ||
+            'https://abdd-production.up.railway.app';
+
+        const GET_ALL_YEARS_API =
+            `${API_BASE_URL}/api/ushare/getAllYears`;
+
+        const EDIT_STATUS_YEARS_API =
+            `${API_BASE_URL}/api/ushare/editStatusYears`;
+
+        const EDIT_SPLIT_TEXT_YEARS_API =
+            `${API_BASE_URL}/api/ushare/editsplitTextYears`;
+
+        const CHECK_YEAR_API =
+            `${API_BASE_URL}/api/ushare/chekyear`;
+
+        const REFRESH_ALFA_API =
+            `${API_BASE_URL}/api/ushare/check-number`;
+
+        const STATUS_OPTIONS = [
+            'PENDING',
+            'CREATED',
+            'CHEKING',
+            'COMPLETE'
+        ];
+
+        const CHECK_CONCURRENCY = 2;
+        const CHECK_TIMEOUT_MS = 300000;
+
+        let yearsData = [];
+        let yearsSearchQuery = '';
+
+        function getJsonHeaders() {
+            if (typeof authHeaders === 'function') {
+                return authHeaders();
+            }
+
+            return {
+                'Content-Type': 'application/json'
+            };
+        }
+
+        async function loadYearsData() {
+            const grid = document.getElementById('years-grid');
+
+            showStatus('Loading years from the server...', 'info');
+
+            grid.innerHTML = `
+                <div class="rounded-2xl border border-gray-700 bg-gray-800 p-10 text-center text-gray-500">
+                    <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-green-400"></i>
+                    <p>Loading years...</p>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(
+                    GET_ALL_YEARS_API,
+                    {
+                        headers: getJsonHeaders()
+                    }
+                );
+
+                const result = await readJsonResponse(response);
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(
+                        result.message ||
+                        result.error ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                const rawYears = Array.isArray(result.data)
+                    ? result.data
+                    : Array.isArray(result.years)
+                        ? result.years
+                        : [];
+
+                yearsData = rawYears;
+                renderYears();
+
+                showStatus(
+                    `${yearsData.length} year(s) loaded successfully.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error('Years loading error:', error);
+
+                yearsData = [];
+                updateSummary([]);
+
+                grid.innerHTML = `
+                    <div class="rounded-2xl border border-red-800 bg-red-900/20 p-10 text-center text-red-300">
+                        <i class="fa-solid fa-triangle-exclamation mb-3 text-3xl"></i>
+                        <p class="font-semibold">Unable to load years.</p>
+                        <p class="mt-2 text-sm">${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+
+                showStatus(
+                    `Unable to load years: ${error.message}`,
+                    'error'
+                );
+            }
+        }
+
+        function applyYearsSearch() {
+            const input = document.getElementById('years-search-input');
+            const clearButton = document.getElementById('clear-years-search-button');
+
+            yearsSearchQuery = String(input?.value ?? '')
+                .trim()
+                .toLowerCase();
+
+            if (clearButton) {
+                clearButton.disabled = yearsSearchQuery.length === 0;
+            }
+
+            renderYears();
+        }
+
+        function clearYearsSearch() {
+            const input = document.getElementById('years-search-input');
+
+            if (input) {
+                input.value = '';
+            }
+
+            yearsSearchQuery = '';
+            renderYears();
+            input?.focus();
+        }
+
+        function getVisibleYears() {
+            const createdFrom = getFilterDateValue('created-from-filter');
+            const createdTo = getFilterDateValue('created-to-filter');
+            const checkedFrom = getFilterDateValue('checked-from-filter');
+            const checkedTo = getFilterDateValue('checked-to-filter');
+
+            return yearsData.filter((year) => {
+                if (yearsSearchQuery) {
+                    const searchableText = JSON.stringify(year).toLowerCase();
+
+                    if (!searchableText.includes(yearsSearchQuery)) {
+                        return false;
+                    }
+                }
+
+                const createdDate = parseDateValue(
+                    year.created_at ??
+                    year.createdAt
+                );
+
+                const checkedDate = parseDateValue(
+                    year.checked_at ??
+                    year.checkedAt ??
+                    year.check_at ??
+                    year.checkAt ??
+                    year.last_checked_at ??
+                    year.lastCheckedAt ??
+                    year.updated_at ??
+                    year.updatedAt
+                );
+
+                if (!isDateInsideRange(createdDate, createdFrom, createdTo)) {
+                    return false;
+                }
+
+                if (!isDateInsideRange(checkedDate, checkedFrom, checkedTo)) {
+                    return false;
+                }
+
+                return true;
+            });
+        }
+
+        function getFilterDateValue(inputId) {
+            const value = document.getElementById(inputId)?.value;
+
+            if (!value) {
+                return null;
+            }
+
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function parseDateValue(value) {
+            if (isEmptyValue(value)) {
+                return null;
+            }
+
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? null : date;
+        }
+
+        function isDateInsideRange(date, fromDate, toDate) {
+            if (!fromDate && !toDate) {
+                return true;
+            }
+
+            if (!date) {
+                return false;
+            }
+
+            if (fromDate && date < fromDate) {
+                return false;
+            }
+
+            if (toDate && date > toDate) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function clearDateFilters() {
+            [
+                'created-from-filter',
+                'created-to-filter',
+                'checked-from-filter',
+                'checked-to-filter'
+            ].forEach((id) => {
+                const input = document.getElementById(id);
+
+                if (input) {
+                    input.value = '';
+                }
+            });
+
+            renderYears();
+        }
+
+        function renderYears() {
+            const grid = document.getElementById('years-grid');
+            const visibleYears = getVisibleYears();
+
+            updateSummary(visibleYears);
+
+            if (yearsData.length === 0) {
+                grid.innerHTML = `
+                    <div class="rounded-xl border border-gray-700 bg-gray-800 p-8 text-center text-gray-500">
+                        <i class="fa-solid fa-calendar-days mb-3 text-3xl text-green-400"></i>
+                        <p>No years are available.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            if (visibleYears.length === 0) {
+                grid.innerHTML = `
+                    <div class="rounded-xl border border-gray-700 bg-gray-800 p-8 text-center text-gray-500">
+                        <i class="fa-solid fa-magnifying-glass mb-3 text-3xl text-green-400"></i>
+                        <p class="font-semibold">No year matches your search.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = visibleYears
+                .map((year) => renderYearCard(year))
+                .join('');
+        }
+
+        function renderYearCard(year) {
+            const yearId = getYearId(year);
+            const title = getYearTitle(year);
+            const sourceGroupId = formatEmptyValue(
+                year.source_group_id ??
+                year.group_id ??
+                '-'
+            );
+            const splitText = formatEmptyValue(
+                year.split_text ??
+                year.splitText ??
+                '-'
+            );
+            const status = formatEmptyValue(year.status ?? '-');
+            const numbers = getYearNumbers(year);
+            const realNumbers = numbers.filter((item) => isValidYearNumber(item.number));
+            const createdAt = formatDateTime(
+                year.created_at ??
+                year.createdAt
+            );
+            const checkedAt = formatDateTime(
+                year.checked_at ??
+                year.checkedAt ??
+                year.check_at ??
+                year.checkAt ??
+                year.last_checked_at ??
+                year.lastCheckedAt ??
+                year.updated_at ??
+                year.updatedAt
+            );
+            const domKey = getYearDomKey(year);
+            const totalReceived = toNumber(year.total_received ?? year.totalReceived ?? 0);
+
+            return `
+                <article class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
+                    <div class="border-b border-gray-700 bg-gray-700/40 p-4">
+                        <div class="flex flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+                            <div class="min-w-0">
+                                <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                    Year
+                                </div>
+
+                                <div class="mt-1 truncate font-mono text-2xl font-bold text-green-300" title="${escapeHtml(title)}">
+                                    ${escapeHtml(title)}
+                                </div>
+
+                                <div class="mt-2 flex flex-wrap gap-2 text-xs">
+                                    <span class="rounded-lg border border-indigo-700 bg-indigo-500/10 px-2 py-1 font-mono font-bold text-indigo-300">
+                                        Group: ${escapeHtml(sourceGroupId)}
+                                    </span>
+
+                                    <span class="rounded-lg border border-gray-600 bg-gray-900/50 px-2 py-1 font-mono font-bold text-gray-300">
+                                        ID: ${escapeHtml(yearId)}
+                                    </span>
+
+                                    <span class="rounded-lg border ${getStatusClasses(status)} px-2 py-1 font-mono font-bold">${escapeHtml(status)}</span>
+                                    <span class="rounded-lg border border-emerald-700 bg-emerald-500/10 px-2 py-1 font-mono font-bold text-emerald-300" title="PostgreSQL total_received">Total Received: $${formatMoney(totalReceived)}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex shrink-0 flex-wrap gap-2">
+                                <button
+                                    type="button"
+                                    onclick="copyYear('${escapeJsString(yearId)}')"
+                                    class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-purple-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-purple-700"
+                                >
+                                    <i class="fa-solid fa-copy"></i>
+                                    Copy Year
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onclick="checkWholeYear('${escapeJsString(yearId)}', this)"
+                                    class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                    <i class="fa-solid fa-rotate"></i>
+                                    Check Year
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
+                            <div class="rounded-xl border border-gray-700 bg-gray-900/40 p-3">
+                                <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                    Created
+                                </div>
+                                <div class="mt-1 font-mono text-xs font-bold text-blue-300">
+                                    ${escapeHtml(createdAt)}
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl border border-gray-700 bg-gray-900/40 p-3">
+                                <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                    Last Checked
+                                </div>
+                                <div class="mt-1 font-mono text-xs font-bold text-orange-300">
+                                    ${escapeHtml(checkedAt)}
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl border border-gray-700 bg-gray-900/40 p-3">
+                                <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                    Numbers
+                                </div>
+                                <div class="mt-1 font-mono text-xs font-bold text-green-300">
+                                    ${realNumbers.length} / 4
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 grid grid-cols-1 gap-3 lg:grid-cols-[280px_1fr]">
+                            <div class="rounded-xl border border-gray-700 bg-gray-900/40 p-3">
+                                <label class="mb-2 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                    Status
+                                </label>
+
+                                <div class="flex gap-2">
+                                    <select
+                                        id="status-${domKey}"
+                                        class="min-w-0 flex-1 cursor-pointer rounded-lg border border-gray-600 bg-gray-950 px-3 py-2 text-xs font-bold text-white outline-none focus:border-green-500"
+                                    >
+                                        ${renderStatusOptions(status)}
+                                    </select>
+
+                                    <button
+                                        type="button"
+                                        onclick="saveYearStatus('${escapeJsString(yearId)}', this)"
+                                        class="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-green-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        <i class="fa-solid fa-check"></i>
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="rounded-xl border border-gray-700 bg-gray-900/40 p-3">
+                                <label class="mb-2 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                    Split Text
+                                </label>
+
+                                <div class="flex flex-col gap-2 md:flex-row">
+                                    <textarea
+                                        id="split-${domKey}"
+                                        rows="2"
+                                        class="min-w-0 flex-1 resize-y rounded-lg border border-gray-600 bg-gray-950 px-3 py-2 text-xs text-white outline-none focus:border-green-500"
+                                        placeholder="Write split text..."
+                                    >${escapeHtml(splitText === '-' ? '' : splitText)}</textarea>
+
+                                    <button
+                                        type="button"
+                                        onclick="saveSplitText('${escapeJsString(yearId)}', this)"
+                                        class="inline-flex cursor-pointer items-center justify-center gap-1 rounded-lg bg-amber-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                        Save Text
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-2 p-3 2xl:grid-cols-4 lg:grid-cols-2">
+                        ${numbers.map((numberData, index) => renderYearNumberCard(yearId, numberData, index + 1)).join('')}
+                    </div>
+                </article>
+            `;
+        }
+
+        function renderYearNumberCard(yearId, item, index) {
+            const validNumber = isValidYearNumber(item.number);
+            const delivered = calculateDeliveredAmount(item.balanceBefore, item.balanceAfter);
+
+            return `
+                <div class="rounded-xl border ${validNumber ? 'border-gray-700 bg-gray-900/50' : 'border-gray-800 bg-gray-900/20'} p-3">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0">
+                            <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                Number ${index}
+                            </div>
+
+                            <div class="mt-1 truncate font-mono text-lg font-bold ${validNumber ? 'text-white' : 'text-gray-600'}" title="${escapeHtml(item.number)}">
+                                ${escapeHtml(validNumber ? item.number : '-')}
+                            </div>
+                        </div>
+
+                        <div class="flex shrink-0 gap-1">
+                            <button
+                                type="button"
+                                onclick="copyYearNumber('${escapeJsString(yearId)}', ${index})"
+                                ${validNumber ? '' : 'disabled'}
+                                class="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-purple-700 bg-purple-500/10 text-purple-300 transition hover:bg-purple-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                                title="Copy this number"
+                            >
+                                <i class="fa-solid fa-copy text-[11px]"></i>
+                            </button>
+
+                            <button
+                                type="button"
+                                onclick="checkYearNumber('${escapeJsString(item.number)}', this)"
+                                ${validNumber ? '' : 'disabled'}
+                                class="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border border-blue-700 bg-blue-500/10 text-blue-300 transition hover:bg-blue-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                                title="Check this number"
+                            >
+                                <i class="fa-solid fa-rotate text-[11px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 grid grid-cols-3 gap-2">
+                        ${renderMoneyBox('Balance Before', item.balanceBefore, 'text-blue-300')}
+                        ${renderMoneyBox('Balance After', item.balanceAfter, 'text-orange-300')}
+                        ${renderMoneyBox('Amount Arrived', delivered, delivered >= 0 ? 'text-green-300' : 'text-red-300')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMoneyBox(label, value, valueClass) {
+            return `
+                <div class="min-w-0 rounded-lg border border-gray-700 bg-gray-800 px-2 py-2">
+                    <div class="truncate text-[8px] font-bold uppercase tracking-wide text-gray-500">
+                        ${escapeHtml(label)}
+                    </div>
+                    <div class="mt-0.5 truncate font-mono text-xs font-bold ${valueClass}" title="$${escapeHtml(formatMoney(value))}">
+                        $${escapeHtml(formatMoney(value))}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderStatusOptions(currentStatus) {
+            const normalizedCurrent = String(currentStatus ?? '').trim();
+            const allOptions = [...STATUS_OPTIONS];
+
+            if (normalizedCurrent && !allOptions.includes(normalizedCurrent) && normalizedCurrent !== '-') {
+                allOptions.unshift(normalizedCurrent);
+            }
+
+            return allOptions
+                .map((status) => `
+                    <option value="${escapeHtml(status)}" ${status === normalizedCurrent ? 'selected' : ''}>
+                        ${escapeHtml(status)}
+                    </option>
+                `)
+                .join('');
+        }
+
+        async function saveYearStatus(yearId, buttonElement) {
+            const year = findYearById(yearId);
+
+            if (!year) {
+                showStatus('Year not found.', 'error');
+                return;
+            }
+
+            const select = document.getElementById(`status-${getYearDomKey(year)}`);
+            const newStatus = String(select?.value ?? '').trim();
+
+            if (!newStatus) {
+                showStatus('Status is required.', 'error');
+                return;
+            }
+
+            const originalHtml = buttonElement?.innerHTML || '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Saving...
+                `;
+            }
+
+            showStatus(`Updating year ${yearId} status...`, 'info');
+
+            try {
+                const result = await sendJsonWithFallback(
+                    EDIT_STATUS_YEARS_API,
+                    {
+                        id: yearId,
+                        year_id: yearId,
+                        status: newStatus
+                    }
+                );
+
+                if (result.success === false) {
+                    throw new Error(result.message || result.error || 'Failed to update status.');
+                }
+
+                showStatus(`Year ${yearId} status updated successfully.`, 'success');
+                await loadYearsData();
+            } catch (error) {
+                console.error('Edit year status error:', error);
+                showStatus(`Unable to update year status: ${error.message}`, 'error');
+
+                if (buttonElement && buttonElement.isConnected) {
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        async function saveSplitText(yearId, buttonElement) {
+            const year = findYearById(yearId);
+
+            if (!year) {
+                showStatus('Year not found.', 'error');
+                return;
+            }
+
+            const textarea = document.getElementById(`split-${getYearDomKey(year)}`);
+            const splitText = String(textarea?.value ?? '').trim();
+            const originalHtml = buttonElement?.innerHTML || '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Saving...
+                `;
+            }
+
+            showStatus(`Updating year ${yearId} split text...`, 'info');
+
+            try {
+                const result = await sendJsonWithFallback(
+                    EDIT_SPLIT_TEXT_YEARS_API,
+                    {
+                        id: yearId,
+                        year_id: yearId,
+                        split_text: splitText,
+                        splitText
+                    }
+                );
+
+                if (result.success === false) {
+                    throw new Error(result.message || result.error || 'Failed to update split text.');
+                }
+
+                showStatus(`Year ${yearId} split text updated successfully.`, 'success');
+                await loadYearsData();
+            } catch (error) {
+                console.error('Edit split text error:', error);
+                showStatus(`Unable to update split text: ${error.message}`, 'error');
+
+                if (buttonElement && buttonElement.isConnected) {
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        async function checkYearNumber(numberphone, buttonElement) {
+            const cleanPhone = String(numberphone ?? '').trim();
+
+            if (!isValidYearNumber(cleanPhone)) {
+                showStatus('Phone number is missing.', 'error');
+                return;
+            }
+
+            const originalHtml = buttonElement?.innerHTML || '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin text-[11px]"></i>
+                `;
+            }
+
+            showStatus(`Checking ${cleanPhone}...`, 'info');
+
+            try {
+                await refreshNumber(cleanPhone);
+                showStatus(`${cleanPhone} checked successfully.`, 'success');
+                await loadYearsData();
+            } catch (error) {
+                console.error(`Check number ${cleanPhone} error:`, error);
+                showStatus(`Unable to check ${cleanPhone}: ${error.message}`, 'error');
+
+                if (buttonElement && buttonElement.isConnected) {
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        async function checkWholeYear(yearId, buttonElement) {
+            const year = findYearById(yearId);
+
+            if (!year) {
+                showStatus('Year not found.', 'error');
+                return;
+            }
+
+            const numbers = getYearNumbers(year)
+                .map((item) => item.number)
+                .filter(isValidYearNumber);
+
+            if (numbers.length === 0) {
+                showStatus('This year has no valid numbers to check.', 'error');
+                return;
+            }
+
+            const confirmed = confirm(
+                `Check year "${getYearTitle(year)}" using the server year check API?`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const originalHtml = buttonElement?.innerHTML || '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Checking...
+                `;
+            }
+
+            showStatus(
+                `Sending year ${getYearTitle(year)} to /api/ushare/chekyear...`,
+                'info'
+            );
+
+            try {
+                const result = await checkYearFromServer(year);
+
+                if (result.success === false) {
+                    throw new Error(
+                        result.message ||
+                        result.error ||
+                        'Failed to check year.'
+                    );
+                }
+
+                await loadYearsData();
+
+                showStatus(
+                    result.message ||
+                    `Year ${getYearTitle(year)} checked successfully.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error('Check whole year error:', error);
+                showStatus(`Unable to check year: ${error.message}`, 'error');
+
+                if (buttonElement && buttonElement.isConnected) {
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        async function checkYearFromServer(year) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), CHECK_TIMEOUT_MS);
+            const yearId = getYearId(year);
+
+            try {
+                const response = await fetch(
+                    CHECK_YEAR_API,
+                    {
+                        method: 'POST',
+                        headers: getJsonHeaders(),
+                        body: JSON.stringify({
+                            id: yearId,
+                            year_id: yearId,
+                            yearId: yearId,
+                            source_group_id:
+                                year.source_group_id ??
+                                year.group_id ??
+                                null,
+                            group_id:
+                                year.group_id ??
+                                year.source_group_id ??
+                                null,
+                            year_name:
+                                year.year_name ??
+                                year.yearName ??
+                                getYearTitle(year)
+                        }),
+                        signal: controller.signal
+                    }
+                );
+
+                const result = await readJsonResponse(response);
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(
+                        [result.message, result.error]
+                            .filter(Boolean)
+                            .join(': ') ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                return result;
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    throw new Error(`Year check timed out for ${getYearTitle(year)}.`);
+                }
+
+                throw error;
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        async function refreshNumber(numberphone) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), CHECK_TIMEOUT_MS);
+
+            try {
+                const response = await fetch(
+                    REFRESH_ALFA_API,
+                    {
+                        method: 'POST',
+                        headers: getJsonHeaders(),
+                        body: JSON.stringify({
+                            numberphone
+                        }),
+                        signal: controller.signal
+                    }
+                );
+
+                const result = await readJsonResponse(response);
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(
+                        [result.message, result.error]
+                            .filter(Boolean)
+                            .join(': ') ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                return result;
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    throw new Error(`Check timed out for ${numberphone}.`);
+                }
+
+                throw error;
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        async function copyYearNumber(yearId, numberIndex) {
+            const year = findYearById(yearId);
+
+            if (!year) {
+                showStatus('Year not found.', 'error');
+                return;
+            }
+
+            const item = getYearNumbers(year)[numberIndex - 1];
+
+            if (!item || !isValidYearNumber(item.number)) {
+                showStatus('Number not found.', 'error');
+                return;
+            }
+
+            const copied = await copyText(formatYearNumberLine(item, numberIndex));
+
+            showStatus(
+                copied
+                    ? `${item.number} copied.`
+                    : 'Unable to copy this number.',
+                copied ? 'success' : 'error'
+            );
+        }
+
+        async function copyYear(yearId) {
+            const year = findYearById(yearId);
+
+            if (!year) {
+                showStatus('Year not found.', 'error');
+                return;
+            }
+
+            const text = formatYearCopyText(year);
+            const copied = await copyText(text);
+
+            showStatus(
+                copied
+                    ? `Year ${getYearTitle(year)} copied.`
+                    : 'Unable to copy the year.',
+                copied ? 'success' : 'error'
+            );
+        }
+
+        function formatYearCopyText(year) {
+            const title = getYearTitle(year);
+            const sourceGroupId = formatEmptyValue(
+                year.source_group_id ??
+                year.group_id ??
+                '-'
+            );
+            const splitText = formatEmptyValue(
+                year.split_text ??
+                year.splitText ??
+                '-'
+            );
+            const status = formatEmptyValue(year.status ?? '-');
+            const totalReceived = toNumber(
+                year.total_received ??
+                year.totalReceived ??
+                0
+            );
+            const createdAt = formatDateTime(
+                year.created_at ??
+                year.createdAt
+            );
+            const checkedAt = formatDateTime(
+                year.checked_at ??
+                year.checkedAt ??
+                year.check_at ??
+                year.checkAt ??
+                year.last_checked_at ??
+                year.lastCheckedAt ??
+                year.updated_at ??
+                year.updatedAt
+            );
+            const lines = getYearNumbers(year)
+                .filter((item) => isValidYearNumber(item.number))
+                .map((item, index) => formatYearNumberLine(item, index + 1));
+
+            return [
+                `Year: ${title}`,
+                `Group: ${sourceGroupId}`,
+                `Status: ${status}`,
+                `Split Text: ${splitText}`,
+                `Created At: ${createdAt}`,
+                `Last Checked: ${checkedAt}`,
+                `Total Received: $${formatMoney(totalReceived)}`,
+                '',
+                ...lines
+            ].join('\n');
+        }
+
+        function formatYearNumberLine(item, index) {
+            const delivered = calculateDeliveredAmount(item.balanceBefore, item.balanceAfter);
+
+            return [
+                `Number ${index}: ${item.number}`,
+                `Before: $${formatMoney(item.balanceBefore)}`,
+                `After: $${formatMoney(item.balanceAfter)}`,
+                `Arrived: $${formatMoney(delivered)}`
+            ].join(' | ');
+        }
+
+        function getYearNumbers(year) {
+            return [1, 2, 3, 4].map((index) => {
+                return {
+                    number:
+                        year[`number${index}`] ??
+                        year[`number_${index}`] ??
+                        year[`phone${index}`] ??
+                        '0',
+                    balanceBefore:
+                        year[`balance${index}_before`] ??
+                        year[`balance_${index}_before`] ??
+                        0,
+                    balanceAfter:
+                        year[`balance${index}_after`] ??
+                        year[`balance_${index}_after`] ??
+                        0
+                };
+            });
+        }
+
+        function getYearId(year) {
+            return String(
+                year?.id ??
+                year?.year_id ??
+                year?.yearId ??
+                ''
+            ).trim();
+        }
+
+        function getYearTitle(year) {
+            return formatEmptyValue(
+                year?.year_name ??
+                year?.yearName ??
+                year?.source_group_id ??
+                year?.group_id ??
+                getYearId(year) ??
+                '-'
+            );
+        }
+
+        function findYearById(yearId) {
+            return yearsData.find(
+                (year) => getYearId(year) === String(yearId)
+            );
+        }
+
+        function getYearDomKey(year) {
+            const text = String(getYearId(year) || getYearTitle(year));
+            let hash = 0;
+
+            for (let index = 0; index < text.length; index += 1) {
+                hash = ((hash << 5) - hash) + text.charCodeAt(index);
+                hash |= 0;
+            }
+
+            return `year_${Math.abs(hash)}`;
+        }
+
+        function isValidYearNumber(value) {
+            const text = String(value ?? '').trim();
+
+            return (
+                text !== '' &&
+                text !== '0' &&
+                text.toLowerCase() !== 'null' &&
+                text.toLowerCase() !== 'undefined' &&
+                text !== '-'
+            );
+        }
+
+        function calculateDeliveredAmount(before, after) {
+            return toNumber(after) - toNumber(before);
+        }
+
+        function updateSummary(visibleYears) {
+            const visible = Array.isArray(visibleYears)
+                ? visibleYears
+                : [];
+
+            const totalNumbers = yearsData.reduce((sum, year) => {
+                return sum + getYearNumbers(year).filter((item) => isValidYearNumber(item.number)).length;
+            }, 0);
+
+            document.getElementById('total-years').textContent = String(yearsData.length);
+            document.getElementById('visible-years').textContent = String(visible.length);
+            document.getElementById('total-year-numbers').textContent = String(totalNumbers);
+        }
+
+        async function sendJsonWithFallback(url, body) {
+            const first = await sendJsonRequest(url, 'PUT', body);
+
+            if (
+                first.shouldFallbackToPost
+            ) {
+                const second = await sendJsonRequest(url, 'POST', body);
+                return second.result;
+            }
+
+            return first.result;
+        }
+
+        async function sendJsonRequest(url, method, body) {
+            const response = await fetch(
+                url,
+                {
+                    method,
+                    headers: getJsonHeaders(),
+                    body: JSON.stringify(body)
+                }
+            );
+
+            const text = await response.text();
+            let result = {};
+
+            if (text) {
+                try {
+                    result = JSON.parse(text);
+                } catch {
+                    result = {
+                        success: false,
+                        message: text
+                    };
+                }
+            }
+
+            const shouldFallbackToPost =
+                method === 'PUT' &&
+                (response.status === 404 || response.status === 405 || String(result.message ?? '').includes('Cannot PUT'));
+
+            if (!shouldFallbackToPost && (!response.ok || result.success === false)) {
+                throw new Error(
+                    result.message ||
+                    result.error ||
+                    `Server returned ${response.status}`
+                );
+            }
+
+            return {
+                result,
+                shouldFallbackToPost
+            };
+        }
+
+        async function readJsonResponse(response) {
+            const text = await response.text();
+
+            if (!text) {
+                return {};
+            }
+
+            try {
+                return JSON.parse(text);
+            } catch {
+                throw new Error('The server returned a non-JSON response.');
+            }
+        }
+
+        async function copyText(text) {
+            try {
+                if (
+                    navigator.clipboard &&
+                    window.isSecureContext
+                ) {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                }
+
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+
+                const copied = document.execCommand('copy');
+                textarea.remove();
+
+                return copied;
+            } catch (error) {
+                console.error('Copy error:', error);
+                return false;
+            }
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('global-status');
+
+            status.className = 'mb-4 block rounded-xl border p-3 text-sm';
+
+            if (type === 'info') {
+                status.classList.add(
+                    'border-blue-500',
+                    'bg-blue-900/40',
+                    'text-blue-300'
+                );
+            } else if (type === 'success') {
+                status.classList.add(
+                    'border-green-500',
+                    'bg-green-900/40',
+                    'text-green-300'
+                );
+            } else {
+                status.classList.add(
+                    'border-red-500',
+                    'bg-red-900/40',
+                    'text-red-300'
+                );
+            }
+
+            status.textContent = message;
+        }
+
+        function getStatusClasses(status) {
+            const text = String(status ?? '').trim().toLowerCase();
+
+            if (text === 'COMPLETE' || text === 'COMPLETE') {
+                return 'border-green-700 bg-green-500/10 text-green-300';
+            }
+
+            if (text === 'CHEKING' || text === 'CHEKING') {
+                return 'border-blue-700 bg-blue-500/10 text-blue-300';
+            }
+
+            if (text === 'PENDING') {
+                return 'border-amber-700 bg-amber-500/10 text-amber-300';
+            }
+
+            return 'border-gray-600 bg-gray-900/60 text-gray-300';
+        }
+
+        function formatDateTime(value) {
+            if (isEmptyValue(value)) {
+                return '-';
+            }
+
+            const date = new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return String(value);
+            }
+
+            return date.toLocaleString();
+        }
+
+        function toNumber(value) {
+            const number = Number.parseFloat(value);
+            return Number.isFinite(number) ? number : 0;
+        }
+
+        function formatMoney(value) {
+            const number = toNumber(value);
+
+            return Number.isInteger(number)
+                ? String(number)
+                : number.toFixed(2);
+        }
+
+        function isEmptyValue(value) {
+            const text = String(value ?? '').trim().toLowerCase();
+            return (
+                text === '' ||
+                text === 'null' ||
+                text === 'undefined' ||
+                text === '-'
+            );
+        }
+
+        function formatEmptyValue(value) {
+            return isEmptyValue(value) ? '-' : String(value).trim();
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function escapeJsString(value) {
+            return String(value ?? '')
+                .replaceAll('\\', '\\\\')
+                .replaceAll("'", "\\'");
+        }
+
+        window.addEventListener('load', loadYearsData);
+    </script>
+</body>
+</html>

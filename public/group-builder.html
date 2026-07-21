@@ -1,0 +1,2112 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Zouzou App - Auto Group Builder</title>
+
+    <script src="./theme.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <link rel="stylesheet" href="./theme.css">
+</head>
+
+<body class="min-h-screen bg-gray-900 font-sans text-gray-100">
+    <header class="sticky top-0 z-50 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+        <div class="flex w-full flex-col items-center justify-between gap-4 xl:flex-row">
+            <div class="flex items-center gap-3">
+                <div class="rounded-lg bg-teal-600 p-2 text-white">
+                    <i class="fa-solid fa-layer-group text-xl"></i>
+                </div>
+
+                <h1 class="text-xl font-bold text-teal-400">
+                    Zouzou App
+                    <span class="text-base font-normal text-white">
+                        | Auto Group Builder
+                    </span>
+                </h1>
+            </div>
+
+            <nav class="flex flex-wrap gap-2">
+                <button
+                    data-theme-toggle
+                    type="button"
+                    onclick="toggleTheme()"
+                    class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-200 shadow transition-all hover:bg-gray-600"
+                >
+                    <i data-theme-icon class="fa-solid fa-sun"></i>
+                    <span data-theme-label>Light Mode</span>
+                </button>
+
+                <a
+                    href="./index.html"
+                    class="flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-orange-600"
+                >
+                    <i class="fa-solid fa-table"></i>
+                    Main Table
+                </a>
+
+                <a
+                    href="./groups.html"
+                    class="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-indigo-700"
+                >
+                    <i class="fa-solid fa-object-group"></i>
+                    Groups View
+                </a>
+
+                <button
+                    id="reload-lines-button"
+                    type="button"
+                    onclick="loadLines()"
+                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    <i class="fa-solid fa-rotate"></i>
+                    Reload Lines
+                </button>
+
+                <button
+                    type="button"
+                    onclick="logout()"
+                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-red-700"
+                >
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Logout
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="w-full max-w-none px-3 py-4 sm:px-5">
+        <div
+            id="global-status"
+            class="mb-4 hidden rounded-xl border p-3 text-sm"
+        ></div>
+
+        <section class="mb-4 rounded-2xl border border-amber-700 bg-amber-900/15 p-4 shadow-xl">
+            <div class="flex items-start gap-3">
+                <i class="fa-solid fa-filter-circle-xmark mt-1 text-xl text-amber-400"></i>
+
+                <div>
+                    <h2 class="font-bold text-amber-300">
+                        Mandatory eligibility rules
+                    </h2>
+
+                    <p class="mt-1 text-sm text-gray-300">
+                        Lines are loaded from Expired Services. The only additional eligibility rule is:
+                    </p>
+
+                    <div class="mt-3 flex flex-wrap gap-2 text-xs">
+                        <span class="rounded-lg border border-gray-600 bg-gray-900/50 px-2.5 py-1.5">
+                            Group ID is null, empty, or 0
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <form
+            id="builder-form"
+            onsubmit="previewGroups(event)"
+            oninput="invalidateCurrentPlan()"
+            class="mb-4 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl"
+        >
+            <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-gray-300">
+                        First group name
+                    </label>
+
+                    <input
+                        id="base-group-name"
+                        type="text"
+                        maxlength="50"
+                        placeholder="Example: jad"
+                        class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition focus:border-teal-500"
+                    >
+
+                    <p class="mt-1.5 text-xs text-gray-500">
+                        Names: jad, jad 1, jad 2, jad 3...
+                    </p>
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-gray-300">
+                        Number of groups
+                    </label>
+
+                    <input
+                        id="requested-groups"
+                        type="number"
+                        min="1"
+                        max="100"
+                        step="1"
+                        value="1"
+                        class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-teal-500"
+                    >
+                </div>
+
+                <div>
+                    <label class="mb-2 block text-sm font-semibold text-gray-300">
+                        Lines per group
+                    </label>
+
+                    <input
+                        id="lines-per-group"
+                        type="number"
+                        min="1"
+                        max="50"
+                        step="1"
+                        value="4"
+                        oninput="handleLinesPerGroupChange()"
+                        class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-teal-500"
+                    >
+                </div>
+            </div>
+
+            <section class="mt-5 rounded-2xl border border-green-800 bg-green-900/15 p-4">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div class="flex items-start gap-3">
+                        <input
+                            id="create-years-after-groups"
+                            type="checkbox"
+                            onchange="toggleCreateYearsOptions()"
+                            class="mt-1 h-5 w-5 cursor-pointer accent-green-600"
+                        >
+
+                        <label for="create-years-after-groups" class="cursor-pointer">
+                            <div class="flex items-center gap-2 font-bold text-green-300">
+                                <i class="fa-solid fa-calendar-plus"></i>
+                                Create Years after groups
+                            </div>
+
+                            <p class="mt-1 text-xs leading-5 text-gray-400">
+                                After each group is created successfully, create one Year from it.
+                                The same give_balance text will be sent with every Year.
+                            </p>
+                        </label>
+                    </div>
+
+                    <div id="give-balance-wrapper" class="hidden w-full lg:max-w-2xl">
+                        <label for="give-balance-text" class="mb-2 block text-sm font-semibold text-gray-300">
+                            give_balance text
+                        </label>
+
+                        <textarea
+                            id="give-balance-text"
+                            rows="3"
+                            maxlength="2000"
+                            disabled
+                            placeholder="Enter the text that will be saved with every created Year..."
+                            class="w-full resize-y rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition focus:border-green-500"
+                        ></textarea>
+
+                        <p class="mt-1.5 text-xs text-gray-500">
+                            This is text, not a numeric value. The same text is used for all created Years.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="mt-5 flex flex-col gap-2 border-t border-gray-700 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 class="flex items-center gap-2 text-lg font-bold text-white">
+                        <i class="fa-solid fa-list-ol text-teal-400"></i>
+                        Conditions for each line position
+                    </h2>
+
+                    <p class="mt-1 text-xs text-gray-500">
+                        Each position has its own balance and validity conditions.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    onclick="copyFirstRuleToAll()"
+                    class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-700"
+                >
+                    <i class="fa-solid fa-copy"></i>
+                    Copy Line 1 Rules to All
+                </button>
+            </div>
+
+            <div
+                id="line-rules-grid"
+                class="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+            ></div>
+
+            <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <button
+                    type="submit"
+                    id="preview-button"
+                    class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-3 font-semibold text-white transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    Preview
+                </button>
+
+                <button
+                    type="button"
+                    onclick="resetBuilder()"
+                    class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-700 px-4 py-3 font-semibold text-white transition hover:bg-gray-600"
+                >
+                    <i class="fa-solid fa-eraser"></i>
+                    Reset
+                </button>
+
+                <button
+                    id="create-groups-button"
+                    type="button"
+                    onclick="createPlannedGroups()"
+                    disabled
+                    class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Create Planned Groups
+                </button>
+            </div>
+
+            <p class="mt-3 text-xs leading-5 text-gray-500">
+                Complete groups only. If one line position cannot be filled,
+                that group is not created and the process stops normally.
+            </p>
+        </form>
+
+        <section class="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <div class="rounded-xl border border-gray-700 bg-gray-800 p-3 shadow-lg">
+                <div class="text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                    Mandatory Eligible
+                </div>
+
+                <div id="mandatory-eligible-count" class="mt-1 font-mono text-2xl font-bold text-blue-300">
+                    0
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-700 bg-gray-800 p-3 shadow-lg">
+                <div class="text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                    Requested Groups
+                </div>
+
+                <div id="requested-groups-count" class="mt-1 font-mono text-2xl font-bold text-orange-300">
+                    0
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-700 bg-gray-800 p-3 shadow-lg">
+                <div class="text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                    Complete Groups
+                </div>
+
+                <div id="creatable-groups-count" class="mt-1 font-mono text-2xl font-bold text-teal-300">
+                    0
+                </div>
+            </div>
+
+            <div class="rounded-xl border border-gray-700 bg-gray-800 p-3 shadow-lg">
+                <div class="text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                    Planned Lines
+                </div>
+
+                <div id="planned-lines-count" class="mt-1 font-mono text-2xl font-bold text-green-300">
+                    0
+                </div>
+            </div>
+        </section>
+
+        <section class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
+            <div class="flex flex-col gap-2 border-b border-gray-700 bg-gray-700/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 class="font-bold text-white">
+                        Group Plan
+                    </h2>
+
+                    <p id="plan-description" class="mt-1 text-xs text-gray-500">
+                        Enter the conditions for every line position and press Preview.
+                    </p>
+                </div>
+
+                <div
+                    id="plan-snapshot-badge"
+                    class="hidden rounded-lg border border-teal-700 bg-teal-500/10 px-3 py-1.5 text-xs font-semibold text-teal-300"
+                >
+                    Saved in memory
+                </div>
+            </div>
+
+            <div
+                id="plan-grid"
+                class="grid grid-cols-1 gap-3 p-3 md:grid-cols-2 xl:grid-cols-3"
+            >
+                <div class="col-span-full rounded-xl border border-dashed border-gray-600 p-10 text-center text-gray-500">
+                    <i class="fa-solid fa-layer-group mb-3 text-3xl text-teal-400"></i>
+                    <p>No plan has been created yet.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="./config.js"></script>
+    <script src="./auth.js"></script>
+    <script>
+        requireRole(["admin", "super_admin"]);
+    </script>
+
+    <script>
+        const API_BASE_URL =
+            window.APP_CONFIG?.API_BASE_URL ||
+            'https://abdd-production.up.railway.app';
+
+        const FETCH_DATA_API =
+            `${API_BASE_URL}/api/ushare/getExpiredServices`;
+
+        const EDIT_GROUP_API =
+            `${API_BASE_URL}/api/ushare/editGroup`;
+
+        const CREATE_YEAR_API =
+            `${API_BASE_URL}/api/ushare/createYears`;
+
+        const REQUEST_TIMEOUT_MS = 120000;
+
+        let allLines = [];
+        let currentPlan = null;
+        let isCreatingGroups = false;
+        let lineRulesDraft = [];
+
+        function normalizeText(value) {
+            return String(value ?? '').trim();
+        }
+
+        function toggleCreateYearsOptions() {
+            const checkbox = document.getElementById(
+                'create-years-after-groups'
+            );
+
+            const wrapper = document.getElementById(
+                'give-balance-wrapper'
+            );
+
+            const textarea = document.getElementById(
+                'give-balance-text'
+            );
+
+            const enabled = Boolean(checkbox?.checked);
+
+            wrapper?.classList.toggle('hidden', !enabled);
+
+            if (textarea) {
+                textarea.disabled = !enabled || isCreatingGroups;
+            }
+
+            updateCreateButtonLabel();
+        }
+
+        function updateCreateButtonLabel() {
+            const button = document.getElementById(
+                'create-groups-button'
+            );
+
+            if (!button || isCreatingGroups) {
+                return;
+            }
+
+            const createYears = Boolean(
+                document.getElementById(
+                    'create-years-after-groups'
+                )?.checked
+            );
+
+            button.innerHTML = createYears
+                ? `
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Create Groups & Years
+                `
+                : `
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Create Planned Groups
+                `;
+        }
+
+        function isNullLike(value) {
+            if (
+                value === null ||
+                value === undefined || value==='0.00'
+            ) {
+                return true;
+            }
+
+            const text =
+                normalizeText(value).toLowerCase();
+
+            return (
+                text === '' ||
+                text === 'null' ||
+                text === 'undefined'
+            );
+        }
+function isZeroOrEmptyGroup(value) {
+    const text = normalizeText(value).toLowerCase();
+
+    return (
+        isNullLike(value) ||
+        text === '0' ||
+        text === 'nogroup' ||
+        text === 'no group'
+    );
+}
+
+        function getRawSecondaryValues(line, index) {
+            return {
+                number:
+                    line[`secondary_number_${index}`] ??
+                    line[`secondary${index}_number`] ??
+                    line[`secondary_${index}_number`],
+
+                used:
+                    line[`secondary_used_${index}`] ??
+                    line[`secondary${index}_used`] ??
+                    line[`secondary_${index}_used`],
+
+                total:
+                    line[`secondary_total_${index}`] ??
+                    line[`secondary${index}_total`] ??
+                    line[`secondary_${index}_total`],
+
+                status:
+                    line[`secondary_status_${index}`] ??
+                    line[`secondary${index}_status`] ??
+                    line[`secondary_${index}_status`]
+            };
+        }
+
+        function isEmptySecondary(line, index) {
+            const secondary =
+                getRawSecondaryValues(line, index);
+
+            const usedText =
+                normalizeText(secondary.used);
+
+            const totalText =
+                normalizeText(secondary.total);
+
+            return (
+                isNullLike(secondary.number) &&
+                isNullLike(secondary.status) &&
+                (
+                    isNullLike(secondary.used) ||
+                    usedText === '0' ||
+                    usedText === '0.00'
+                ) &&
+                (
+                    isNullLike(secondary.total) ||
+                    totalText === '0' ||
+                    totalText === '0.00'
+                )
+            );
+        }
+
+        function passesMandatoryRules(line) {
+            return isZeroOrEmptyGroup(line.group_id);
+        }
+
+        function getLineNumber(line, fieldName) {
+            const parsed =
+                Number.parseFloat(line[fieldName]);
+
+            return Number.isFinite(parsed)
+                ? parsed
+                : 0;
+        }
+
+        function createEmptyRule() {
+            return {
+                balanceMin: '',
+                balanceMax: '',
+                validityMin: '',
+                validityMax: ''
+            };
+        }
+
+        function captureRuleDrafts() {
+            const cards =
+                document.querySelectorAll(
+                    '[data-line-rule-card]'
+                );
+
+            if (cards.length === 0) {
+                return;
+            }
+
+            lineRulesDraft = Array.from(cards).map(
+                (card) => {
+                    return {
+                        balanceMin:
+                            card.querySelector(
+                                '[data-rule-field="balanceMin"]'
+                            )?.value ?? '',
+
+                        balanceMax:
+                            card.querySelector(
+                                '[data-rule-field="balanceMax"]'
+                            )?.value ?? '',
+
+                        validityMin:
+                            card.querySelector(
+                                '[data-rule-field="validityMin"]'
+                            )?.value ?? '',
+
+                        validityMax:
+                            card.querySelector(
+                                '[data-rule-field="validityMax"]'
+                            )?.value ?? ''
+                    };
+                }
+            );
+        }
+
+        function getLinesPerGroupValue() {
+            const count = Number(
+                document.getElementById(
+                    'lines-per-group'
+                )?.value
+            );
+
+            if (
+                !Number.isInteger(count) ||
+                count < 1
+            ) {
+                return 1;
+            }
+
+            return Math.min(count, 50);
+        }
+
+        function renderLineRuleCards() {
+            const count =
+                getLinesPerGroupValue();
+
+            while (
+                lineRulesDraft.length < count
+            ) {
+                lineRulesDraft.push(
+                    createEmptyRule()
+                );
+            }
+
+            lineRulesDraft =
+                lineRulesDraft.slice(0, count);
+
+            const grid =
+                document.getElementById(
+                    'line-rules-grid'
+                );
+
+            grid.innerHTML =
+                lineRulesDraft
+                    .map((rule, index) => {
+                        return `
+                            <article
+                                data-line-rule-card
+                                data-rule-index="${index}"
+                                class="rounded-xl border border-gray-700 bg-gray-900/35 p-3"
+                            >
+                                <div class="mb-3 flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600 font-mono text-sm font-bold text-white">
+                                            ${index + 1}
+                                        </span>
+
+                                        <div>
+                                            <div class="font-bold text-white">
+                                                Line ${index + 1}
+                                            </div>
+
+                                            <div class="text-[10px] text-gray-500">
+                                                Independent conditions
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="mb-1.5 text-xs font-semibold text-green-300">
+                                            Balance
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input
+                                                data-rule-field="balanceMin"
+                                                type="number"
+                                                step="0.01"
+                                                value="${escapeHtml(rule.balanceMin)}"
+                                                placeholder="Min"
+                                                class="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 font-mono text-sm text-white outline-none focus:border-teal-500"
+                                            >
+
+                                            <input
+                                                data-rule-field="balanceMax"
+                                                type="number"
+                                                step="0.01"
+                                                value="${escapeHtml(rule.balanceMax)}"
+                                                placeholder="Max"
+                                                class="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 font-mono text-sm text-white outline-none focus:border-teal-500"
+                                            >
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="mb-1.5 text-xs font-semibold text-orange-300">
+                                            Validity Days
+                                        </div>
+
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input
+                                                data-rule-field="validityMin"
+                                                type="number"
+                                                step="1"
+                                                value="${escapeHtml(rule.validityMin)}"
+                                                placeholder="Min"
+                                                class="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 font-mono text-sm text-white outline-none focus:border-teal-500"
+                                            >
+
+                                            <input
+                                                data-rule-field="validityMax"
+                                                type="number"
+                                                step="1"
+                                                value="${escapeHtml(rule.validityMax)}"
+                                                placeholder="Max"
+                                                class="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 font-mono text-sm text-white outline-none focus:border-teal-500"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        `;
+                    })
+                    .join('');
+        }
+
+        function handleLinesPerGroupChange() {
+            captureRuleDrafts();
+            renderLineRuleCards();
+            invalidateCurrentPlan();
+        }
+
+        function copyFirstRuleToAll() {
+            captureRuleDrafts();
+
+            if (lineRulesDraft.length === 0) {
+                return;
+            }
+
+            const firstRule = {
+                ...lineRulesDraft[0]
+            };
+
+            lineRulesDraft =
+                lineRulesDraft.map(() => ({
+                    ...firstRule
+                }));
+
+            renderLineRuleCards();
+            invalidateCurrentPlan();
+
+            showStatus(
+                'Line 1 conditions were copied to all line positions.',
+                'info'
+            );
+        }
+
+        function parseOptionalRuleNumber(
+            rawValue,
+            label
+        ) {
+            const value =
+                normalizeText(rawValue);
+
+            if (value === '') {
+                return null;
+            }
+
+            const parsed = Number(value);
+
+            if (!Number.isFinite(parsed)) {
+                throw new Error(
+                    `${label} must be a valid number.`
+                );
+            }
+
+            return parsed;
+        }
+
+        function readLineRules() {
+            captureRuleDrafts();
+
+            return lineRulesDraft.map(
+                (draft, index) => {
+                    const lineLabel =
+                        `Line ${index + 1}`;
+
+                    const rule = {
+                        balanceMin:
+                            parseOptionalRuleNumber(
+                                draft.balanceMin,
+                                `${lineLabel} minimum balance`
+                            ),
+
+                        balanceMax:
+                            parseOptionalRuleNumber(
+                                draft.balanceMax,
+                                `${lineLabel} maximum balance`
+                            ),
+
+                        validityMin:
+                            parseOptionalRuleNumber(
+                                draft.validityMin,
+                                `${lineLabel} minimum validity`
+                            ),
+
+                        validityMax:
+                            parseOptionalRuleNumber(
+                                draft.validityMax,
+                                `${lineLabel} maximum validity`
+                            )
+                    };
+
+                    if (
+                        rule.balanceMin !== null &&
+                        rule.balanceMax !== null &&
+                        rule.balanceMin >
+                            rule.balanceMax
+                    ) {
+                        throw new Error(
+                            `${lineLabel}: minimum balance cannot be greater than maximum balance.`
+                        );
+                    }
+
+                    if (
+                        rule.validityMin !== null &&
+                        rule.validityMax !== null &&
+                        rule.validityMin >
+                            rule.validityMax
+                    ) {
+                        throw new Error(
+                            `${lineLabel}: minimum validity cannot be greater than maximum validity.`
+                        );
+                    }
+
+                    return rule;
+                }
+            );
+        }
+
+        function readSettings() {
+            const baseName =
+                normalizeText(
+                    document.getElementById(
+                        'base-group-name'
+                    )?.value
+                );
+
+            const requestedGroups =
+                Number(
+                    document.getElementById(
+                        'requested-groups'
+                    )?.value
+                );
+
+            const linesPerGroup =
+                Number(
+                    document.getElementById(
+                        'lines-per-group'
+                    )?.value
+                );
+
+            const createYears = Boolean(
+                document.getElementById(
+                    'create-years-after-groups'
+                )?.checked
+            );
+
+            const giveBalance = normalizeText(
+                document.getElementById(
+                    'give-balance-text'
+                )?.value
+            );
+
+            if (!baseName) {
+                throw new Error(
+                    'Enter the first group name.'
+                );
+            }
+
+            if (
+                !Number.isInteger(requestedGroups) ||
+                requestedGroups < 1 ||
+                requestedGroups > 100
+            ) {
+                throw new Error(
+                    'Number of groups must be between 1 and 100.'
+                );
+            }
+
+            if (
+                !Number.isInteger(linesPerGroup) ||
+                linesPerGroup < 1 ||
+                linesPerGroup > 50
+            ) {
+                throw new Error(
+                    'Lines per group must be between 1 and 50.'
+                );
+            }
+
+            const rules =
+                readLineRules();
+
+            if (createYears && !giveBalance) {
+                throw new Error(
+                    'Enter the give_balance text before creating Years.'
+                );
+            }
+
+            if (
+                rules.length !== linesPerGroup
+            ) {
+                throw new Error(
+                    'The number of line-condition cards does not match Lines per group.'
+                );
+            }
+
+            return {
+                baseName,
+                requestedGroups,
+                linesPerGroup,
+                createYears,
+                giveBalance,
+                rules
+            };
+        }
+
+        function passesLineRule(line, rule) {
+            const balance =
+                getLineNumber(line, 'balance');
+
+            const validity =
+                getLineNumber(line, 'validity');
+
+            if (
+                rule.balanceMin !== null &&
+                balance < rule.balanceMin
+            ) {
+                return false;
+            }
+
+            if (
+                rule.balanceMax !== null &&
+                balance > rule.balanceMax
+            ) {
+                return false;
+            }
+
+            if (
+                rule.validityMin !== null &&
+                validity < rule.validityMin
+            ) {
+                return false;
+            }
+
+            if (
+                rule.validityMax !== null &&
+                validity > rule.validityMax
+            ) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function buildGroupName(baseName, index) {
+            return index === 0
+                ? baseName
+                : `${baseName} ${index}`;
+        }
+
+        function getExistingGroupIds(lines) {
+            return new Set(
+                lines
+                    .map((line) =>
+                        normalizeText(line.group_id)
+                    )
+                    .filter((groupId) =>
+                        groupId !== '' &&
+                        groupId !== '0' &&
+                        groupId.toLowerCase() !== 'null'
+                    )
+            );
+        }
+
+        /*
+         * Finds a complete one-to-one assignment:
+         * every line position gets one unique phone number.
+         * This avoids using a number twice and avoids a greedy
+         * choice blocking a more restrictive later position.
+         */
+        function findCompleteGroup(
+            availableLines,
+            rules
+        ) {
+            const candidatesByRule =
+                rules.map((rule) => {
+                    return availableLines
+                        .map((line, lineIndex) => ({
+                            line,
+                            lineIndex
+                        }))
+                        .filter(({ line }) =>
+                            passesLineRule(line, rule)
+                        )
+                        .map(({ lineIndex }) =>
+                            lineIndex
+                        );
+                });
+
+            if (
+                candidatesByRule.some(
+                    (candidates) =>
+                        candidates.length === 0
+                )
+            ) {
+                return null;
+            }
+
+            const ruleOrder =
+                rules
+                    .map((_, ruleIndex) =>
+                        ruleIndex
+                    )
+                    .sort(
+                        (firstIndex, secondIndex) =>
+                            candidatesByRule[firstIndex]
+                                .length -
+                            candidatesByRule[secondIndex]
+                                .length
+                    );
+
+            const matchedRuleByLine =
+                new Map();
+
+            function tryAssignRule(
+                ruleIndex,
+                visitedLines
+            ) {
+                for (
+                    const lineIndex of
+                    candidatesByRule[ruleIndex]
+                ) {
+                    if (
+                        visitedLines.has(lineIndex)
+                    ) {
+                        continue;
+                    }
+
+                    visitedLines.add(lineIndex);
+
+                    const previousRule =
+                        matchedRuleByLine.get(
+                            lineIndex
+                        );
+
+                    if (
+                        previousRule === undefined ||
+                        tryAssignRule(
+                            previousRule,
+                            visitedLines
+                        )
+                    ) {
+                        matchedRuleByLine.set(
+                            lineIndex,
+                            ruleIndex
+                        );
+
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            for (
+                const ruleIndex of ruleOrder
+            ) {
+                const assigned =
+                    tryAssignRule(
+                        ruleIndex,
+                        new Set()
+                    );
+
+                if (!assigned) {
+                    return null;
+                }
+            }
+
+            const lineIndexByRule =
+                new Array(rules.length);
+
+            for (
+                const [
+                    lineIndex,
+                    ruleIndex
+                ] of matchedRuleByLine.entries()
+            ) {
+                lineIndexByRule[ruleIndex] =
+                    lineIndex;
+            }
+
+            if (
+                lineIndexByRule.some(
+                    (lineIndex) =>
+                        lineIndex === undefined
+                )
+            ) {
+                return null;
+            }
+
+            return lineIndexByRule.map(
+                (lineIndex, ruleIndex) => ({
+                    line:
+                        availableLines[lineIndex],
+                    ruleIndex
+                })
+            );
+        }
+
+        function createPlan(lines, settings) {
+            const mandatoryEligible =
+                lines.filter(
+                    passesMandatoryRules
+                );
+
+            let availableLines = [
+                ...mandatoryEligible
+            ];
+
+            const existingGroupIds =
+                getExistingGroupIds(lines);
+
+            const groups = [];
+
+            for (
+                let groupIndex = 0;
+                groupIndex <
+                settings.requestedGroups;
+                groupIndex++
+            ) {
+                const matches =
+                    findCompleteGroup(
+                        availableLines,
+                        settings.rules
+                    );
+
+                if (!matches) {
+                    break;
+                }
+
+                const groupId =
+                    buildGroupName(
+                        settings.baseName,
+                        groupIndex
+                    );
+
+                const selectedLines =
+                    matches.map(
+                        (match) => match.line
+                    );
+
+                groups.push({
+                    groupId,
+                    matches
+                });
+
+                const selectedSet =
+                    new Set(selectedLines);
+
+                availableLines =
+                    availableLines.filter(
+                        (line) =>
+                            !selectedSet.has(line)
+                    );
+            }
+
+            const collisions =
+                groups
+                    .map((group) =>
+                        group.groupId
+                    )
+                    .filter((groupId) =>
+                        existingGroupIds.has(
+                            groupId
+                        )
+                    );
+
+            return {
+                settings,
+                mandatoryEligible,
+                groups,
+                collisions,
+                selectedLineCount:
+                    groups.length *
+                    settings.linesPerGroup,
+                createdAt: Date.now()
+            };
+        }
+
+        function formatRuleRange(
+            min,
+            max,
+            suffix = ''
+        ) {
+            if (
+                min === null &&
+                max === null
+            ) {
+                return 'Any';
+            }
+
+            if (
+                min !== null &&
+                max !== null
+            ) {
+                return `${min}${suffix} – ${max}${suffix}`;
+            }
+
+            if (min !== null) {
+                return `≥ ${min}${suffix}`;
+            }
+
+            return `≤ ${max}${suffix}`;
+        }
+
+        function previewGroups(event) {
+            event?.preventDefault();
+
+            try {
+                const settings =
+                    readSettings();
+
+                const plan =
+                    createPlan(
+                        allLines,
+                        settings
+                    );
+
+                if (
+                    plan.collisions.length > 0
+                ) {
+                    currentPlan = null;
+                    renderPlan(null);
+                    setCreateButtonEnabled(false);
+
+                    showStatus(
+                        `These group IDs already exist: ${plan.collisions.join(', ')}. Change the first group name.`,
+                        'error'
+                    );
+
+                    return;
+                }
+
+                currentPlan = plan;
+                renderPlan(plan);
+
+                if (
+                    plan.groups.length === 0
+                ) {
+                    setCreateButtonEnabled(false);
+
+                    showStatus(
+                        'No complete group can be created with all line-position conditions. Nothing was changed.',
+                        'info'
+                    );
+
+                    return;
+                }
+
+                setCreateButtonEnabled(true);
+
+                if (
+                    plan.groups.length <
+                    settings.requestedGroups
+                ) {
+                    showStatus(
+                        `Only ${plan.groups.length} complete group(s) can be built. The process stops before the first incomplete group.`,
+                        'info'
+                    );
+                } else {
+                    showStatus(
+                        `${plan.groups.length} complete group(s) are ready.`,
+                        'success'
+                    );
+                }
+            } catch (error) {
+                currentPlan = null;
+                renderPlan(null);
+                setCreateButtonEnabled(false);
+                showStatus(
+                    error.message,
+                    'error'
+                );
+            }
+        }
+
+        function renderPlan(plan) {
+            const grid =
+                document.getElementById(
+                    'plan-grid'
+                );
+
+            const description =
+                document.getElementById(
+                    'plan-description'
+                );
+
+            const badge =
+                document.getElementById(
+                    'plan-snapshot-badge'
+                );
+
+            document.getElementById(
+                'mandatory-eligible-count'
+            ).textContent =
+                String(
+                    plan?.mandatoryEligible
+                        .length ?? 0
+                );
+
+            document.getElementById(
+                'requested-groups-count'
+            ).textContent =
+                String(
+                    plan?.settings
+                        .requestedGroups ?? 0
+                );
+
+            document.getElementById(
+                'creatable-groups-count'
+            ).textContent =
+                String(
+                    plan?.groups.length ?? 0
+                );
+
+            document.getElementById(
+                'planned-lines-count'
+            ).textContent =
+                String(
+                    plan?.selectedLineCount ?? 0
+                );
+
+            if (!plan) {
+                description.textContent =
+                    'Enter the conditions for every line position and press Preview.';
+
+                badge.classList.add('hidden');
+
+                grid.innerHTML = `
+                    <div class="col-span-full rounded-xl border border-dashed border-gray-600 p-10 text-center text-gray-500">
+                        <i class="fa-solid fa-layer-group mb-3 text-3xl text-teal-400"></i>
+                        <p>No plan has been created yet.</p>
+                    </div>
+                `;
+
+                return;
+            }
+
+            description.textContent = plan.settings.createYears
+                ? `${plan.settings.linesPerGroup} independent line condition(s) per group. One Year will be created from every completed group.`
+                : `${plan.settings.linesPerGroup} independent line condition(s) per group.`;
+
+            badge.classList.remove('hidden');
+
+            if (
+                plan.groups.length === 0
+            ) {
+                grid.innerHTML = `
+                    <div class="col-span-full rounded-xl border border-amber-700 bg-amber-900/15 p-8 text-center text-amber-300">
+                        <i class="fa-solid fa-circle-info mb-3 text-3xl"></i>
+                        <p class="font-semibold">
+                            A complete group could not be matched.
+                        </p>
+                    </div>
+                `;
+
+                return;
+            }
+
+            grid.innerHTML =
+                plan.groups
+                    .map(
+                        (
+                            group,
+                            groupIndex
+                        ) => {
+                            const linesHtml =
+                                group.matches
+                                    .map(
+                                        (
+                                            match,
+                                            matchIndex
+                                        ) => {
+                                            const line =
+                                                match.line;
+
+                                            const rule =
+                                                plan.settings
+                                                    .rules[
+                                                        match.ruleIndex
+                                                    ];
+
+                                            return `
+                                                <div class="rounded-lg border border-gray-700 bg-gray-900/50 p-2">
+                                                    <div class="flex items-center justify-between gap-2">
+                                                        <div class="flex min-w-0 items-center gap-2">
+                                                            <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-teal-600 font-mono text-xs font-bold text-white">
+                                                                ${matchIndex + 1}
+                                                            </span>
+
+                                                            <span class="truncate font-mono text-sm font-bold text-white">
+                                                                ${escapeHtml(line.numberphone)}
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="shrink-0 text-right">
+                                                            <div class="font-mono text-xs font-bold text-green-400">
+                                                                $${escapeHtml(formatNumber(line.balance))}
+                                                            </div>
+
+                                                            <div class="font-mono text-[11px] font-bold text-orange-300">
+                                                                ${escapeHtml(line.validity ?? 0)} days
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="mt-2 grid grid-cols-2 gap-1 text-[10px]">
+                                                        <div class="rounded bg-gray-800 px-2 py-1 text-gray-400">
+                                                            Balance:
+                                                            <span class="font-mono font-bold text-green-300">
+                                                                ${escapeHtml(
+                                                                    formatRuleRange(
+                                                                        rule.balanceMin,
+                                                                        rule.balanceMax
+                                                                    )
+                                                                )}
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="rounded bg-gray-800 px-2 py-1 text-gray-400">
+                                                            Validity:
+                                                            <span class="font-mono font-bold text-orange-300">
+                                                                ${escapeHtml(
+                                                                    formatRuleRange(
+                                                                        rule.validityMin,
+                                                                        rule.validityMax,
+                                                                        'd'
+                                                                    )
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }
+                                    )
+                                    .join('');
+
+                            return `
+                                <article class="overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-lg">
+                                    <div class="flex items-center justify-between border-b border-gray-700 bg-gray-700/35 px-3 py-2.5">
+                                        <div>
+                                            <div class="text-[10px] uppercase tracking-wide text-gray-500">
+                                                Group ${groupIndex + 1}
+                                            </div>
+
+                                            <div class="font-mono text-lg font-bold text-teal-300">
+                                                ${escapeHtml(group.groupId)}
+                                            </div>
+                                        </div>
+
+                                        <span class="rounded-lg bg-gray-900/60 px-2 py-1 font-mono text-xs font-bold text-white">
+                                            ${group.matches.length} lines
+                                        </span>
+                                    </div>
+
+                                    <div class="space-y-2 p-2">
+                                        ${linesHtml}
+                                    </div>
+                                </article>
+                            `;
+                        }
+                    )
+                    .join('');
+        }
+
+        function invalidateCurrentPlan() {
+            if (
+                !currentPlan ||
+                isCreatingGroups
+            ) {
+                return;
+            }
+
+            currentPlan = null;
+            setCreateButtonEnabled(false);
+
+            document.getElementById(
+                'plan-snapshot-badge'
+            ).classList.add('hidden');
+
+            document.getElementById(
+                'plan-description'
+            ).textContent =
+                'Conditions changed. Press Preview again.';
+
+            showStatus(
+                'Conditions changed. Preview again before creating groups.',
+                'info'
+            );
+        }
+
+        function setCreateButtonEnabled(
+            enabled
+        ) {
+            const button =
+                document.getElementById(
+                    'create-groups-button'
+                );
+
+            button.disabled =
+                !enabled ||
+                isCreatingGroups;
+        }
+
+        async function createPlannedGroups() {
+            if (
+                !currentPlan ||
+                currentPlan.groups.length === 0 ||
+                isCreatingGroups
+            ) {
+                return;
+            }
+
+            const confirmed = confirm(
+                currentPlan.settings.createYears
+                    ? `Create ${currentPlan.groups.length} complete group(s) with ${currentPlan.selectedLineCount} line(s), then create one Year from every group using the same give_balance text?`
+                    : `Create ${currentPlan.groups.length} complete group(s) with ${currentPlan.selectedLineCount} line(s)?`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            isCreatingGroups = true;
+            setPageBusy(true);
+
+            try {
+                showStatus(
+                    'Refreshing server data and rebuilding the plan...',
+                    'info'
+                );
+
+                const latestLines =
+                    await fetchAllLines();
+
+                allLines = latestLines;
+
+                const refreshedPlan =
+                    createPlan(
+                        latestLines,
+                        currentPlan.settings
+                    );
+
+                if (
+                    refreshedPlan
+                        .collisions.length > 0
+                ) {
+                    throw new Error(
+                        `These group IDs already exist: ${refreshedPlan.collisions.join(', ')}.`
+                    );
+                }
+
+                currentPlan =
+                    refreshedPlan;
+
+                renderPlan(
+                    refreshedPlan
+                );
+
+                if (
+                    refreshedPlan
+                        .groups.length === 0
+                ) {
+                    showStatus(
+                        'No complete group is available now. Nothing was changed.',
+                        'info'
+                    );
+
+                    return;
+                }
+
+                let createdGroups = 0;
+                let createdLines = 0;
+                let createdYears = 0;
+
+                for (
+                    let groupIndex = 0;
+                    groupIndex <
+                    refreshedPlan.groups.length;
+                    groupIndex++
+                ) {
+                    const group =
+                        refreshedPlan
+                            .groups[
+                                groupIndex
+                            ];
+
+                    showStatus(
+                        `Creating ${group.groupId} (${groupIndex + 1} of ${refreshedPlan.groups.length})...`,
+                        'info'
+                    );
+
+                    const numberphones =
+                        group.matches.map(
+                            (match) =>
+                                normalizeText(
+                                    match.line
+                                        .numberphone
+                                )
+                        );
+
+                    const result =
+                        await sendEditGroupRequest(
+                            numberphones,
+                            group.groupId
+                        );
+
+                    if (!result.success) {
+                        throw new Error(
+                            `Stopped at ${group.groupId}: ${result.message}`
+                        );
+                    }
+
+                    const updatedCount =
+                        Number(
+                            result.updated_count ??
+                            result.data?.length ??
+                            numberphones.length
+                        );
+
+                    if (
+                        Number.isFinite(
+                            updatedCount
+                        ) &&
+                        updatedCount <
+                            numberphones.length
+                    ) {
+                        throw new Error(
+                            `${group.groupId} was partially updated (${updatedCount} of ${numberphones.length}).`
+                        );
+                    }
+
+                    createdGroups++;
+                    createdLines +=
+                        numberphones.length;
+
+                    if (
+                        refreshedPlan.settings
+                            .createYears
+                    ) {
+                        showStatus(
+                            `Group ${group.groupId} was created. Creating its Year (${groupIndex + 1} of ${refreshedPlan.groups.length})...`,
+                            'info'
+                        );
+
+                        const yearResult =
+                            await sendCreateYearRequest(
+                                group.groupId,
+                                refreshedPlan.settings
+                                    .giveBalance
+                            );
+
+                        if (!yearResult.success) {
+                            throw new Error(
+                                `Group ${group.groupId} was created, but its Year was not created: ${yearResult.message}`
+                            );
+                        }
+
+                        createdYears++;
+                    }
+                }
+
+                const skippedGroups =
+                    refreshedPlan.settings
+                        .requestedGroups -
+                    createdGroups;
+
+                currentPlan = null;
+                setCreateButtonEnabled(false);
+
+                await loadLines(false);
+                renderPlan(null);
+
+                if (skippedGroups > 0) {
+                    showStatus(
+                        refreshedPlan.settings.createYears
+                            ? `Created ${createdGroups} complete group(s), ${createdLines} line(s), and ${createdYears} Year(s). ${skippedGroups} requested group(s) were skipped because a complete match was not available.`
+                            : `Created ${createdGroups} complete group(s) with ${createdLines} line(s). ${skippedGroups} requested group(s) were skipped because a complete match was not available.`,
+                        'success'
+                    );
+                } else {
+                    showStatus(
+                        refreshedPlan.settings.createYears
+                            ? `Created all ${createdGroups} group(s) and ${createdYears} Year(s) successfully. They are now visible on the Groups and Years pages.`
+                            : `Created all ${createdGroups} group(s) successfully. They are now visible on the Groups page.`,
+                        'success'
+                    );
+                }
+            } catch (error) {
+                showStatus(
+                    error.message ||
+                    'Unable to create groups.',
+                    'error'
+                );
+            } finally {
+                isCreatingGroups = false;
+                setPageBusy(false);
+            }
+        }
+
+        async function sendEditGroupRequest(
+            numberphones,
+            groupId
+        ) {
+            const controller =
+                new AbortController();
+
+            const timeoutId =
+                setTimeout(() => {
+                    controller.abort();
+                }, REQUEST_TIMEOUT_MS);
+
+            try {
+                const response =
+                    await fetch(
+                        EDIT_GROUP_API,
+                        {
+                            method: 'PUT',
+                            headers: authHeaders(),
+                            body: JSON.stringify({
+                                numberphones,
+                                group_id: groupId
+                            }),
+                            signal:
+                                controller.signal
+                        }
+                    );
+
+                const result =
+                    await readJsonResponse(
+                        response
+                    );
+
+                if (
+                    !response.ok ||
+                    result.success === false
+                ) {
+                    return {
+                        success: false,
+                        message:
+                            result.message ||
+                            `Server returned ${response.status}`
+                    };
+                }
+
+                return {
+                    success: true,
+                    ...result
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    message:
+                        error.name ===
+                        'AbortError'
+                            ? `No response within ${REQUEST_TIMEOUT_MS / 1000} seconds.`
+                            : error.message
+                };
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        async function sendCreateYearRequest(
+            groupId,
+            giveBalance
+        ) {
+            const controller =
+                new AbortController();
+
+            const timeoutId =
+                setTimeout(() => {
+                    controller.abort();
+                }, REQUEST_TIMEOUT_MS);
+
+            try {
+                const response =
+                    await fetch(
+                        CREATE_YEAR_API,
+                        {
+                            method: 'POST',
+                            headers: authHeaders(),
+                            body: JSON.stringify({
+                                group_id: groupId,
+                                source_group_id: groupId,
+                                give_balance: giveBalance
+                            }),
+                            signal:
+                                controller.signal
+                        }
+                    );
+
+                const result =
+                    await readJsonResponse(
+                        response
+                    );
+
+                if (
+                    !response.ok ||
+                    result.success === false
+                ) {
+                    return {
+                        success: false,
+                        message:
+                            result.message ||
+                            result.error ||
+                            `Server returned ${response.status}`
+                    };
+                }
+
+                return {
+                    success: true,
+                    ...result
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    message:
+                        error.name ===
+                        'AbortError'
+                            ? `No response within ${REQUEST_TIMEOUT_MS / 1000} seconds.`
+                            : error.message
+                };
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        async function fetchAllLines() {
+            const response =
+                await fetch(
+                    FETCH_DATA_API,
+                    {
+                        headers: authHeaders(),
+                        cache: 'no-store'
+                    }
+                );
+
+            const result =
+                await readJsonResponse(
+                    response
+                );
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message ||
+                    `Server returned ${response.status}`
+                );
+            }
+
+            const lines =
+                Array.isArray(result.data)
+                    ? result.data
+                    : Array.isArray(result.numbers)
+                        ? result.numbers
+                        : Array.isArray(result.rows)
+                            ? result.rows
+                            : null;
+
+            if (
+                result.success === false ||
+                !Array.isArray(lines)
+            ) {
+                throw new Error(
+                    result.message ||
+                    'The server returned an invalid response.'
+                );
+            }
+
+            return lines;
+        }
+
+        async function loadLines(
+            showMessage = true
+        ) {
+            setReloadButtonLoading(true);
+
+            if (showMessage) {
+                showStatus(
+                    'Loading lines from the server...',
+                    'info'
+                );
+            }
+
+            try {
+                allLines =
+                    await fetchAllLines();
+
+                currentPlan = null;
+                renderPlan(null);
+                setCreateButtonEnabled(false);
+
+                const mandatoryEligible =
+                    allLines.filter(
+                        passesMandatoryRules
+                    ).length;
+
+                document.getElementById(
+                    'mandatory-eligible-count'
+                ).textContent =
+                    String(
+                        mandatoryEligible
+                    );
+
+                if (showMessage) {
+                    showStatus(
+                        `${allLines.length} expired-service line(s) loaded. ${mandatoryEligible} have an empty Group ID and can be used.`,
+                        'success'
+                    );
+                }
+            } catch (error) {
+                allLines = [];
+                currentPlan = null;
+                renderPlan(null);
+                setCreateButtonEnabled(false);
+
+                showStatus(
+                    `Unable to load lines: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                setReloadButtonLoading(false);
+            }
+        }
+
+        function setReloadButtonLoading(
+            loading
+        ) {
+            const button =
+                document.getElementById(
+                    'reload-lines-button'
+                );
+
+            if (!button) {
+                return;
+            }
+
+            button.disabled = loading;
+
+            button.innerHTML = loading
+                ? `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Loading...
+                `
+                : `
+                    <i class="fa-solid fa-rotate"></i>
+                    Reload Lines
+                `;
+        }
+
+        function setPageBusy(busy) {
+            const form =
+                document.getElementById(
+                    'builder-form'
+                );
+
+            form
+                .querySelectorAll(
+                    'input, textarea, button'
+                )
+                .forEach((element) => {
+                    element.disabled = busy;
+                });
+
+            const createButton =
+                document.getElementById(
+                    'create-groups-button'
+                );
+
+            createButton.innerHTML = busy
+                ? `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Creating Groups${
+                        document.getElementById(
+                            'create-years-after-groups'
+                        )?.checked
+                            ? ' & Years'
+                            : ''
+                    }...
+                `
+                : createButton.innerHTML;
+
+            if (!busy) {
+                toggleCreateYearsOptions();
+                setCreateButtonEnabled(
+                    Boolean(
+                        currentPlan &&
+                        currentPlan
+                            .groups.length > 0
+                    )
+                );
+            }
+        }
+
+        function resetBuilder() {
+            if (isCreatingGroups) {
+                return;
+            }
+
+            document.getElementById(
+                'builder-form'
+            ).reset();
+
+            document.getElementById(
+                'requested-groups'
+            ).value = '1';
+
+            document.getElementById(
+                'lines-per-group'
+            ).value = '4';
+
+            document.getElementById(
+                'create-years-after-groups'
+            ).checked = false;
+
+            document.getElementById(
+                'give-balance-text'
+            ).value = '';
+
+            toggleCreateYearsOptions();
+
+            lineRulesDraft =
+                Array.from(
+                    { length: 4 },
+                    createEmptyRule
+                );
+
+            renderLineRuleCards();
+
+            currentPlan = null;
+            renderPlan(null);
+            setCreateButtonEnabled(false);
+
+            showStatus(
+                'Conditions were reset.',
+                'info'
+            );
+        }
+
+        function showStatus(message, type) {
+            const element =
+                document.getElementById(
+                    'global-status'
+                );
+
+            element.className =
+                'mb-4 block rounded-xl border p-3 text-sm';
+
+            if (type === 'success') {
+                element.classList.add(
+                    'border-green-500',
+                    'bg-green-900/30',
+                    'text-green-300'
+                );
+            } else if (type === 'error') {
+                element.classList.add(
+                    'border-red-500',
+                    'bg-red-900/30',
+                    'text-red-300'
+                );
+            } else {
+                element.classList.add(
+                    'border-blue-500',
+                    'bg-blue-900/30',
+                    'text-blue-300'
+                );
+            }
+
+            element.textContent = message;
+        }
+
+        async function readJsonResponse(
+            response
+        ) {
+            const text =
+                await response.text();
+
+            if (!text) {
+                return {};
+            }
+
+            try {
+                return JSON.parse(text);
+            } catch {
+                throw new Error(
+                    'The server returned a non-JSON response.'
+                );
+            }
+        }
+
+        function formatNumber(value) {
+            const number =
+                Number.parseFloat(value);
+
+            if (!Number.isFinite(number)) {
+                return '0.00';
+            }
+
+            return number.toFixed(2);
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        lineRulesDraft =
+            Array.from(
+                { length: 4 },
+                createEmptyRule
+            );
+
+        renderLineRuleCards();
+        toggleCreateYearsOptions();
+        loadLines();
+    </script>
+</body>
+</html>
