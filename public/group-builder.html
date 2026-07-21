@@ -952,6 +952,19 @@ function isZeroOrEmptyGroup(value) {
         }
 
         /*
+         * Always keep matched lines in their configured slot order.
+         * The slot is the rule index: Line 1, Line 2, Line 3, Line 4...
+         */
+        function getMatchesInSlotOrder(matches) {
+            return [...(Array.isArray(matches) ? matches : [])]
+                .sort(
+                    (firstMatch, secondMatch) =>
+                        Number(firstMatch?.ruleIndex ?? 0) -
+                        Number(secondMatch?.ruleIndex ?? 0)
+                );
+        }
+
+        /*
          * Finds a complete one-to-one assignment:
          * every line position gets one unique phone number.
          * This avoids using a number twice and avoids a greedy
@@ -1123,14 +1136,19 @@ function isZeroOrEmptyGroup(value) {
                         groupIndex
                     );
 
+                const orderedMatches =
+                    getMatchesInSlotOrder(
+                        matches
+                    );
+
                 const selectedLines =
-                    matches.map(
+                    orderedMatches.map(
                         (match) => match.line
                     );
 
                 groups.push({
                     groupId,
-                    matches
+                    matches: orderedMatches
                 });
 
                 const selectedSet =
@@ -1353,8 +1371,13 @@ function isZeroOrEmptyGroup(value) {
                             group,
                             groupIndex
                         ) => {
+                            const orderedMatches =
+                                getMatchesInSlotOrder(
+                                    group.matches
+                                );
+
                             const linesHtml =
-                                group.matches
+                                orderedMatches
                                     .map(
                                         (
                                             match,
@@ -1362,6 +1385,9 @@ function isZeroOrEmptyGroup(value) {
                                         ) => {
                                             const line =
                                                 match.line;
+
+                                            const slotNumber =
+                                                Number(match.ruleIndex) + 1;
 
                                             const rule =
                                                 plan.settings
@@ -1374,7 +1400,7 @@ function isZeroOrEmptyGroup(value) {
                                                     <div class="flex items-center justify-between gap-2">
                                                         <div class="flex min-w-0 items-center gap-2">
                                                             <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-teal-600 font-mono text-xs font-bold text-white">
-                                                                ${matchIndex + 1}
+                                                                ${slotNumber}
                                                             </span>
 
                                                             <span class="truncate font-mono text-sm font-bold text-white">
@@ -1439,7 +1465,7 @@ function isZeroOrEmptyGroup(value) {
                                         </div>
 
                                         <span class="rounded-lg bg-gray-900/60 px-2 py-1 font-mono text-xs font-bold text-white">
-                                            ${group.matches.length} lines
+                                            ${orderedMatches.length} lines
                                         </span>
                                     </div>
 
@@ -1580,8 +1606,13 @@ function isZeroOrEmptyGroup(value) {
                         'info'
                     );
 
+                    const orderedMatches =
+                        getMatchesInSlotOrder(
+                            group.matches
+                        );
+
                     const numberphones =
-                        group.matches.map(
+                        orderedMatches.map(
                             (match) =>
                                 normalizeText(
                                     match.line
@@ -1637,7 +1668,8 @@ function isZeroOrEmptyGroup(value) {
                             await sendCreateYearRequest(
                                 group.groupId,
                                 refreshedPlan.settings
-                                    .giveBalance
+                                    .giveBalance,
+                                numberphones
                             );
 
                         if (!yearResult.success) {
@@ -1753,7 +1785,8 @@ function isZeroOrEmptyGroup(value) {
 
         async function sendCreateYearRequest(
             groupId,
-            giveBalance
+            giveBalance,
+            numberphones
         ) {
             const controller =
                 new AbortController();
@@ -1764,6 +1797,22 @@ function isZeroOrEmptyGroup(value) {
                 }, REQUEST_TIMEOUT_MS);
 
             try {
+                const orderedNumberphones =
+                    (Array.isArray(numberphones)
+                        ? numberphones
+                        : []
+                    )
+                        .map(normalizeText)
+                        .filter(Boolean);
+
+                const yearNumbers =
+                    orderedNumberphones.map(
+                        (numberphone, index) => ({
+                            slot: index + 1,
+                            numberphone
+                        })
+                    );
+
                 const response =
                     await fetch(
                         CREATE_YEAR_API,
@@ -1773,7 +1822,29 @@ function isZeroOrEmptyGroup(value) {
                             body: JSON.stringify({
                                 group_id: groupId,
                                 source_group_id: groupId,
-                                give_balance: giveBalance
+                                give_balance: giveBalance,
+
+                                // Keep the exact Line 1 -> Line 4 order.
+                                numberphones:
+                                    orderedNumberphones,
+
+                                ordered_numberphones:
+                                    orderedNumberphones,
+
+                                year_numbers:
+                                    yearNumbers,
+
+                                number1:
+                                    orderedNumberphones[0] ?? null,
+
+                                number2:
+                                    orderedNumberphones[1] ?? null,
+
+                                number3:
+                                    orderedNumberphones[2] ?? null,
+
+                                number4:
+                                    orderedNumberphones[3] ?? null
                             }),
                             signal:
                                 controller.signal
