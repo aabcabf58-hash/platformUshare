@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zouzou App - Filtered Refresh All</title>
+    <title>Zouzou App - Filtered Check Queue</title>
 
     <script src="./theme.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -26,7 +26,7 @@
                 <h1 class="text-xl font-bold text-blue-400">
                     Zouzou App
                     <span class="text-base font-normal text-white">
-                        | Filtered Refresh All
+                        | Filtered Check Queue
                     </span>
                 </h1>
             </div>
@@ -54,7 +54,7 @@
 
             <div class="rounded-2xl border border-green-800 bg-green-900/20 p-4 shadow-xl">
                 <div class="text-xs font-semibold uppercase tracking-wide text-green-500">
-                    Will Refresh
+                    Will Queue
                 </div>
                 <div id="included-lines-count" class="mt-2 text-3xl font-bold text-green-300">0</div>
             </div>
@@ -68,7 +68,7 @@
 
             <div class="rounded-2xl border border-blue-800 bg-blue-900/20 p-4 shadow-xl">
                 <div class="text-xs font-semibold uppercase tracking-wide text-blue-500">
-                    Completed
+                    Queued
                 </div>
                 <div id="completed-lines-count" class="mt-2 text-3xl font-bold text-blue-300">0</div>
             </div>
@@ -81,7 +81,7 @@
                         Exclusion Conditions
                     </h2>
                     <p class="mt-1 text-sm text-gray-400">
-                        A number will not be refreshed when it matches any enabled condition.
+                        A number will not be queued when it matches any enabled condition.
                     </p>
                 </div>
 
@@ -149,17 +149,17 @@
 
                         <div class="min-w-0 flex-1">
                             <div class="font-semibold text-white">
-                                Refresh only numbers starting with
+                                Queue only numbers starting with
                             </div>
                             <p class="mt-1 text-xs text-gray-500">
-                                Only numbers matching one of these prefixes will be refreshed. Enter prefixes separated by commas, spaces, or new lines.
+                                Only numbers matching one of these prefixes will be queued. Enter prefixes separated by commas, spaces, or new lines.
                             </p>
 
                             <textarea
                                 id="included-prefixes-input"
                                 rows="2"
                                 oninput="applyConditions()"
-                                placeholder="Example: 03, 701, 76 (only these prefixes will refresh)"
+                                placeholder="Example: 03, 701, 76 (only these prefixes will queue)"
                                 class="mt-3 w-full resize-y rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 font-mono text-white outline-none focus:border-blue-500"
                             ></textarea>
                         </div>
@@ -167,43 +167,22 @@
                 </label>
 
                 <label class="rounded-xl border border-gray-700 bg-gray-900/50 p-4">
-                    <div class="flex items-start gap-3">
-                        <input
-                            id="exclude-active-enabled"
-                            type="checkbox"
-                            onchange="applyConditions()"
-                            class="mt-1 h-4 w-4 cursor-pointer rounded accent-green-500"
-                        >
-
-                        <div>
-                            <div class="font-semibold text-green-300">
-                                Exclude Active service numbers
-                            </div>
-                            <p class="mt-1 text-xs text-gray-500">
-                                Active means the line currently has service data, bundle data, dates, or secondary lines.
-                            </p>
-                        </div>
+                    <div class="font-semibold text-cyan-300">
+                        Service status filter
                     </div>
-                </label>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Queue all numbers, only numbers with active services, or only numbers whose services are expired.
+                    </p>
 
-                <label class="rounded-xl border border-gray-700 bg-gray-900/50 p-4">
-                    <div class="flex items-start gap-3">
-                        <input
-                            id="exclude-expired-enabled"
-                            type="checkbox"
-                            onchange="applyConditions()"
-                            class="mt-1 h-4 w-4 cursor-pointer rounded accent-red-500"
-                        >
-
-                        <div>
-                            <div class="font-semibold text-red-300">
-                                Exclude Expired service numbers
-                            </div>
-                            <p class="mt-1 text-xs text-gray-500">
-                                Expired uses the same service-data test used by the main table.
-                            </p>
-                        </div>
-                    </div>
+                    <select
+                        id="service-filter-select"
+                        onchange="applyConditions()"
+                        class="mt-3 w-full cursor-pointer rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 font-semibold text-white outline-none focus:border-cyan-500"
+                    >
+                        <option value="all" selected>All numbers</option>
+                        <option value="active">Active services only</option>
+                        <option value="expired">Expired services only</option>
+                    </select>
                 </label>
 
                 <label class="rounded-xl border border-gray-700 bg-gray-900/50 p-4">
@@ -211,7 +190,7 @@
                         Check result filter
                     </div>
                     <p class="mt-1 text-xs text-gray-500">
-                        Choose Failed only to refresh numbers whose latest saved check was unsuccessful.
+                        Choose Failed only to queue numbers whose latest saved check was unsuccessful.
                     </p>
 
                     <select
@@ -225,90 +204,47 @@
                 </label>
             </div>
 
-            <div class="mt-4 grid gap-3 border-t border-gray-700 pt-4 md:grid-cols-2 xl:grid-cols-4">
-                <div>
-                    <label for="concurrency-input" class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">
-                        Concurrent Requests
-                    </label>
+            <div class="mt-4 border-t border-gray-700 pt-4">
+                <label for="preview-search-input" class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">
+                    Preview Search
+                </label>
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
                     <input
-                        id="concurrency-input"
-                        type="number"
-                        min="1"
-                        max="20"
-                        value="10"
-                        class="w-full rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 font-mono text-white outline-none focus:border-blue-500"
+                        id="preview-search-input"
+                        type="search"
+                        oninput="renderPreviewTable()"
+                        placeholder="Search phone, status, group, or exclusion reason..."
+                        class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2.5 pl-11 pr-4 text-white outline-none focus:border-blue-500"
                     >
-                </div>
-
-                <div>
-                    <label for="request-timeout-input" class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">
-                        Timeout Per Request (seconds)
-                    </label>
-                    <input
-                        id="request-timeout-input"
-                        type="number"
-                        min="30"
-                        max="600"
-                        value="120"
-                        class="w-full rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 font-mono text-white outline-none focus:border-blue-500"
-                    >
-                </div>
-
-                <div class="md:col-span-2 xl:col-span-2">
-                    <label for="preview-search-input" class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">
-                        Preview Search
-                    </label>
-                    <div class="relative">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                        <input
-                            id="preview-search-input"
-                            type="search"
-                            oninput="renderPreviewTable()"
-                            placeholder="Search phone, status, group, or exclusion reason..."
-                            class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2.5 pl-11 pr-4 text-white outline-none focus:border-blue-500"
-                        >
-                    </div>
                 </div>
             </div>
 
             <div class="mt-4 flex flex-col gap-3 border-t border-gray-700 pt-4 lg:flex-row lg:items-center lg:justify-between">
                 <div class="text-sm text-gray-400">
-                    The page refreshes only the green eligible numbers. Each number is sent as a separate request.
+                    All green eligible numbers are sent together in one request. The worker servers will process them in organized groups.
                 </div>
 
-                <div class="flex flex-wrap gap-2">
-                    <button
-                        id="stop-refresh-button"
-                        type="button"
-                        onclick="requestStopRefresh()"
-                        disabled
-                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-5 py-3 font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                        <i class="fa-solid fa-stop"></i>
-                        Stop After Current Batch
-                    </button>
-
-                    <button
-                        id="start-refresh-button"
-                        type="button"
-                        onclick="startFilteredRefresh()"
-                        disabled
-                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-bold text-white shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                        <i class="fa-solid fa-play"></i>
-                        Start Filtered Refresh
-                        (<span id="start-refresh-count">0</span>)
-                    </button>
-                </div>
+                <button
+                    id="start-refresh-button"
+                    type="button"
+                    onclick="startFilteredRefresh()"
+                    disabled
+                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-bold text-white shadow transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                    <i class="fa-solid fa-list-check"></i>
+                    Queue Filtered Checks
+                    (<span id="start-refresh-count">0</span>)
+                </button>
             </div>
         </section>
 
         <section class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
             <div class="flex flex-col gap-2 border-b border-gray-700 p-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h2 class="font-bold text-white">Refresh Preview</h2>
+                    <h2 class="font-bold text-white">Check Queue Preview</h2>
                     <p class="mt-1 text-xs text-gray-500">
-                        Green rows will refresh. When the prefix filter is enabled, only matching prefixes stay green; all others are excluded in red.
+                        Green rows will be queued in one request. When the prefix filter is enabled, only matching prefixes stay green; all others are excluded in red.
                     </p>
                 </div>
 
@@ -359,16 +295,12 @@
         const FETCH_DATA_API =
             `${API_BASE_URL}/api/ushare/getAllnumbers`;
 
-        const REFRESH_ALFA_API =
-            `${API_BASE_URL}/api/ushare/check-number`;
-
-        const PENDING_REFRESH_STORAGE_KEY =
-            'zouzou_pending_refresh_numbers';
+        const CHECK_ALL_API =
+            `${API_BASE_URL}/api/ushare/chekall`;
 
         let linesData = [];
         let evaluatedLines = [];
         let isRefreshing = false;
-        let stopRequested = false;
         let completedCount = 0;
         const refreshResults = new Map();
 
@@ -445,11 +377,8 @@
             getElement('recent-unit-select').value = 'minutes';
             getElement('include-prefix-enabled').checked = false;
             getElement('included-prefixes-input').value = '';
-            getElement('exclude-active-enabled').checked = false;
-            getElement('exclude-expired-enabled').checked = false;
+            getElement('service-filter-select').value = 'all';
             getElement('check-result-filter-select').value = 'all';
-            getElement('concurrency-input').value = '10';
-            getElement('request-timeout-input').value = '120';
             applyConditions();
         }
 
@@ -499,10 +428,11 @@
                 prefixes: parsePrefixes(
                     getElement('included-prefixes-input')?.value
                 ),
-                excludeActive:
-                    getElement('exclude-active-enabled')?.checked === true,
-                excludeExpired:
-                    getElement('exclude-expired-enabled')?.checked === true,
+                serviceFilter: ['active', 'expired'].includes(
+                    getElement('service-filter-select')?.value
+                )
+                    ? getElement('service-filter-select').value
+                    : 'all',
                 checkResultFilter:
                     getElement('check-result-filter-select')?.value === 'failed'
                         ? 'failed'
@@ -560,12 +490,12 @@
 
             const expired = isExpiredServiceLine(line);
 
-            if (conditions.excludeActive && !expired) {
-                reasons.push('Active service');
+            if (conditions.serviceFilter === 'active' && expired) {
+                reasons.push('Service is expired');
             }
 
-            if (conditions.excludeExpired && expired) {
-                reasons.push('Expired service');
+            if (conditions.serviceFilter === 'expired' && !expired) {
+                reasons.push('Service is active');
             }
 
             if (
@@ -638,7 +568,7 @@
                     item.line?.line_type,
                     item.serviceStatus,
                     getSavedCheckStatus(item.line),
-                    item.excluded ? 'excluded' : 'will refresh',
+                    item.excluded ? 'excluded' : 'will queue',
                     item.reasons.join(' '),
                     refreshResults.get(
                         normalizePhone(item.line?.numberphone)
@@ -688,7 +618,7 @@
                 : `
                     <span class="inline-flex items-center gap-1 rounded-lg border border-green-700 bg-green-500/10 px-2.5 py-1 text-xs font-bold text-green-300">
                         <i class="fa-solid fa-check"></i>
-                        WILL REFRESH
+                        WILL QUEUE
                     </span>
                 `;
 
@@ -703,15 +633,15 @@
                             `<div class="mb-1 rounded-md bg-red-500/10 px-2 py-1 text-xs text-red-300">${escapeHtml(reason)}</div>`
                     )
                     .join('')
-                : '<span class="text-xs text-gray-500">No exclusion matched</span>';
+                : '<span class="text-xs text-gray-500">Eligible for queue</span>';
 
-            let resultHtml = '<span class="text-xs text-gray-500">Not started</span>';
+            let resultHtml = '<span class="text-xs text-gray-500">Not queued</span>';
 
             if (result?.status === 'running') {
                 resultHtml = `
                     <span class="inline-flex items-center gap-1 text-xs font-bold text-blue-300">
                         <i class="fa-solid fa-spinner fa-spin"></i>
-                        Refreshing...
+                        Sending...
                     </span>
                 `;
             } else if (result?.status === 'success') {
@@ -762,144 +692,135 @@
                 return;
             }
 
-            const jobs = evaluatedLines
-                .filter((item) => !item.excluded)
-                .map((item) => item.line);
+            const numberphones = Array.from(
+                new Set(
+                    evaluatedLines
+                        .filter((item) => !item.excluded)
+                        .map((item) => normalizePhone(item.line?.numberphone))
+                        .filter(Boolean)
+                )
+            );
 
-            if (jobs.length === 0) {
+            if (numberphones.length === 0) {
                 showStatus(
-                    'No numbers are eligible after applying the exclusion conditions.',
+                    'No numbers are eligible after applying the conditions.',
                     'error'
                 );
                 return;
             }
 
             const confirmed = confirm(
-                `Refresh ${jobs.length} eligible number(s)? Excluded numbers will not be sent.`
+                `Queue ${numberphones.length} eligible number(s) for checking? All numbers will be sent in one request.`
             );
 
             if (!confirmed) {
                 return;
             }
 
-            const concurrency = clampInteger(
-                getElement('concurrency-input')?.value,
-                1,
-                20,
-                10
-            );
-
-            const timeoutSeconds = clampInteger(
-                getElement('request-timeout-input')?.value,
-                30,
-                600,
-                120
-            );
-
             isRefreshing = true;
-            stopRequested = false;
             completedCount = 0;
             refreshResults.clear();
             setRefreshControls(true);
+
+            numberphones.forEach((phone) => {
+                refreshResults.set(phone, {
+                    status: 'running',
+                    message: 'Sending to check queue...'
+                });
+            });
+
             updateSummary();
             renderPreviewTable();
-
-            let successCount = 0;
-            let failedCount = 0;
-            const failedNumbers = [];
+            showStatus(
+                `Sending ${numberphones.length} number(s) to the server in one request...`,
+                'info'
+            );
 
             try {
-                for (
-                    let startIndex = 0;
-                    startIndex < jobs.length;
-                    startIndex += concurrency
-                ) {
-                    if (stopRequested) {
-                        break;
-                    }
+                const response = await fetch(CHECK_ALL_API, {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({ numberphones })
+                });
 
-                    const batch = jobs.slice(
-                        startIndex,
-                        startIndex + concurrency
+                const result = await readJsonResponse(response);
+
+                if (!response.ok || result.success === false) {
+                    const message = [result.message, result.error]
+                        .filter(Boolean)
+                        .join(': ');
+
+                    throw new Error(
+                        message || `Server returned ${response.status}`
                     );
-
-                    batch.forEach((line) => {
-                        refreshResults.set(
-                            normalizePhone(line.numberphone),
-                            {
-                                status: 'running',
-                                message: ''
-                            }
-                        );
-                    });
-
-                    renderPreviewTable();
-
-                    const batchNumber =
-                        Math.floor(startIndex / concurrency) + 1;
-                    const totalBatches =
-                        Math.ceil(jobs.length / concurrency);
-
-                    showStatus(
-                        `Running batch ${batchNumber}/${totalBatches}. Completed ${completedCount}/${jobs.length}.`,
-                        'info'
-                    );
-
-                    const settledResults = await Promise.allSettled(
-                        batch.map((line) =>
-                            refreshLine(line, timeoutSeconds * 1000)
-                        )
-                    );
-
-                    settledResults.forEach((settled, index) => {
-                        const line = batch[index];
-                        const phone = normalizePhone(line.numberphone);
-                        completedCount += 1;
-
-                        if (
-                            settled.status === 'fulfilled' &&
-                            settled.value.success
-                        ) {
-                            successCount += 1;
-                            refreshResults.set(phone, {
-                                status: 'success',
-                                message: 'Refreshed successfully.'
-                            });
-                        } else {
-                            failedCount += 1;
-                            const message =
-                                settled.status === 'fulfilled'
-                                    ? settled.value.message
-                                    : settled.reason?.message ||
-                                      'Unexpected refresh error.';
-
-                            failedNumbers.push(phone);
-                            refreshResults.set(phone, {
-                                status: 'failed',
-                                message
-                            });
-                        }
-                    });
-
-                    updateSummary();
-                    renderPreviewTable();
                 }
 
-                const stoppedText = stopRequested
-                    ? ' Refresh stopped after the current batch.'
-                    : '';
+                const hasUpdatedList = Array.isArray(result.updatedNumbers);
+                const updatedNumbers = new Set(
+                    hasUpdatedList
+                        ? result.updatedNumbers.map(normalizePhone)
+                        : numberphones
+                );
+                const notFoundNumbers = new Set(
+                    Array.isArray(result.notFoundNumbers)
+                        ? result.notFoundNumbers.map(normalizePhone)
+                        : []
+                );
 
-                const failedText = failedNumbers.length > 0
-                    ? ` Failed numbers: ${failedNumbers.join(', ')}.`
+                let queuedCount = 0;
+                let notFoundCount = 0;
+
+                numberphones.forEach((phone) => {
+                    if (notFoundNumbers.has(phone)) {
+                        notFoundCount += 1;
+                        refreshResults.set(phone, {
+                            status: 'failed',
+                            message: 'Number was not found in the database.'
+                        });
+                        return;
+                    }
+
+                    if (updatedNumbers.has(phone)) {
+                        queuedCount += 1;
+                        refreshResults.set(phone, {
+                            status: 'success',
+                            message: 'required_info changed to true.'
+                        });
+                        return;
+                    }
+
+                    refreshResults.set(phone, {
+                        status: 'failed',
+                        message: 'The server did not update this number.'
+                    });
+                });
+
+                completedCount = queuedCount;
+                updateSummary();
+                renderPreviewTable();
+
+                const missingText = notFoundCount > 0
+                    ? ` Not found: ${notFoundCount}.`
                     : '';
 
                 showStatus(
-                    `Filtered refresh finished. Successful: ${successCount}, Failed: ${failedCount}, Completed: ${completedCount}/${jobs.length}.${stoppedText}${failedText}`,
-                    failedCount === 0 && !stopRequested
-                        ? 'success'
-                        : failedCount > 0
-                            ? 'error'
-                            : 'info'
+                    `Queue request completed. Requested: ${numberphones.length}, queued: ${queuedCount}.${missingText}`,
+                    notFoundCount === 0 ? 'success' : 'error'
+                );
+            } catch (error) {
+                numberphones.forEach((phone) => {
+                    refreshResults.set(phone, {
+                        status: 'failed',
+                        message: error.message
+                    });
+                });
+
+                completedCount = 0;
+                updateSummary();
+                renderPreviewTable();
+                showStatus(
+                    `Unable to queue numbers: ${error.message}`,
+                    'error'
                 );
             } finally {
                 isRefreshing = false;
@@ -908,22 +829,8 @@
             }
         }
 
-        function requestStopRefresh() {
-            if (!isRefreshing) {
-                return;
-            }
-
-            stopRequested = true;
-            getElement('stop-refresh-button').disabled = true;
-            showStatus(
-                'Stop requested. The current batch will finish, and no new batch will start.',
-                'info'
-            );
-        }
-
         function setRefreshControls(running) {
             getElement('start-refresh-button').disabled = running;
-            getElement('stop-refresh-button').disabled = !running;
             getElement('reload-data-button').disabled = running;
 
             [
@@ -932,131 +839,14 @@
                 'recent-unit-select',
                 'include-prefix-enabled',
                 'included-prefixes-input',
-                'exclude-active-enabled',
-                'exclude-expired-enabled',
-                'check-result-filter-select',
-                'concurrency-input',
-                'request-timeout-input'
+                'service-filter-select',
+                'check-result-filter-select'
             ].forEach((id) => {
                 const element = getElement(id);
                 if (element) {
                     element.disabled = running;
                 }
             });
-        }
-
-        async function refreshLine(line, timeoutMilliseconds) {
-            const phone = normalizePhone(line?.numberphone);
-
-            if (!phone) {
-                return {
-                    success: false,
-                    message: 'Phone number is missing.'
-                };
-            }
-
-            markRefreshPending(phone, true, line);
-
-            const controller = new AbortController();
-            const timeoutId = setTimeout(
-                () => controller.abort(),
-                timeoutMilliseconds
-            );
-
-            try {
-                const response = await fetch(REFRESH_ALFA_API, {
-                    method: 'POST',
-                    headers: authHeaders(),
-                    body: JSON.stringify({
-                        numberphone: phone
-                    }),
-                    signal: controller.signal
-                });
-
-                const result = await readJsonResponse(response);
-
-                if (!response.ok || result.success === false) {
-                    const message = [
-                        result.message,
-                        result.error
-                    ]
-                        .filter(Boolean)
-                        .join(': ');
-
-                    return {
-                        success: false,
-                        message:
-                            message ||
-                            `Server returned ${response.status}`
-                    };
-                }
-
-                return {
-                    success: true,
-                    message: 'Refreshed successfully.'
-                };
-            } catch (error) {
-                return {
-                    success: false,
-                    message:
-                        error.name === 'AbortError'
-                            ? `No response within ${Math.round(
-                                timeoutMilliseconds / 1000
-                            )} seconds.`
-                            : error.message
-                };
-            } finally {
-                clearTimeout(timeoutId);
-                markRefreshPending(phone, false);
-            }
-        }
-
-        function loadPendingRefreshes() {
-            try {
-                const raw = localStorage.getItem(
-                    PENDING_REFRESH_STORAGE_KEY
-                );
-                const parsed = raw ? JSON.parse(raw) : {};
-
-                return parsed && typeof parsed === 'object'
-                    ? parsed
-                    : {};
-            } catch {
-                return {};
-            }
-        }
-
-        function markRefreshPending(phone, pending, line = null) {
-            const normalizedPhone = normalizePhone(phone);
-
-            if (!normalizedPhone) {
-                return;
-            }
-
-            const pendingRefreshes = loadPendingRefreshes();
-
-            if (pending) {
-                pendingRefreshes[normalizedPhone] = {
-                    startedAt: Date.now(),
-                    previousUpdatedAt: String(
-                        getUpdatedAtValue(line) ?? ''
-                    )
-                };
-            } else {
-                delete pendingRefreshes[normalizedPhone];
-            }
-
-            try {
-                localStorage.setItem(
-                    PENDING_REFRESH_STORAGE_KEY,
-                    JSON.stringify(pendingRefreshes)
-                );
-            } catch (error) {
-                console.error(
-                    'Unable to save pending refresh state:',
-                    error
-                );
-            }
         }
 
         function getSavedCheckStatus(line) {
