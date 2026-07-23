@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zouzou App - Admin Center</title>
+  <title>Zouzou App - Users Management</title>
 
   <script src="./theme.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -13,177 +13,360 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   >
   <link rel="stylesheet" href="./theme.css">
+
+  <style>
+    .users-table-scroll::-webkit-scrollbar {
+      height: 10px;
+      width: 10px;
+    }
+
+    .users-table-scroll::-webkit-scrollbar-track {
+      background: rgba(17, 24, 39, 0.7);
+    }
+
+    .users-table-scroll::-webkit-scrollbar-thumb {
+      background: rgba(75, 85, 99, 0.9);
+      border-radius: 999px;
+    }
+
+    .number-cell {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .loading-spin {
+      animation: loading-spin 0.8s linear infinite;
+    }
+
+    @keyframes loading-spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 
 <body class="min-h-screen bg-gray-900 font-sans text-gray-100">
-  <header class="sticky top-0 z-50 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+  <header class="sticky top-0 z-40 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
     <div class="flex w-full flex-col items-center justify-between gap-4 xl:flex-row">
       <div class="flex items-center gap-3">
         <div class="rounded-lg bg-cyan-600 p-2 text-white">
-          <i class="fa-solid fa-screwdriver-wrench text-xl"></i>
+          <i class="fa-solid fa-users-gear text-xl"></i>
         </div>
 
         <h1 class="text-xl font-bold text-cyan-400">
           Zouzou App
           <span class="text-base font-normal text-white">
-            | Admin Center
+            | Users Management
           </span>
         </h1>
       </div>
 
       <nav class="flex flex-wrap items-center justify-center gap-2">
-<button data-theme-toggle type="button" onclick="toggleTheme()" class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600"><i data-theme-icon class="fa-solid fa-sun"></i><span data-theme-label>Light Mode</span></button>
-<a href="./index.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-table"></i>Main Table</a><a href="./groups.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-object-group"></i>Groups</a><a href="./years.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-calendar-days"></i>Years</a><a href="./group-builder.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-layer-group"></i>Group Builder</a><a href="./refresh-all.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-arrows-rotate"></i>Refresh All</a><a href="./admin-center.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition bg-cyan-600 text-white"><i class="fa-solid fa-screwdriver-wrench"></i>Admin Center</a><button type="button" onclick="logout()" class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700"><i class="fa-solid fa-right-from-bracket"></i>Logout</button></nav>
+        <button
+          data-theme-toggle
+          type="button"
+          onclick="toggleTheme()"
+          class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600"
+        >
+          <i data-theme-icon class="fa-solid fa-sun"></i>
+          <span data-theme-label>Light Mode</span>
+        </button>
+
+        <a href="./index.html" class="flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600">
+          <i class="fa-solid fa-table"></i>
+          Main Table
+        </a>
+
+        <a href="./groups.html" class="flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600">
+          <i class="fa-solid fa-object-group"></i>
+          Groups
+        </a>
+
+        <a href="./years.html" class="flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600">
+          <i class="fa-solid fa-calendar-days"></i>
+          Years
+        </a>
+
+        <a href="./admin-center.html" class="flex items-center gap-2 rounded-xl bg-cyan-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-cyan-700">
+          <i class="fa-solid fa-users-gear"></i>
+          Users
+        </a>
+
+        <button
+          type="button"
+          onclick="logout()"
+          class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700"
+        >
+          <i class="fa-solid fa-right-from-bracket"></i>
+          Logout
+        </button>
+      </nav>
     </div>
   </header>
 
-  <main class="mx-auto w-full max-w-[1800px] px-3 py-5 sm:px-5">
-    <div
-      id="global-status"
-      class="mb-4 hidden rounded-xl border p-3 text-sm"
-    ></div>
+  <main class="mx-auto w-full max-w-[1900px] px-3 py-5 sm:px-5">
+    <div id="global-status" class="mb-4 hidden rounded-xl border p-3 text-sm"></div>
 
-    <section class="mb-5 rounded-2xl border border-cyan-800 bg-cyan-900/20 p-5 shadow-xl">
-      <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+    <section class="mb-5 overflow-hidden rounded-3xl border border-cyan-800 bg-gradient-to-br from-cyan-950/80 via-gray-900 to-gray-900 shadow-2xl">
+      <div class="flex flex-col gap-5 p-5 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h2 class="text-2xl font-bold text-cyan-300">
-            Admin Center
+          <div class="mb-2 flex flex-wrap items-center gap-2">
+            <span class="rounded-full border border-cyan-700 bg-cyan-900/50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-300">
+              Wallet Administration
+            </span>
+            <span id="current-role-badge" class="rounded-full border border-gray-600 bg-gray-800 px-3 py-1 text-xs font-bold text-gray-300">
+              Role: -
+            </span>
+          </div>
+
+          <h2 class="text-2xl font-black text-white sm:text-3xl">
+            Users & Wallet Limits
           </h2>
 
-          <p class="mt-2 max-w-5xl text-sm leading-6 text-gray-300">
-            صفحة الإدارة صارت مركّزة على المستخدمين. Get All Users يعرض كل users، وكل user جنبو أزرار Role / Password / Balance + / Balance -. قسم السنين انشال من هون.
+          <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-300">
+            كل مستخدم موجود بسطر واحد. زيادة وخصم رصيد LBP موجودين حول الرصيد، وتعديل الحد الأدنى موجود مباشرة حدّ قيمة الـ Min Balance.
           </p>
         </div>
 
-        <div class="rounded-xl border border-gray-700 bg-gray-900/60 px-4 py-3">
-          <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
-            Current Role
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div class="rounded-2xl border border-gray-700 bg-gray-900/75 px-4 py-3 text-center">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">All Users</div>
+            <div id="stat-total" class="mt-1 text-xl font-black text-white">0</div>
           </div>
 
-          <div id="current-role-label" class="mt-1 font-mono text-lg font-bold text-cyan-300">
-            -
+          <div class="rounded-2xl border border-blue-800 bg-blue-950/40 px-4 py-3 text-center">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-blue-400">Clients</div>
+            <div id="stat-clients" class="mt-1 text-xl font-black text-blue-300">0</div>
+          </div>
+
+          <div class="rounded-2xl border border-purple-800 bg-purple-950/40 px-4 py-3 text-center">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-purple-400">Admins</div>
+            <div id="stat-admins" class="mt-1 text-xl font-black text-purple-300">0</div>
+          </div>
+
+          <div class="rounded-2xl border border-amber-800 bg-amber-950/40 px-4 py-3 text-center">
+            <div class="text-[10px] font-bold uppercase tracking-wide text-amber-400">Super Admins</div>
+            <div id="stat-super-admins" class="mt-1 text-xl font-black text-amber-300">0</div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="mb-5 grid grid-cols-1 gap-3 md:grid-cols-2">
-      <button
-        type="button"
-        onclick="scrollToTool('tool-users')"
-        class="rounded-2xl border border-gray-700 bg-gray-800 p-4 text-left shadow-lg transition hover:border-blue-600 hover:bg-gray-700/50"
-      >
-        <div class="flex items-center gap-3">
-          <i class="fa-solid fa-users rounded-xl bg-blue-600 p-3 text-white"></i>
-          <div>
-            <div class="font-bold text-white">Get All Users</div>
-            <div class="text-xs text-gray-400">admin + super_admin</div>
+    <section class="mb-5 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
+      <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[1.2fr_1.2fr_1fr_1fr_auto]">
+        <label class="block">
+          <span class="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-400">Numberphone</span>
+          <div class="relative">
+            <i class="fa-solid fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input
+              id="filter-phone"
+              type="search"
+              oninput="applyFilters(true)"
+              placeholder="Search number..."
+              class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-10 pr-4 font-mono text-white outline-none transition focus:border-cyan-500"
+            >
           </div>
-        </div>
-      </button>
+        </label>
 
-      <button
-        type="button"
-        onclick="scrollToTool('tool-create-user')"
-        class="rounded-2xl border border-gray-700 bg-gray-800 p-4 text-left shadow-lg transition hover:border-green-600 hover:bg-gray-700/50"
-      >
-        <div class="flex items-center gap-3">
-          <i class="fa-solid fa-user-plus rounded-xl bg-green-600 p-3 text-white"></i>
-          <div>
-            <div class="font-bold text-white">Create User</div>
-            <div class="text-xs text-gray-400">admin + super_admin</div>
+        <label class="block">
+          <span class="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-400">User Name</span>
+          <div class="relative">
+            <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            <input
+              id="filter-name"
+              type="search"
+              oninput="applyFilters(true)"
+              placeholder="Search name..."
+              class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-10 pr-4 text-white outline-none transition focus:border-cyan-500"
+            >
           </div>
+        </label>
+
+        <label class="block">
+          <span class="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-400">Minimum LBP Balance</span>
+          <input
+            id="filter-min-balance"
+            type="number"
+            step="any"
+            oninput="applyFilters(true)"
+            placeholder="From balance"
+            class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-cyan-500"
+          >
+        </label>
+
+        <label class="block">
+          <span class="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-400">Maximum LBP Balance</span>
+          <input
+            id="filter-max-balance"
+            type="number"
+            step="any"
+            oninput="applyFilters(true)"
+            placeholder="To balance"
+            class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-cyan-500"
+          >
+        </label>
+
+        <div class="flex items-end gap-2">
+          <button
+            type="button"
+            onclick="resetFilters()"
+            class="flex-1 rounded-xl border border-gray-600 bg-gray-700 px-4 py-3 font-bold text-white transition hover:bg-gray-600"
+            title="Clear filters"
+          >
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+          </button>
+
+          <button
+            id="reload-users-button"
+            type="button"
+            onclick="runGetAllUsers()"
+            class="flex-1 rounded-xl bg-cyan-600 px-4 py-3 font-bold text-white transition hover:bg-cyan-700"
+            title="Reload users"
+          >
+            <i class="fa-solid fa-rotate"></i>
+          </button>
         </div>
-      </button>
+      </div>
+
+      <div class="mt-4 flex flex-col gap-3 border-t border-gray-700 pt-4 xl:flex-row xl:items-center xl:justify-between">
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" data-role-filter="all" onclick="setRoleFilter('all')" class="role-filter-button rounded-xl bg-cyan-600 px-4 py-2 text-xs font-bold text-white shadow transition">
+            All
+          </button>
+
+          <button type="button" data-role-filter="client" onclick="setRoleFilter('client')" class="role-filter-button rounded-xl border border-blue-800 bg-blue-950/30 px-4 py-2 text-xs font-bold text-blue-300 transition hover:bg-blue-900/50">
+            Clients
+          </button>
+
+          <button type="button" data-role-filter="admin" onclick="setRoleFilter('admin')" class="role-filter-button rounded-xl border border-purple-800 bg-purple-950/30 px-4 py-2 text-xs font-bold text-purple-300 transition hover:bg-purple-900/50">
+            Admins
+          </button>
+
+          <button type="button" data-role-filter="super_admin" onclick="setRoleFilter('super_admin')" class="role-filter-button rounded-xl border border-amber-800 bg-amber-950/30 px-4 py-2 text-xs font-bold text-amber-300 transition hover:bg-amber-900/50">
+            Super Admins
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <label class="flex items-center gap-2 text-xs font-bold text-gray-400">
+            Show
+            <select
+              id="page-size"
+              onchange="changePageSize()"
+              class="rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 font-bold text-white outline-none focus:border-cyan-500"
+            >
+              <option value="10">10</option>
+              <option value="20" selected>20</option>
+              <option value="30">30</option>
+            </select>
+            per page
+          </label>
+
+          <label class="flex items-center gap-2 text-xs font-bold text-gray-400">
+            Sort
+            <select
+              id="sort-users"
+              onchange="applyFilters(true)"
+              class="rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 font-bold text-white outline-none focus:border-cyan-500"
+            >
+              <option value="phone_asc">Number ↑</option>
+              <option value="phone_desc">Number ↓</option>
+              <option value="name_asc">Name A-Z</option>
+              <option value="balance_desc">Balance High-Low</option>
+              <option value="balance_asc">Balance Low-High</option>
+            </select>
+          </label>
+        </div>
+      </div>
     </section>
 
-    <section class="space-y-4">
-      <article id="tool-users" data-role="admin,super_admin" class="tool-card overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
-        <button type="button" onclick="toggleTool(this)" class="flex w-full items-center justify-between gap-3 border-b border-gray-700 bg-gray-700/30 p-4 text-left">
-          <div class="flex items-center gap-3">
-            <i class="fa-solid fa-users rounded-xl bg-blue-600 p-3 text-white"></i>
-            <div>
-              <h3 class="font-bold text-white">Get All Users</h3>
-              <p class="text-xs text-gray-400">
-                كل user بيطلع بكرت لحالو، وأزرار الإدارة بتطلع فقط للـ super_admin.
-              </p>
-            </div>
-          </div>
-          <i class="fa-solid fa-chevron-up text-gray-400"></i>
-        </button>
-
-        <div class="tool-body p-4">
-          <div class="flex flex-col gap-3 border-b border-gray-700 pb-4 xl:flex-row xl:items-center xl:justify-between">
-            <div>
-              <p class="text-sm text-gray-400">
-                Load users من السيرفر، وبعدها بتعدل كل user من نفس الكرت.
-              </p>
-
-              <p id="super-admin-note" class="mt-1 hidden text-xs text-amber-300">
-                ملاحظة: أنت admin، لذلك أزرار role/password/balance مخفية. فقط super_admin بيشوفها.
-              </p>
-            </div>
-
-            <div class="flex flex-col gap-2 sm:flex-row">
-              <input
-                id="users-search-input"
-                type="search"
-                oninput="renderUsersList()"
-                placeholder="Search users..."
-                class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition focus:border-blue-500 sm:w-80"
-              >
-
-              <button onclick="runGetAllUsers()" class="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white transition hover:bg-blue-700">
-                <i class="fa-solid fa-download mr-1"></i>
-                Load Users
-              </button>
-            </div>
-          </div>
-
-          <div id="users-output" class="mt-4">
-            <div class="rounded-xl border border-dashed border-gray-600 p-10 text-center text-gray-500">
-              <i class="fa-solid fa-users mb-3 text-3xl text-blue-400"></i>
-              <p>Press Load Users to display user cards.</p>
-            </div>
-          </div>
+    <section class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-2xl">
+      <div class="flex flex-col gap-3 border-b border-gray-700 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 class="font-black text-white">Users List</h3>
+          <p id="results-summary" class="mt-1 text-xs text-gray-400">No users loaded.</p>
         </div>
-      </article>
 
-      <article id="tool-create-user" data-role="admin,super_admin" class="tool-card overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
-        <button type="button" onclick="toggleTool(this)" class="flex w-full items-center justify-between gap-3 border-b border-gray-700 bg-gray-700/30 p-4 text-left">
-          <div class="flex items-center gap-3">
-            <i class="fa-solid fa-user-plus rounded-xl bg-green-600 p-3 text-white"></i>
-            <div>
-              <h3 class="font-bold text-white">Create User</h3>
-              <p class="text-xs text-gray-400">Allowed: admin + super_admin</p>
-            </div>
-          </div>
-          <i class="fa-solid fa-chevron-down text-gray-400"></i>
-        </button>
-
-        <div class="tool-body hidden p-4">
-          <form onsubmit="runCreateUser(event)" class="grid grid-cols-1 gap-3 lg:grid-cols-4">
-            <input id="create-name" type="text" placeholder="name_user" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-green-500">
-            <input id="create-phone" type="text" placeholder="numberphone" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-green-500">
-            <input id="create-password" type="password" placeholder="password" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-green-500">
-
-            <select id="create-role" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-bold text-white outline-none focus:border-green-500">
-              <option value="client">client</option>
-              <option value="admin">admin</option>
-              <option value="super_admin">super_admin</option>
-            </select>
-
-            <button type="submit" class="lg:col-span-4 rounded-xl bg-green-600 px-5 py-3 font-bold text-white transition hover:bg-green-700">
-              <i class="fa-solid fa-plus mr-1"></i>
-              Create User
-            </button>
-          </form>
-
-          <div id="create-user-output" class="mt-4"></div>
+        <div id="read-only-note" class="hidden rounded-xl border border-amber-800 bg-amber-950/30 px-3 py-2 text-xs font-bold text-amber-300">
+          <i class="fa-solid fa-eye mr-1"></i>
+          Admin view: wallet editing is available to super_admin only.
         </div>
-      </article>
+      </div>
+
+      <div class="users-table-scroll overflow-auto">
+        <table class="min-w-[1260px] w-full border-collapse text-left">
+          <thead class="sticky top-0 z-10 bg-gray-900/95 text-[11px] uppercase tracking-wide text-gray-400 backdrop-blur">
+            <tr>
+              <th class="border-b border-gray-700 px-4 py-3">#</th>
+              <th class="border-b border-gray-700 px-4 py-3">Numberphone</th>
+              <th class="border-b border-gray-700 px-4 py-3">Name</th>
+              <th class="border-b border-gray-700 px-4 py-3">Role</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">LBP Balance</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Min Balance LBP</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">USD Balance</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Min Balance USD</th>
+            </tr>
+          </thead>
+
+          <tbody id="users-table-body" class="divide-y divide-gray-700/80">
+            <tr>
+              <td colspan="8" class="px-4 py-16 text-center text-gray-500">
+                <i class="fa-solid fa-users mb-3 block text-4xl text-cyan-500"></i>
+                Loading users...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex flex-col gap-3 border-t border-gray-700 bg-gray-900/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div id="pagination-summary" class="text-xs font-medium text-gray-400">Page 1 of 1</div>
+        <div id="pagination-buttons" class="flex flex-wrap items-center justify-center gap-1"></div>
+      </div>
     </section>
   </main>
+
+  <div id="action-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-md overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
+        <div>
+          <h3 id="modal-title" class="text-lg font-black text-white">Update Wallet</h3>
+          <p id="modal-subtitle" class="mt-1 text-xs text-gray-400"></p>
+        </div>
+
+        <button type="button" onclick="closeActionModal()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-gray-300 transition hover:bg-gray-600 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="action-modal-form" onsubmit="submitActionModal(event)" class="p-5">
+        <input id="modal-action" type="hidden">
+        <input id="modal-numberphone" type="hidden">
+
+        <label class="block">
+          <span id="modal-input-label" class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Amount</span>
+          <input
+            id="modal-value"
+            type="number"
+            step="any"
+            required
+            autocomplete="off"
+            class="w-full rounded-2xl border border-gray-600 bg-gray-900 px-4 py-4 font-mono text-xl font-black text-white outline-none transition focus:border-cyan-500"
+          >
+        </label>
+
+        <p id="modal-help" class="mt-2 text-xs leading-5 text-gray-500"></p>
+
+        <div class="mt-5 flex gap-3">
+          <button type="button" onclick="closeActionModal()" class="flex-1 rounded-xl border border-gray-600 bg-gray-700 px-4 py-3 font-bold text-white transition hover:bg-gray-600">
+            Cancel
+          </button>
+
+          <button id="modal-submit-button" type="submit" class="flex-1 rounded-xl bg-cyan-600 px-4 py-3 font-bold text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-60">
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="./config.js"></script>
   <script src="./auth.js"></script>
@@ -192,46 +375,41 @@
     requireRole(["admin", "super_admin"]);
 
     /*
-      حط الـAPIs هون.
-      خليه endpoint فقط، مش full URL.
-      مثال:
-      GET_ALL_USERS: "/api/users/getAllUsers"
+      GET_ALL_USERS is already filled from your endpoint.
+
+      Fill the remaining endpoint paths using your actual routes.
+      Keep them as endpoint paths only, not full URLs.
     */
     const ADMIN_APIS = {
-      GET_ALL_USERS: "",
-      CREATE_USER: "",
-      EDIT_USER_ROLE: "",
-      EDIT_USER_PASSWORD: "",
-      ADD_BALANCE: "",
+      GET_ALL_USERS: "/auth/getAllUser",
+      ADD_BALANCE: "/auth/addBalance",
+      EDIT_MIN_BALANCE_LBP: "/auth/editMinBalanceLbp",
+      EDIT_MIN_BALANCE_USD: "/auth/editMinBalanceUsd",
     };
 
     let allUsersData = [];
+    let filteredUsersData = [];
+    let currentPage = 1;
+    let currentRoleFilter = "all";
+    let activeRequest = false;
 
     const currentUser = getUser() || parseJwtPayload(getToken()) || {};
     const currentRole = normalizeRole(currentUser.role);
     const isSuperAdmin = currentRole === "super_admin";
 
-    document.getElementById("current-role-label").textContent =
-      currentRole || "-";
+    document.getElementById("current-role-badge").textContent =
+      `Role: ${currentRole || "-"}`;
 
     if (!isSuperAdmin) {
-      document
-        .getElementById("super-admin-note")
-        ?.classList.remove("hidden");
+      document.getElementById("read-only-note")?.classList.remove("hidden");
     }
 
-    applyRoleVisibility();
-
-    function applyRoleVisibility() {
-      document.querySelectorAll("[data-role]").forEach((section) => {
-        const allowed = section.dataset.role
-          .split(",")
-          .map((role) => role.trim().toLowerCase());
-
-        if (!allowed.includes(currentRole)) {
-          section.classList.add("hidden");
-        }
-      });
+    function normalizeRole(value) {
+      return String(value ?? "")
+        .trim()
+        .toLowerCase()
+        .replaceAll("-", "_")
+        .replaceAll(" ", "_");
     }
 
     function getApiUrl(key) {
@@ -268,9 +446,7 @@
       try {
         data = text ? JSON.parse(text) : {};
       } catch (error) {
-        data = {
-          raw: text,
-        };
+        data = { raw: text };
       }
 
       if (!response.ok) {
@@ -284,37 +460,13 @@
       return data;
     }
 
-    function toggleTool(button) {
-      const article = button.closest(".tool-card");
-      const body = article.querySelector(".tool-body");
-      const icon = button.querySelector(".fa-chevron-down, .fa-chevron-up");
-
-      body.classList.toggle("hidden");
-
-      if (icon) {
-        icon.classList.toggle("fa-chevron-down");
-        icon.classList.toggle("fa-chevron-up");
-      }
-    }
-
-    function scrollToTool(id) {
-      const el = document.getElementById(id);
-
-      if (el) {
-        el.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }
-    }
-
     function showStatus(message, type = "info") {
       const box = document.getElementById("global-status");
 
       const classes = {
-        info: "border-blue-800 bg-blue-900/20 text-blue-300",
-        success: "border-green-800 bg-green-900/20 text-green-300",
-        error: "border-red-800 bg-red-900/20 text-red-300",
+        info: "border-blue-800 bg-blue-900/30 text-blue-300",
+        success: "border-green-800 bg-green-900/30 text-green-300",
+        error: "border-red-800 bg-red-900/30 text-red-300",
       };
 
       box.className =
@@ -322,22 +474,44 @@
 
       box.textContent = message;
       box.classList.remove("hidden");
+
+      if (type === "success") {
+        window.setTimeout(() => box.classList.add("hidden"), 3500);
+      }
+    }
+
+    function setReloading(isLoading) {
+      const button = document.getElementById("reload-users-button");
+      const icon = button?.querySelector("i");
+
+      if (!button || !icon) {
+        return;
+      }
+
+      button.disabled = isLoading;
+      icon.classList.toggle("loading-spin", isLoading);
     }
 
     async function runGetAllUsers() {
+      if (activeRequest) {
+        return;
+      }
+
+      activeRequest = true;
+      setReloading(true);
+      renderLoadingRow();
+
       try {
         showStatus("Loading users...", "info");
 
-        const data = await sendAdminRequest("GET_ALL_USERS");
+        const response = await sendAdminRequest("GET_ALL_USERS");
 
-        allUsersData =
-          Array.isArray(data?.data)
-            ? data.data
-            : Array.isArray(data)
-              ? data
-              : [];
+        allUsersData = extractUsersArray(response)
+          .map(normalizeUser)
+          .filter((user) => user.numberphone);
 
-        renderUsersList();
+        updateStatistics();
+        applyFilters(true);
 
         showStatus(
           `${allUsersData.length} user(s) loaded successfully.`,
@@ -345,385 +519,642 @@
         );
       } catch (error) {
         allUsersData = [];
-        renderError("users-output", error);
+        filteredUsersData = [];
+        updateStatistics();
+        renderTable();
         showStatus(error.message, "error");
+      } finally {
+        activeRequest = false;
+        setReloading(false);
       }
     }
 
-    function renderUsersList() {
-      const container = document.getElementById("users-output");
-      const query = String(
-        document.getElementById("users-search-input")?.value ?? ""
-      )
-        .trim()
-        .toLowerCase();
-
-      const visibleUsers = allUsersData.filter((user) => {
-        if (!query) {
-          return true;
-        }
-
-        return JSON.stringify(user)
-          .toLowerCase()
-          .includes(query);
-      });
-
-      if (allUsersData.length === 0) {
-        container.innerHTML = `
-          <div class="rounded-xl border border-dashed border-gray-600 p-10 text-center text-gray-500">
-            <i class="fa-solid fa-users mb-3 text-3xl text-blue-400"></i>
-            <p>No users loaded yet.</p>
-          </div>
-        `;
-        return;
+    function extractUsersArray(response) {
+      if (Array.isArray(response)) {
+        return response;
       }
 
-      if (visibleUsers.length === 0) {
-        container.innerHTML = `
-          <div class="rounded-xl border border-gray-700 bg-gray-900 p-8 text-center text-gray-500">
-            <i class="fa-solid fa-magnifying-glass mb-3 text-3xl text-blue-400"></i>
-            <p>No users match your search.</p>
-          </div>
-        `;
-        return;
+      if (Array.isArray(response?.data)) {
+        return response.data;
       }
 
-      container.innerHTML = `
-        <div class="mb-3 flex items-center justify-between gap-2 rounded-xl border border-gray-700 bg-gray-900 px-4 py-3">
-          <div class="text-sm text-gray-300">
-            Showing
-            <span class="font-bold text-blue-300">${visibleUsers.length}</span>
-            /
-            <span class="font-bold text-cyan-300">${allUsersData.length}</span>
-            users
-          </div>
+      if (Array.isArray(response?.users)) {
+        return response.users;
+      }
 
-          <button
-            type="button"
-            onclick="runGetAllUsers()"
-            class="rounded-lg bg-gray-700 px-3 py-2 text-xs font-bold text-white transition hover:bg-gray-600"
-          >
-            <i class="fa-solid fa-rotate mr-1"></i>
-            Reload
-          </button>
-        </div>
+      if (Array.isArray(response?.result)) {
+        return response.result;
+      }
 
-        <div class="space-y-3">
-          ${visibleUsers.map(renderUserCard).join("")}
-        </div>
-      `;
+      return [];
     }
 
-    function renderUserCard(user) {
-      const numberphone = getUserPhone(user);
-      const name = user.name_user || user.name || "-";
-      const role = normalizeRole(user.role || "-");
-      const balance = user.balance ?? user.user_balance ?? user.wallet_balance ?? "-";
-      const id = user.id ?? "-";
-
-      return `
-        <article class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-lg">
-          <div class="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_auto] xl:items-center">
-            <div class="min-w-0">
-              <div class="flex flex-wrap items-center gap-2">
-                <div class="whitespace-nowrap font-mono text-xl font-bold text-white">
-                  ${escapeHtml(numberphone || "-")}
-                </div>
-
-                <span class="rounded-lg border border-blue-800 bg-blue-900/20 px-2.5 py-1 text-xs font-bold text-blue-300">
-                  ${escapeHtml(role || "-")}
-                </span>
-
-                <span class="rounded-lg border border-gray-700 bg-gray-900 px-2.5 py-1 text-xs font-bold text-gray-300">
-                  ID: ${escapeHtml(id)}
-                </span>
-              </div>
-
-              <div class="mt-2 grid grid-cols-1 gap-2 md:grid-cols-3">
-                ${renderMiniInfo("Name", name, "text-green-300")}
-                ${renderMiniInfo("Balance", balance, "text-orange-300")}
-                ${renderMiniInfo("Raw Role", user.role ?? "-", "text-purple-300")}
-              </div>
-            </div>
-
-            <div class="flex flex-wrap gap-2 xl:justify-end">
-              ${renderUserActions(numberphone, role)}
-            </div>
-          </div>
-
-          <details class="mt-3 rounded-xl border border-gray-700 bg-gray-900/70 p-3">
-            <summary class="cursor-pointer text-xs font-bold text-gray-400">
-              Raw user data
-            </summary>
-
-            <pre class="mt-3 max-h-[300px] overflow-auto rounded-lg bg-gray-950 p-3 text-xs text-gray-300">${escapeHtml(JSON.stringify(user, null, 2))}</pre>
-          </details>
-        </article>
-      `;
+    function normalizeUser(user) {
+      return {
+        raw: user,
+        id: user.id ?? null,
+        numberphone: String(
+          user.numberphone ??
+          user.phone ??
+          user.mobile ??
+          user.mobile_number ??
+          ""
+        ).trim(),
+        name: String(
+          user.name_user ??
+          user.name ??
+          user.full_name ??
+          "-"
+        ).trim(),
+        role: normalizeRole(user.role || "client"),
+        balanceLbp: toNumericValue(
+          user.balance_lbp ??
+          user.balance ??
+          user.user_balance ??
+          user.wallet_balance ??
+          0
+        ),
+        minBalanceLbp: toNumericValue(
+          user.min_balance_lbp ??
+          user.minbalancelbp ??
+          0
+        ),
+        balanceUsd: toNumericValue(
+          user.balance_usd ??
+          user.usd_balance ??
+          0
+        ),
+        minBalanceUsd: toNumericValue(
+          user.min_balance_usd ??
+          user.minbalanceusd ??
+          0
+        ),
+      };
     }
 
-    function renderUserActions(numberphone, role) {
-      if (!isSuperAdmin) {
-        return `
-          <span class="rounded-xl border border-amber-800 bg-amber-900/20 px-4 py-2 text-xs font-bold text-amber-300">
-            Super admin actions hidden
-          </span>
-        `;
-      }
-
-      const safePhone = escapeJsString(numberphone || "");
-      const safeRole = escapeJsString(role || "client");
-
-      return `
-        <button
-          type="button"
-          onclick="editUserRole('${safePhone}', '${safeRole}')"
-          class="rounded-xl bg-purple-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-purple-700"
-        >
-          <i class="fa-solid fa-user-shield mr-1"></i>
-          Role
-        </button>
-
-        <button
-          type="button"
-          onclick="editUserPassword('${safePhone}')"
-          class="rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-amber-700"
-        >
-          <i class="fa-solid fa-key mr-1"></i>
-          Password
-        </button>
-
-        <button
-          type="button"
-          onclick="changeUserBalance('${safePhone}', 'add')"
-          class="rounded-xl bg-green-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-green-700"
-        >
-          <i class="fa-solid fa-plus mr-1"></i>
-          Balance
-        </button>
-
-        <button
-          type="button"
-          onclick="changeUserBalance('${safePhone}', 'subtract')"
-          class="rounded-xl bg-red-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-red-700"
-        >
-          <i class="fa-solid fa-minus mr-1"></i>
-          Balance
-        </button>
-      `;
+    function toNumericValue(value) {
+      const normalized = String(value ?? 0).replaceAll(",", "").trim();
+      const parsed = Number(normalized);
+      return Number.isFinite(parsed) ? parsed : 0;
     }
 
-    async function editUserRole(numberphone, currentRoleValue) {
-      if (!numberphone) {
-        alert("Missing numberphone");
-        return;
-      }
+    function updateStatistics() {
+      const clients = allUsersData.filter((user) => user.role === "client").length;
+      const admins = allUsersData.filter((user) => user.role === "admin").length;
+      const superAdmins = allUsersData.filter((user) => user.role === "super_admin").length;
 
-      const newRole = prompt(
-        "Enter new role: client / admin / super_admin",
-        currentRoleValue || "client"
-      );
-
-      if (!newRole) {
-        return;
-      }
-
-      try {
-        showStatus("Updating user role...", "info");
-
-        await sendAdminRequest(
-          "EDIT_USER_ROLE",
-          {
-            method: "PUT",
-            body: {
-              numberphone,
-              role: newRole.trim(),
-            },
-          }
-        );
-
-        showStatus("Role updated successfully.", "success");
-        await runGetAllUsers();
-      } catch (error) {
-        showStatus(error.message, "error");
-        alert(error.message);
-      }
+      document.getElementById("stat-total").textContent = allUsersData.length;
+      document.getElementById("stat-clients").textContent = clients;
+      document.getElementById("stat-admins").textContent = admins;
+      document.getElementById("stat-super-admins").textContent = superAdmins;
     }
 
-    async function editUserPassword(numberphone) {
-      if (!numberphone) {
-        alert("Missing numberphone");
-        return;
-      }
+    function setRoleFilter(role) {
+      currentRoleFilter = role;
 
-      const newPassword = prompt(
-        `Enter new password for ${numberphone}`
-      );
-
-      if (!newPassword) {
-        return;
-      }
-
-      try {
-        showStatus("Updating user password...", "info");
-
-        await sendAdminRequest(
-          "EDIT_USER_PASSWORD",
-          {
-            method: "PUT",
-            body: {
-              numberphone,
-              password: newPassword,
-            },
-          }
-        );
-
-        showStatus("Password updated successfully.", "success");
-      } catch (error) {
-        showStatus(error.message, "error");
-        alert(error.message);
-      }
-    }
-
-    async function changeUserBalance(numberphone, operation) {
-      if (!numberphone) {
-        alert("Missing numberphone");
-        return;
-      }
-
-      const rawAmount = prompt(
-        operation === "add"
-          ? `Amount to ADD for ${numberphone}`
-          : `Amount to SUBTRACT from ${numberphone}`
-      );
-
-      if (!rawAmount) {
-        return;
-      }
-
-      const amount = Number(rawAmount);
-
-      if (!Number.isFinite(amount) || amount <= 0) {
-        alert("Amount must be a positive number");
-        return;
-      }
-
-      const note = prompt("Note optional", "") || "";
-
-      const finalAmount =
-        operation === "subtract"
-          ? -Math.abs(amount)
-          : Math.abs(amount);
-
-      try {
-        showStatus("Updating balance...", "info");
-
-        await sendAdminRequest(
-          "ADD_BALANCE",
-          {
-            method: "POST",
-            body: {
-              numberphone,
-              amount: finalAmount,
-              operation,
-              note,
-            },
-          }
-        );
-
-        showStatus("Balance updated successfully.", "success");
-        await runGetAllUsers();
-      } catch (error) {
-        showStatus(error.message, "error");
-        alert(error.message);
-      }
-    }
-
-    async function runCreateUser(event) {
-      event.preventDefault();
-
-      const body = {
-        name_user: getInputValue("create-name"),
-        numberphone: getInputValue("create-phone"),
-        password: getInputValue("create-password"),
-        role: getInputValue("create-role"),
+      const inactiveClasses = {
+        all: "border border-gray-600 bg-gray-900 text-gray-300 hover:bg-gray-700",
+        client: "border border-blue-800 bg-blue-950/30 text-blue-300 hover:bg-blue-900/50",
+        admin: "border border-purple-800 bg-purple-950/30 text-purple-300 hover:bg-purple-900/50",
+        super_admin: "border border-amber-800 bg-amber-950/30 text-amber-300 hover:bg-amber-900/50",
       };
 
-      try {
-        showStatus("Creating user...", "info");
+      document.querySelectorAll(".role-filter-button").forEach((button) => {
+        const buttonRole = button.dataset.roleFilter;
+        const base = "role-filter-button rounded-xl px-4 py-2 text-xs font-bold shadow transition";
 
-        const data = await sendAdminRequest(
-          "CREATE_USER",
-          {
-            method: "POST",
-            body,
-          }
-        );
+        button.className = buttonRole === role
+          ? `${base} bg-cyan-600 text-white hover:bg-cyan-700`
+          : `${base} ${inactiveClasses[buttonRole] || inactiveClasses.all}`;
+      });
 
-        renderOutput("create-user-output", data, "Create User Result");
-        showStatus("User created successfully.", "success");
+      applyFilters(true);
+    }
 
-        document.getElementById("create-name").value = "";
-        document.getElementById("create-phone").value = "";
-        document.getElementById("create-password").value = "";
+    function applyFilters(resetPage = false) {
+      const phoneQuery = getInputValue("filter-phone").toLowerCase();
+      const nameQuery = getInputValue("filter-name").toLowerCase();
+      const minBalanceRaw = getInputValue("filter-min-balance");
+      const maxBalanceRaw = getInputValue("filter-max-balance");
+      const minBalance = minBalanceRaw === "" ? null : Number(minBalanceRaw);
+      const maxBalance = maxBalanceRaw === "" ? null : Number(maxBalanceRaw);
+      const sortValue = getInputValue("sort-users") || "phone_asc";
 
-        if (allUsersData.length > 0) {
-          await runGetAllUsers();
+      filteredUsersData = allUsersData.filter((user) => {
+        if (
+          currentRoleFilter !== "all" &&
+          user.role !== currentRoleFilter
+        ) {
+          return false;
         }
-      } catch (error) {
-        renderError("create-user-output", error);
-        showStatus(error.message, "error");
+
+        if (
+          phoneQuery &&
+          !user.numberphone.toLowerCase().includes(phoneQuery)
+        ) {
+          return false;
+        }
+
+        if (
+          nameQuery &&
+          !user.name.toLowerCase().includes(nameQuery)
+        ) {
+          return false;
+        }
+
+        if (
+          minBalance !== null &&
+          Number.isFinite(minBalance) &&
+          user.balanceLbp < minBalance
+        ) {
+          return false;
+        }
+
+        if (
+          maxBalance !== null &&
+          Number.isFinite(maxBalance) &&
+          user.balanceLbp > maxBalance
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+
+      filteredUsersData.sort((a, b) => sortUsers(a, b, sortValue));
+
+      if (resetPage) {
+        currentPage = 1;
+      }
+
+      const totalPages = getTotalPages();
+
+      if (currentPage > totalPages) {
+        currentPage = totalPages;
+      }
+
+      renderTable();
+    }
+
+    function sortUsers(a, b, sortValue) {
+      switch (sortValue) {
+        case "phone_desc":
+          return b.numberphone.localeCompare(a.numberphone, undefined, { numeric: true });
+        case "name_asc":
+          return a.name.localeCompare(b.name);
+        case "balance_desc":
+          return b.balanceLbp - a.balanceLbp;
+        case "balance_asc":
+          return a.balanceLbp - b.balanceLbp;
+        case "phone_asc":
+        default:
+          return a.numberphone.localeCompare(b.numberphone, undefined, { numeric: true });
       }
     }
 
-    function renderMiniInfo(label, value, valueClass = "text-white") {
+    function resetFilters() {
+      document.getElementById("filter-phone").value = "";
+      document.getElementById("filter-name").value = "";
+      document.getElementById("filter-min-balance").value = "";
+      document.getElementById("filter-max-balance").value = "";
+      document.getElementById("sort-users").value = "phone_asc";
+      setRoleFilter("all");
+    }
+
+    function changePageSize() {
+      currentPage = 1;
+      renderTable();
+    }
+
+    function getPageSize() {
+      const value = Number(document.getElementById("page-size")?.value || 20);
+      return [10, 20, 30].includes(value) ? value : 20;
+    }
+
+    function getTotalPages() {
+      return Math.max(1, Math.ceil(filteredUsersData.length / getPageSize()));
+    }
+
+    function goToPage(page) {
+      const totalPages = getTotalPages();
+      currentPage = Math.min(Math.max(1, page), totalPages);
+      renderTable();
+
+      document.querySelector("table")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+
+    function renderLoadingRow() {
+      document.getElementById("users-table-body").innerHTML = `
+        <tr>
+          <td colspan="8" class="px-4 py-16 text-center text-gray-400">
+            <i class="fa-solid fa-spinner loading-spin mb-3 block text-4xl text-cyan-400"></i>
+            Loading users...
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("users-table-body");
+      const pageSize = getPageSize();
+      const totalPages = getTotalPages();
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, filteredUsersData.length);
+      const pageUsers = filteredUsersData.slice(startIndex, endIndex);
+
+      if (allUsersData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="px-4 py-16 text-center text-gray-500">
+              <i class="fa-solid fa-users-slash mb-3 block text-4xl text-gray-600"></i>
+              No users available.
+            </td>
+          </tr>
+        `;
+      } else if (pageUsers.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="px-4 py-16 text-center text-gray-500">
+              <i class="fa-solid fa-magnifying-glass mb-3 block text-4xl text-cyan-700"></i>
+              No users match the selected filters.
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = pageUsers
+          .map((user, index) => renderUserRow(user, startIndex + index + 1))
+          .join("");
+      }
+
+      document.getElementById("results-summary").textContent =
+        `${filteredUsersData.length} of ${allUsersData.length} user(s) match the current view.`;
+
+      document.getElementById("pagination-summary").textContent =
+        filteredUsersData.length === 0
+          ? "No results"
+          : `Showing ${startIndex + 1}-${endIndex} · Page ${currentPage} of ${totalPages}`;
+
+      renderPaginationButtons(totalPages);
+    }
+
+    function renderUserRow(user, rowNumber) {
+      const safePhone = escapeJsString(user.numberphone);
+      const safeName = escapeHtml(user.name || "-");
+
       return `
-        <div class="min-w-0 rounded-xl border border-gray-700 bg-gray-900 px-3 py-2">
-          <div class="truncate text-[10px] font-bold uppercase tracking-wide text-gray-500">
-            ${escapeHtml(label)}
-          </div>
-          <div class="mt-1 truncate font-mono text-sm font-bold ${valueClass}" title="${escapeHtml(value)}">
-            ${escapeHtml(value ?? "-")}
-          </div>
-        </div>
+        <tr class="bg-gray-800 transition hover:bg-gray-700/50">
+          <td class="whitespace-nowrap px-4 py-3 text-xs font-bold text-gray-500">
+            ${rowNumber}
+          </td>
+
+          <td class="number-cell whitespace-nowrap px-4 py-3 font-mono text-base font-black text-white">
+            ${escapeHtml(user.numberphone)}
+          </td>
+
+          <td class="max-w-[260px] px-4 py-3">
+            <div class="truncate font-bold text-gray-100" title="${safeName}">
+              ${safeName}
+            </div>
+          </td>
+
+          <td class="whitespace-nowrap px-4 py-3">
+            ${renderRoleBadge(user.role)}
+          </td>
+
+          <td class="whitespace-nowrap px-4 py-3">
+            <div class="mx-auto flex w-fit items-center overflow-hidden rounded-xl border border-gray-600 bg-gray-900 shadow-inner">
+              ${isSuperAdmin ? `
+                <button
+                  type="button"
+                  onclick="openBalanceModal('${safePhone}', 'CREDIT')"
+                  class="flex h-10 w-10 items-center justify-center bg-green-600 text-white transition hover:bg-green-700"
+                  title="Add LBP balance"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              ` : ""}
+
+              <div class="min-w-[150px] px-4 text-center">
+                <div class="text-[9px] font-bold uppercase tracking-wide text-gray-500">Balance LBP</div>
+                <div class="number-cell mt-0.5 font-mono text-sm font-black ${getBalanceTextClass(user.balanceLbp)}">
+                  ${formatLbp(user.balanceLbp)}
+                </div>
+              </div>
+
+              ${isSuperAdmin ? `
+                <button
+                  type="button"
+                  onclick="openBalanceModal('${safePhone}', 'DEBIT')"
+                  class="flex h-10 w-10 items-center justify-center bg-red-600 text-white transition hover:bg-red-700"
+                  title="Subtract LBP balance"
+                >
+                  <i class="fa-solid fa-minus"></i>
+                </button>
+              ` : ""}
+            </div>
+          </td>
+
+          <td class="whitespace-nowrap px-4 py-3">
+            <div class="mx-auto flex w-fit items-center gap-2 rounded-xl border border-gray-600 bg-gray-900 px-3 py-2">
+              <div class="text-center">
+                <div class="text-[9px] font-bold uppercase tracking-wide text-gray-500">Min LBP</div>
+                <div class="number-cell mt-0.5 font-mono text-sm font-black text-orange-300">
+                  ${formatLbp(user.minBalanceLbp)}
+                </div>
+              </div>
+
+              ${isSuperAdmin ? `
+                <button
+                  type="button"
+                  onclick="openMinBalanceModal('${safePhone}', 'LBP', ${safeNumber(user.minBalanceLbp)})"
+                  class="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-600 text-white transition hover:bg-orange-700"
+                  title="Edit minimum LBP balance"
+                >
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              ` : ""}
+            </div>
+          </td>
+
+          <td class="whitespace-nowrap px-4 py-3 text-center">
+            <div class="mx-auto w-fit rounded-xl border border-gray-600 bg-gray-900 px-4 py-2">
+              <div class="text-[9px] font-bold uppercase tracking-wide text-gray-500">Balance USD</div>
+              <div class="number-cell mt-0.5 font-mono text-sm font-black ${getBalanceTextClass(user.balanceUsd)}">
+                ${formatUsd(user.balanceUsd)}
+              </div>
+            </div>
+          </td>
+
+          <td class="whitespace-nowrap px-4 py-3">
+            <div class="mx-auto flex w-fit items-center gap-2 rounded-xl border border-gray-600 bg-gray-900 px-3 py-2">
+              <div class="text-center">
+                <div class="text-[9px] font-bold uppercase tracking-wide text-gray-500">Min USD</div>
+                <div class="number-cell mt-0.5 font-mono text-sm font-black text-violet-300">
+                  ${formatUsd(user.minBalanceUsd)}
+                </div>
+              </div>
+
+              ${isSuperAdmin ? `
+                <button
+                  type="button"
+                  onclick="openMinBalanceModal('${safePhone}', 'USD', ${safeNumber(user.minBalanceUsd)})"
+                  class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-600 text-white transition hover:bg-violet-700"
+                  title="Edit minimum USD balance"
+                >
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              ` : ""}
+            </div>
+          </td>
+        </tr>
       `;
     }
 
-    function renderOutput(containerId, data, title = "Result") {
-      const container = document.getElementById(containerId);
+    function renderRoleBadge(role) {
+      const roleStyles = {
+        client: "border-blue-800 bg-blue-950/40 text-blue-300",
+        admin: "border-purple-800 bg-purple-950/40 text-purple-300",
+        super_admin: "border-amber-800 bg-amber-950/40 text-amber-300",
+      };
+
+      const label = role === "super_admin" ? "super admin" : role;
+      const classes = roleStyles[role] || "border-gray-600 bg-gray-900 text-gray-300";
+
+      return `
+        <span class="inline-flex rounded-lg border px-2.5 py-1 text-[11px] font-black uppercase tracking-wide ${classes}">
+          ${escapeHtml(label || "-")}
+        </span>
+      `;
+    }
+
+    function getBalanceTextClass(value) {
+      if (value < 0) {
+        return "text-red-300";
+      }
+
+      if (value === 0) {
+        return "text-gray-300";
+      }
+
+      return "text-green-300";
+    }
+
+    function formatLbp(value) {
+      return new Intl.NumberFormat("en-US", {
+        maximumFractionDigits: 2,
+      }).format(toNumericValue(value));
+    }
+
+    function formatUsd(value) {
+      return new Intl.NumberFormat("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(toNumericValue(value));
+    }
+
+    function safeNumber(value) {
+      const numericValue = toNumericValue(value);
+      return Number.isFinite(numericValue) ? numericValue : 0;
+    }
+
+    function renderPaginationButtons(totalPages) {
+      const container = document.getElementById("pagination-buttons");
+      const pages = getVisiblePageNumbers(currentPage, totalPages);
 
       container.innerHTML = `
-        <div class="rounded-xl border border-gray-700 bg-gray-900 p-3">
-          <div class="mb-3 font-bold text-white">${escapeHtml(title)}</div>
-          <pre class="max-h-[420px] overflow-auto rounded-lg bg-gray-950 p-3 text-xs text-gray-300">${escapeHtml(JSON.stringify(data, null, 2))}</pre>
-        </div>
+        <button
+          type="button"
+          onclick="goToPage(${currentPage - 1})"
+          ${currentPage <= 1 ? "disabled" : ""}
+          class="flex h-9 min-w-9 items-center justify-center rounded-lg border border-gray-600 bg-gray-800 px-3 text-xs font-bold text-gray-300 transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        ${pages.map((page) => {
+          if (page === "...") {
+            return `<span class="px-2 text-gray-500">...</span>`;
+          }
+
+          const active = page === currentPage;
+
+          return `
+            <button
+              type="button"
+              onclick="goToPage(${page})"
+              class="flex h-9 min-w-9 items-center justify-center rounded-lg px-3 text-xs font-black transition ${
+                active
+                  ? "bg-cyan-600 text-white shadow"
+                  : "border border-gray-600 bg-gray-800 text-gray-300 hover:bg-gray-700"
+              }"
+            >
+              ${page}
+            </button>
+          `;
+        }).join("")}
+
+        <button
+          type="button"
+          onclick="goToPage(${currentPage + 1})"
+          ${currentPage >= totalPages ? "disabled" : ""}
+          class="flex h-9 min-w-9 items-center justify-center rounded-lg border border-gray-600 bg-gray-800 px-3 text-xs font-bold text-gray-300 transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
       `;
     }
 
-    function renderError(containerId, error) {
-      const container = document.getElementById(containerId);
+    function getVisiblePageNumbers(page, totalPages) {
+      if (totalPages <= 7) {
+        return Array.from({ length: totalPages }, (_, index) => index + 1);
+      }
 
-      container.innerHTML = `
-        <div class="rounded-xl border border-red-800 bg-red-900/20 p-3 text-sm text-red-300">
-          ${escapeHtml(error.message || String(error))}
-        </div>
-      `;
+      if (page <= 4) {
+        return [1, 2, 3, 4, 5, "...", totalPages];
+      }
+
+      if (page >= totalPages - 3) {
+        return [1, "...", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+      }
+
+      return [1, "...", page - 1, page, page + 1, "...", totalPages];
     }
 
-    function getUserPhone(user) {
-      return String(
-        user.numberphone ??
-        user.phone ??
-        user.mobile ??
-        user.mobile_number ??
-        ""
-      ).trim();
+    function openBalanceModal(numberphone, direction) {
+      const isCredit = direction === "CREDIT";
+
+      openActionModal({
+        action: direction,
+        numberphone,
+        title: isCredit ? "Add LBP Balance" : "Subtract LBP Balance",
+        subtitle: `${numberphone} · ${direction}`,
+        label: "Amount LBP",
+        value: "",
+        help: isCredit
+          ? "The amount must be greater than zero. The API receives direction: CREDIT."
+          : "The amount must be greater than zero. The API receives direction: DEBIT.",
+        submitText: isCredit ? "Add Balance" : "Subtract Balance",
+        submitClass: isCredit ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700",
+      });
+    }
+
+    function openMinBalanceModal(numberphone, currency, currentValue) {
+      const isLbp = currency === "LBP";
+
+      openActionModal({
+        action: isLbp ? "EDIT_MIN_LBP" : "EDIT_MIN_USD",
+        numberphone,
+        title: isLbp ? "Edit Minimum LBP Balance" : "Edit Minimum USD Balance",
+        subtitle: numberphone,
+        label: isLbp ? "Minimum Balance LBP" : "Minimum Balance USD",
+        value: currentValue,
+        help: "The number may be positive, zero, or negative. Example: -1000000",
+        submitText: "Save Minimum",
+        submitClass: isLbp ? "bg-orange-600 hover:bg-orange-700" : "bg-violet-600 hover:bg-violet-700",
+      });
+    }
+
+    function openActionModal(config) {
+      document.getElementById("modal-action").value = config.action;
+      document.getElementById("modal-numberphone").value = config.numberphone;
+      document.getElementById("modal-title").textContent = config.title;
+      document.getElementById("modal-subtitle").textContent = config.subtitle;
+      document.getElementById("modal-input-label").textContent = config.label;
+      document.getElementById("modal-value").value = config.value;
+      document.getElementById("modal-help").textContent = config.help;
+
+      const submitButton = document.getElementById("modal-submit-button");
+      submitButton.textContent = config.submitText;
+      submitButton.className = `flex-1 rounded-xl px-4 py-3 font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${config.submitClass}`;
+
+      const modal = document.getElementById("action-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+
+      window.setTimeout(() => {
+        document.getElementById("modal-value")?.focus();
+        document.getElementById("modal-value")?.select();
+      }, 50);
+    }
+
+    function closeActionModal() {
+      const modal = document.getElementById("action-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.getElementById("action-modal-form").reset();
+    }
+
+    async function submitActionModal(event) {
+      event.preventDefault();
+
+      const action = getInputValue("modal-action");
+      const numberphone = getInputValue("modal-numberphone");
+      const rawValue = getInputValue("modal-value");
+      const value = Number(rawValue);
+      const submitButton = document.getElementById("modal-submit-button");
+
+      if (!numberphone) {
+        showStatus("Missing numberphone.", "error");
+        return;
+      }
+
+      if (rawValue === "" || !Number.isFinite(value)) {
+        showStatus("Enter a valid number.", "error");
+        return;
+      }
+
+      if ((action === "CREDIT" || action === "DEBIT") && value <= 0) {
+        showStatus("Balance amount must be greater than zero.", "error");
+        return;
+      }
+
+      submitButton.disabled = true;
+
+      try {
+        if (action === "CREDIT" || action === "DEBIT") {
+          await sendAdminRequest("ADD_BALANCE", {
+            method: "POST",
+            body: {
+              numberphone,
+              amount: value,
+              direction: action,
+            },
+          });
+        } else if (action === "EDIT_MIN_LBP") {
+          await sendAdminRequest("EDIT_MIN_BALANCE_LBP", {
+            method: "PUT",
+            body: {
+              numberphone,
+              min_balance_lbp: value,
+            },
+          });
+        } else if (action === "EDIT_MIN_USD") {
+          await sendAdminRequest("EDIT_MIN_BALANCE_USD", {
+            method: "PUT",
+            body: {
+              numberphone,
+              min_balance_usd: value,
+            },
+          });
+        } else {
+          throw new Error("Unknown action");
+        }
+
+        closeActionModal();
+        showStatus("User wallet updated successfully.", "success");
+        await runGetAllUsers();
+      } catch (error) {
+        showStatus(error.message, "error");
+      } finally {
+        submitButton.disabled = false;
+      }
     }
 
     function getInputValue(id) {
-      return String(
-        document.getElementById(id)?.value ?? ""
-      ).trim();
+      return String(document.getElementById(id)?.value ?? "").trim();
     }
 
     function escapeHtml(value) {
@@ -742,6 +1173,20 @@
         .replaceAll("\n", "\\n")
         .replaceAll("\r", "\\r");
     }
+
+    document.getElementById("action-modal")?.addEventListener("click", (event) => {
+      if (event.target.id === "action-modal") {
+        closeActionModal();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeActionModal();
+      }
+    });
+
+    runGetAllUsers();
   </script>
 </body>
 </html>
