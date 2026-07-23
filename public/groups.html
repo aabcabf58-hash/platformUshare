@@ -60,25 +60,25 @@
     </header>
 
     <main class="w-full max-w-none px-2 py-4 sm:px-4">
-        <section class="sticky top-[88px] z-40 mb-4 grid grid-cols-1 gap-3 bg-gray-900/95 py-2 backdrop-blur lg:grid-cols-2">
+        <section class="sticky top-[88px] z-40 mb-3 grid grid-cols-1 gap-2 bg-gray-900/95 py-1.5 backdrop-blur lg:grid-cols-2">
             <div
                 id="global-status"
-                class="col-span-full hidden w-full whitespace-pre-wrap break-words rounded-xl border p-3 text-sm shadow-xl"
+                class="col-span-full hidden w-full whitespace-pre-wrap break-words rounded-xl border p-2 text-xs shadow-xl"
             ></div>
-            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
-                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:divide-x sm:divide-gray-700">
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-2 shadow-xl">
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:divide-x sm:divide-gray-700">
                     <div class="sm:pr-4">
-                        <div class="text-xs font-semibold uppercase text-gray-500">Total Groups</div>
-                        <div id="total-groups" class="mt-1 text-3xl font-bold text-indigo-300">0</div>
+                        <div class="text-[10px] font-semibold uppercase text-gray-500">Total Groups</div>
+                        <div id="total-groups" class="mt-0.5 text-2xl font-bold text-indigo-300">0</div>
                     </div>
 
                     <div class="sm:px-4">
-                        <div class="text-xs font-semibold uppercase text-gray-500">Total Lines</div>
-                        <div id="total-lines" class="mt-1 text-3xl font-bold text-blue-300">0</div>
+                        <div class="text-[10px] font-semibold uppercase text-gray-500">Total Lines</div>
+                        <div id="total-lines" class="mt-0.5 text-2xl font-bold text-blue-300">0</div>
                     </div>
 
                     <div class="min-w-0 sm:pl-4">
-                        <label for="group-name-search" class="text-xs font-semibold uppercase text-gray-500">
+                        <label for="group-name-search" class="text-[10px] font-semibold uppercase text-gray-500">
                             Group Name
                         </label>
 
@@ -91,7 +91,7 @@
                                 onkeydown="handleGroupNameSearchKeydown(event)"
                                 placeholder="Search group names..."
                                 autocomplete="off"
-                                class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2.5 pl-9 pr-9 text-sm font-semibold text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2 pl-9 pr-9 text-xs font-semibold text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                 title="Search inside the group-name list"
                             >
                             <button
@@ -105,12 +105,12 @@
                             </button>
                         </div>
 
-                        <div class="relative mt-2">
+                        <div class="relative mt-1.5">
                             <i class="fa-solid fa-object-group pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400"></i>
                             <select
                                 id="group-name-filter"
                                 onchange="applyGroupNameFilter()"
-                                class="w-full cursor-pointer appearance-none rounded-xl border border-gray-600 bg-gray-900 py-2.5 pl-9 pr-9 text-sm font-semibold text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                                class="w-full cursor-pointer appearance-none rounded-xl border border-gray-600 bg-gray-900 py-2 pl-9 pr-9 text-xs font-semibold text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                                 title="Show all groups or only one selected group"
                             >
                                 <option value="">All Groups</option>
@@ -124,9 +124,9 @@
                     </div>
                 </div>
             </div>
-            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-3 shadow-xl">
-                <div class="flex gap-2"><div class="relative flex-1"><i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i><input id="group-search-input" type="search" oninput="applyGroupSearch()" placeholder="Search phone number, group ID, type, balance, validity, or any value..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-11 pr-4 text-sm text-white outline-none focus:border-indigo-500"></div><button id="clear-group-search-button" type="button" onclick="clearGroupSearch()" disabled class="rounded-xl bg-gray-700 px-4 py-3 text-sm text-white disabled:opacity-50"><i class="fa-solid fa-xmark"></i></button></div>
-                <div class="mt-2 text-xs text-indigo-300">Showing <span id="visible-groups-count" class="font-bold">0</span> / <span id="all-groups-count" class="font-bold">0</span> groups</div>
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-2 shadow-xl">
+                <div class="flex gap-1.5"><div class="relative flex-1"><i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-gray-500"></i><input id="group-search-input" type="search" oninput="applyGroupSearch()" placeholder="Search phone number, group ID, line type, SIM type, balance, validity, or any value..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2 pl-10 pr-3 text-xs text-white outline-none focus:border-indigo-500"></div><button id="clear-group-search-button" type="button" onclick="clearGroupSearch()" disabled class="rounded-xl bg-gray-700 px-3 py-2 text-xs text-white disabled:opacity-50"><i class="fa-solid fa-xmark"></i></button></div>
+                <div class="mt-1.5 text-[10px] text-indigo-300">Showing <span id="visible-groups-count" class="font-bold">0</span> / <span id="all-groups-count" class="font-bold">0</span> groups</div>
             </div>
         </section>
         <section class="mb-4 rounded-2xl border border-indigo-800 bg-indigo-900/10 p-3 shadow-xl">
@@ -683,8 +683,12 @@
         }
 
         function renderLineCard(line, groupId) {
-            const emergencyActive =
-                isEmergencyActive(line.emergency_status);
+            const typeSim = formatEmptyValue(
+                line.type_sim ??
+                line.typeSim ??
+                line.sim_type ??
+                '-'
+            );
 
             const subscriptionDate =
                 formatDate(line.subscription_date);
@@ -725,12 +729,8 @@
                                     ${escapeHtml(groupId)}
                                 </span>
 
-                                <span class="shrink-0 rounded border ${
-                                    emergencyActive
-                                        ? 'border-green-700 bg-green-500/10 text-green-400'
-                                        : 'border-red-700 bg-red-500/10 text-red-400'
-                                } px-1.5 py-0.5 text-[9px] font-semibold">
-                                    ${emergencyActive ? 'EMG ON' : 'EMG OFF'}
+                                <span class="shrink-0 rounded border border-cyan-700 bg-cyan-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-cyan-300" title="SIM Type: ${escapeHtml(typeSim)}">
+                                    SIM: ${escapeHtml(typeSim)}
                                 </span>
                             </div>
                         </div>
@@ -2040,15 +2040,6 @@
                 console.error('Copy error:', error);
                 return false;
             }
-        }
-
-        function isEmergencyActive(value) {
-            return (
-                value === true ||
-                value === 1 ||
-                value === '1' ||
-                String(value).toLowerCase() === 'true'
-            );
         }
 
         function formatDate(value) {
