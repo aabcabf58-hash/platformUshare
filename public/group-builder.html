@@ -98,12 +98,22 @@
                     </h2>
 
                     <p class="mt-1 text-sm text-gray-300">
-                        Lines are loaded from Expired Services. The only additional eligibility rule is:
+                        Lines are loaded from Expired Services. Eligibility is controlled by these rules:
                     </p>
 
                     <div class="mt-3 flex flex-wrap gap-2 text-xs">
                         <span class="rounded-lg border border-gray-600 bg-gray-900/50 px-2.5 py-1.5">
                             Group ID is null, empty, or 0
+                        </span>
+
+                        <span class="rounded-lg border border-green-700 bg-green-900/20 px-2.5 py-1.5 text-green-300">
+                            <i class="fa-solid fa-circle-check mr-1"></i>
+                            Check result is selectable
+                        </span>
+
+                        <span class="rounded-lg border border-blue-700 bg-blue-900/20 px-2.5 py-1.5 text-blue-300">
+                            <i class="fa-solid fa-clock mr-1"></i>
+                            Last check must be within the selected hours
                         </span>
                     </div>
                 </div>
@@ -168,6 +178,69 @@
                     >
                 </div>
             </div>
+
+            <section class="mt-5 rounded-2xl border border-blue-800 bg-blue-900/15 p-4">
+                <div class="mb-3 flex items-start gap-3">
+                    <i class="fa-solid fa-shield-check mt-1 text-xl text-blue-300"></i>
+
+                    <div>
+                        <h2 class="font-bold text-blue-300">
+                            Check eligibility
+                        </h2>
+
+                        <p class="mt-1 text-xs leading-5 text-gray-400">
+                            Choose which check results are allowed and how recent the last check must be.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                        <label for="check-result-mode" class="mb-2 block text-sm font-semibold text-gray-300">
+                            Allowed check results
+                        </label>
+
+                        <select
+                            id="check-result-mode"
+                            oninput="updateMandatoryEligibleCount()"
+                            class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                        >
+                            <option value="success_only" selected>
+                                Successful checks only
+                            </option>
+
+                            <option value="success_and_failed">
+                                Successful and failed checks
+                            </option>
+                        </select>
+
+                        <p class="mt-1.5 text-xs text-gray-500">
+                            Failed checks are included only when the second option is selected.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label for="max-check-age-hours" class="mb-2 block text-sm font-semibold text-gray-300">
+                            Maximum last-check age (hours)
+                        </label>
+
+                        <input
+                            id="max-check-age-hours"
+                            type="number"
+                            min="1"
+                            max="720"
+                            step="1"
+                            value="3"
+                            oninput="updateMandatoryEligibleCount()"
+                            class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-blue-500"
+                        >
+
+                        <p class="mt-1.5 text-xs text-gray-500">
+                            Example: 3 means lines checked more than 3 hours ago are excluded.
+                        </p>
+                    </div>
+                </div>
+            </section>
 
             <section class="mt-5 rounded-2xl border border-green-800 bg-green-900/15 p-4">
                 <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -510,8 +583,154 @@ function isZeroOrEmptyGroup(value) {
             );
         }
 
-        function passesMandatoryRules(line) {
-            return isZeroOrEmptyGroup(line.group_id);
+        function getBooleanState(value) {
+            if (value === true || value === false) {
+                return value;
+            }
+
+            const text = normalizeText(value).toLowerCase();
+
+            if (
+                text === 'true' ||
+                text === '1' ||
+                text === 'yes'
+            ) {
+                return true;
+            }
+
+            if (
+                text === 'false' ||
+                text === '0' ||
+                text === 'no'
+            ) {
+                return false;
+            }
+
+            return null;
+        }
+
+        function getLastCheckTimestamp(line) {
+            const rawValue =
+                line.updated_at ??
+                line.last_check_at ??
+                line.checked_at;
+
+            if (isNullLike(rawValue)) {
+                return null;
+            }
+
+            const timestamp = new Date(rawValue).getTime();
+
+            return Number.isFinite(timestamp)
+                ? timestamp
+                : null;
+        }
+
+        function wasCheckedWithinHours(line, maxCheckAgeHours) {
+            const timestamp = getLastCheckTimestamp(line);
+
+            if (timestamp === null) {
+                return false;
+            }
+
+            const ageMilliseconds = Date.now() - timestamp;
+            const maximumMilliseconds =
+                maxCheckAgeHours * 60 * 60 * 1000;
+
+            return (
+                ageMilliseconds >= 0 &&
+                ageMilliseconds <= maximumMilliseconds
+            );
+        }
+
+        function isAllowedCheckResult(line, checkResultMode) {
+            const state = getBooleanState(
+                line.check_success
+            );
+
+            if (checkResultMode === 'success_and_failed') {
+                return state === true || state === false;
+            }
+
+            return state === true;
+        }
+
+        function passesMandatoryRules(line, settings) {
+            return (
+                isZeroOrEmptyGroup(line.group_id) &&
+                isAllowedCheckResult(
+                    line,
+                    settings.checkResultMode
+                ) &&
+                wasCheckedWithinHours(
+                    line,
+                    settings.maxCheckAgeHours
+                )
+            );
+        }
+
+        function readEligibilitySettings() {
+            const checkResultMode = normalizeText(
+                document.getElementById(
+                    'check-result-mode'
+                )?.value
+            );
+
+            const maxCheckAgeHours = Number(
+                document.getElementById(
+                    'max-check-age-hours'
+                )?.value
+            );
+
+            if (
+                checkResultMode !== 'success_only' &&
+                checkResultMode !== 'success_and_failed'
+            ) {
+                throw new Error(
+                    'Choose a valid check-result option.'
+                );
+            }
+
+            if (
+                !Number.isFinite(maxCheckAgeHours) ||
+                maxCheckAgeHours < 1 ||
+                maxCheckAgeHours > 720
+            ) {
+                throw new Error(
+                    'Maximum last-check age must be between 1 and 720 hours.'
+                );
+            }
+
+            return {
+                checkResultMode,
+                maxCheckAgeHours
+            };
+        }
+
+        function updateMandatoryEligibleCount() {
+            const countElement = document.getElementById(
+                'mandatory-eligible-count'
+            );
+
+            if (!countElement) {
+                return;
+            }
+
+            try {
+                const eligibilitySettings =
+                    readEligibilitySettings();
+
+                const count = allLines.filter((line) =>
+                    passesMandatoryRules(
+                        line,
+                        eligibilitySettings
+                    )
+                ).length;
+
+                countElement.textContent = String(count);
+            } catch {
+                countElement.textContent = '0';
+            }
         }
 
         function getLineNumber(line, fieldName) {
@@ -828,6 +1047,9 @@ function isZeroOrEmptyGroup(value) {
                     )?.value
                 );
 
+            const eligibilitySettings =
+                readEligibilitySettings();
+
             const createYears = Boolean(
                 document.getElementById(
                     'create-years-after-groups'
@@ -887,6 +1109,7 @@ function isZeroOrEmptyGroup(value) {
                 baseName,
                 requestedGroups,
                 linesPerGroup,
+                ...eligibilitySettings,
                 createYears,
                 giveBalance,
                 rules
@@ -949,6 +1172,19 @@ function isZeroOrEmptyGroup(value) {
                         groupId.toLowerCase() !== 'null'
                     )
             );
+        }
+
+        /*
+         * Always keep matched lines in their configured slot order.
+         * The slot is the rule index: Line 1, Line 2, Line 3, Line 4...
+         */
+        function getMatchesInSlotOrder(matches) {
+            return [...(Array.isArray(matches) ? matches : [])]
+                .sort(
+                    (firstMatch, secondMatch) =>
+                        Number(firstMatch?.ruleIndex ?? 0) -
+                        Number(secondMatch?.ruleIndex ?? 0)
+                );
         }
 
         /*
@@ -1088,8 +1324,11 @@ function isZeroOrEmptyGroup(value) {
 
         function createPlan(lines, settings) {
             const mandatoryEligible =
-                lines.filter(
-                    passesMandatoryRules
+                lines.filter((line) =>
+                    passesMandatoryRules(
+                        line,
+                        settings
+                    )
                 );
 
             let availableLines = [
@@ -1123,14 +1362,19 @@ function isZeroOrEmptyGroup(value) {
                         groupIndex
                     );
 
+                const orderedMatches =
+                    getMatchesInSlotOrder(
+                        matches
+                    );
+
                 const selectedLines =
-                    matches.map(
+                    orderedMatches.map(
                         (match) => match.line
                     );
 
                 groups.push({
                     groupId,
-                    matches
+                    matches: orderedMatches
                 });
 
                 const selectedSet =
@@ -1164,6 +1408,62 @@ function isZeroOrEmptyGroup(value) {
                     settings.linesPerGroup,
                 createdAt: Date.now()
             };
+        }
+
+        function getCheckStatusView(line) {
+            const state = getBooleanState(
+                line.check_success
+            );
+
+            if (state === true) {
+                return {
+                    icon: 'fa-circle-check',
+                    text: 'Check successful',
+                    className: 'text-green-400'
+                };
+            }
+
+            if (state === false) {
+                return {
+                    icon: 'fa-circle-xmark',
+                    text: 'Check failed',
+                    className: 'text-red-400'
+                };
+            }
+
+            return {
+                icon: 'fa-circle-question',
+                text: 'Check status unknown',
+                className: 'text-gray-400'
+            };
+        }
+
+        function formatLastCheckAge(line) {
+            const timestamp = getLastCheckTimestamp(line);
+
+            if (timestamp === null) {
+                return 'No check time';
+            }
+
+            const ageMilliseconds = Math.max(
+                0,
+                Date.now() - timestamp
+            );
+
+            const minutes = Math.floor(
+                ageMilliseconds / 60000
+            );
+
+            if (minutes < 60) {
+                return `${minutes}m ago`;
+            }
+
+            const hours = Math.floor(minutes / 60);
+            const remainingMinutes = minutes % 60;
+
+            return remainingMinutes > 0
+                ? `${hours}h ${remainingMinutes}m ago`
+                : `${hours}h ago`;
         }
 
         function formatRuleRange(
@@ -1353,8 +1653,13 @@ function isZeroOrEmptyGroup(value) {
                             group,
                             groupIndex
                         ) => {
+                            const orderedMatches =
+                                getMatchesInSlotOrder(
+                                    group.matches
+                                );
+
                             const linesHtml =
-                                group.matches
+                                orderedMatches
                                     .map(
                                         (
                                             match,
@@ -1363,22 +1668,38 @@ function isZeroOrEmptyGroup(value) {
                                             const line =
                                                 match.line;
 
+                                            const slotNumber =
+                                                Number(match.ruleIndex) + 1;
+
                                             const rule =
                                                 plan.settings
                                                     .rules[
                                                         match.ruleIndex
                                                     ];
 
+                                            const checkStatus =
+                                                getCheckStatusView(line);
+
+                                            const lastCheckAge =
+                                                formatLastCheckAge(line);
+
                                             return `
                                                 <div class="rounded-lg border border-gray-700 bg-gray-900/50 p-2">
                                                     <div class="flex items-center justify-between gap-2">
                                                         <div class="flex min-w-0 items-center gap-2">
                                                             <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-teal-600 font-mono text-xs font-bold text-white">
-                                                                ${matchIndex + 1}
+                                                                ${slotNumber}
                                                             </span>
 
                                                             <span class="truncate font-mono text-sm font-bold text-white">
                                                                 ${escapeHtml(line.numberphone)}
+                                                            </span>
+
+                                                            <span
+                                                                class="${checkStatus.className}"
+                                                                title="${escapeHtml(checkStatus.text)}"
+                                                            >
+                                                                <i class="fa-solid ${checkStatus.icon}"></i>
                                                             </span>
                                                         </div>
 
@@ -1393,7 +1714,7 @@ function isZeroOrEmptyGroup(value) {
                                                         </div>
                                                     </div>
 
-                                                    <div class="mt-2 grid grid-cols-2 gap-1 text-[10px]">
+                                                    <div class="mt-2 grid grid-cols-1 gap-1 text-[10px] sm:grid-cols-3">
                                                         <div class="rounded bg-gray-800 px-2 py-1 text-gray-400">
                                                             Balance:
                                                             <span class="font-mono font-bold text-green-300">
@@ -1418,6 +1739,13 @@ function isZeroOrEmptyGroup(value) {
                                                                 )}
                                                             </span>
                                                         </div>
+
+                                                        <div class="rounded bg-gray-800 px-2 py-1 text-gray-400">
+                                                            Last check:
+                                                            <span class="font-mono font-bold text-blue-300">
+                                                                ${escapeHtml(lastCheckAge)}
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             `;
@@ -1439,7 +1767,7 @@ function isZeroOrEmptyGroup(value) {
                                         </div>
 
                                         <span class="rounded-lg bg-gray-900/60 px-2 py-1 font-mono text-xs font-bold text-white">
-                                            ${group.matches.length} lines
+                                            ${orderedMatches.length} lines
                                         </span>
                                     </div>
 
@@ -1580,8 +1908,13 @@ function isZeroOrEmptyGroup(value) {
                         'info'
                     );
 
+                    const orderedMatches =
+                        getMatchesInSlotOrder(
+                            group.matches
+                        );
+
                     const numberphones =
-                        group.matches.map(
+                        orderedMatches.map(
                             (match) =>
                                 normalizeText(
                                     match.line
@@ -1637,7 +1970,8 @@ function isZeroOrEmptyGroup(value) {
                             await sendCreateYearRequest(
                                 group.groupId,
                                 refreshedPlan.settings
-                                    .giveBalance
+                                    .giveBalance,
+                                numberphones
                             );
 
                         if (!yearResult.success) {
@@ -1753,7 +2087,8 @@ function isZeroOrEmptyGroup(value) {
 
         async function sendCreateYearRequest(
             groupId,
-            giveBalance
+            giveBalance,
+            numberphones
         ) {
             const controller =
                 new AbortController();
@@ -1764,6 +2099,22 @@ function isZeroOrEmptyGroup(value) {
                 }, REQUEST_TIMEOUT_MS);
 
             try {
+                const orderedNumberphones =
+                    (Array.isArray(numberphones)
+                        ? numberphones
+                        : []
+                    )
+                        .map(normalizeText)
+                        .filter(Boolean);
+
+                const yearNumbers =
+                    orderedNumberphones.map(
+                        (numberphone, index) => ({
+                            slot: index + 1,
+                            numberphone
+                        })
+                    );
+
                 const response =
                     await fetch(
                         CREATE_YEAR_API,
@@ -1773,7 +2124,29 @@ function isZeroOrEmptyGroup(value) {
                             body: JSON.stringify({
                                 group_id: groupId,
                                 source_group_id: groupId,
-                                give_balance: giveBalance
+                                give_balance: giveBalance,
+
+                                // Keep the exact Line 1 -> Line 4 order.
+                                numberphones:
+                                    orderedNumberphones,
+
+                                ordered_numberphones:
+                                    orderedNumberphones,
+
+                                year_numbers:
+                                    yearNumbers,
+
+                                number1:
+                                    orderedNumberphones[0] ?? null,
+
+                                number2:
+                                    orderedNumberphones[1] ?? null,
+
+                                number3:
+                                    orderedNumberphones[2] ?? null,
+
+                                number4:
+                                    orderedNumberphones[3] ?? null
                             }),
                             signal:
                                 controller.signal
@@ -1880,9 +2253,15 @@ function isZeroOrEmptyGroup(value) {
                 renderPlan(null);
                 setCreateButtonEnabled(false);
 
+                const eligibilitySettings =
+                    readEligibilitySettings();
+
                 const mandatoryEligible =
-                    allLines.filter(
-                        passesMandatoryRules
+                    allLines.filter((line) =>
+                        passesMandatoryRules(
+                            line,
+                            eligibilitySettings
+                        )
                     ).length;
 
                 document.getElementById(
@@ -1894,7 +2273,7 @@ function isZeroOrEmptyGroup(value) {
 
                 if (showMessage) {
                     showStatus(
-                        `${allLines.length} expired-service line(s) loaded. ${mandatoryEligible} have an empty Group ID and can be used.`,
+                        `${allLines.length} expired-service line(s) loaded. ${mandatoryEligible} match the Group ID, check-result, and last-check-age rules.`,
                         'success'
                     );
                 }
@@ -1998,6 +2377,14 @@ function isZeroOrEmptyGroup(value) {
             document.getElementById(
                 'lines-per-group'
             ).value = '4';
+
+            document.getElementById(
+                'check-result-mode'
+            ).value = 'success_only';
+
+            document.getElementById(
+                'max-check-age-hours'
+            ).value = '3';
 
             document.getElementById(
                 'create-years-after-groups'
