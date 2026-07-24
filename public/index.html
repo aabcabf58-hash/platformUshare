@@ -4482,8 +4482,19 @@
         }
 
         async function removeSelectedFromGroup() {
-            const selectedPhones =
-                getSelectedPhoneNumbers();
+            if (isGroupUpdating) {
+                return;
+            }
+
+            const selectedPhones = [
+                ...new Set(
+                    getSelectedPhoneNumbers()
+                        .map((phone) =>
+                            String(phone ?? '').trim()
+                        )
+                        .filter(Boolean)
+                )
+            ];
 
             if (selectedPhones.length === 0) {
                 showGlobalStatus(
@@ -4494,16 +4505,155 @@
             }
 
             const confirmed = confirm(
-                `Remove ${selectedPhones.length} selected line(s) from their group in one request? group_id will become 0.`
+                `Remove ${selectedPhones.length} selected line(s) from their groups? Each number will be sent in a separate request. Successful removals will remain applied even if other numbers fail.`
             );
 
             if (!confirmed) {
                 return;
             }
 
-            await updateSelectedGroupId('0', {
-                closeModalAfterSuccess: false
-            });
+            isGroupUpdating = true;
+            updateSelectedCount();
+
+            const successfulPhones = [];
+            const failedItems = [];
+
+            /*
+             * Every call below contains one number only:
+             * numberphones: [phone]
+             *
+             * Five independent requests may run together for speed,
+             * but no request contains more than one phone number.
+             */
+            const concurrency = 5;
+
+            try {
+                for (
+                    let startIndex = 0;
+                    startIndex < selectedPhones.length;
+                    startIndex += concurrency
+                ) {
+                    const batch = selectedPhones.slice(
+                        startIndex,
+                        startIndex + concurrency
+                    );
+
+                    showGlobalStatus(
+                        `Removing numbers from groups: ${startIndex}/${selectedPhones.length} completed...`,
+                        'info'
+                    );
+
+                    const batchResults = await Promise.all(
+                        batch.map(async (phone) => {
+                            const result =
+                                await sendEditGroupRequest(
+                                    [phone],
+                                    '0'
+                                );
+
+                            return {
+                                phone,
+                                result
+                            };
+                        })
+                    );
+
+                    batchResults.forEach(
+                        ({ phone, result }) => {
+                            const explicitUpdatedCount =
+                                result.updated_count ??
+                                (
+                                    Array.isArray(result.data)
+                                        ? result.data.length
+                                        : null
+                                );
+
+                            const notFoundCount = Number(
+                                result.not_found_count ?? 0
+                            );
+
+                            const hasExplicitZeroUpdate =
+                                explicitUpdatedCount !== null &&
+                                Number(explicitUpdatedCount) <= 0;
+
+                            const succeeded =
+                                result.success === true &&
+                                notFoundCount === 0 &&
+                                !hasExplicitZeroUpdate;
+
+                            if (succeeded) {
+                                successfulPhones.push(phone);
+                                return;
+                            }
+
+                            failedItems.push({
+                                phone,
+                                message:
+                                    result.message ||
+                                    (
+                                        notFoundCount > 0
+                                            ? 'Number was not found.'
+                                            : 'The group was not removed.'
+                                    )
+                            });
+                        }
+                    );
+                }
+
+                await loadTableData();
+
+                /*
+                 * After reloading, keep failed numbers selected when they
+                 * are visible on the current page so they can be retried.
+                 */
+                const failedPhoneSet = new Set(
+                    failedItems.map(
+                        (item) => item.phone
+                    )
+                );
+
+                document
+                    .querySelectorAll('.line-checkbox')
+                    .forEach((checkbox) => {
+                        checkbox.checked =
+                            failedPhoneSet.has(
+                                String(
+                                    checkbox.value ?? ''
+                                ).trim()
+                            );
+                    });
+
+                const failedText =
+                    failedItems.length > 0
+                        ? failedItems
+                            .map(
+                                (item) =>
+                                    `${item.phone}: ${item.message}`
+                            )
+                            .join(' | ')
+                        : '';
+
+                const finalMessage =
+                    failedItems.length === 0
+                        ? `Removed ${successfulPhones.length} number(s) from their groups successfully. Every number was sent in a separate request.`
+                        : `Removed successfully: ${successfulPhones.length}. Failed: ${failedItems.length}. Successful removals were kept. Failed numbers: ${failedText}`;
+
+                showGlobalStatus(
+                    finalMessage,
+                    failedItems.length === 0
+                        ? 'success'
+                        : 'error'
+                );
+            } catch (error) {
+                showGlobalStatus(
+                    error.message ||
+                    'An unexpected error occurred while removing groups.',
+                    'error'
+                );
+            } finally {
+                isGroupUpdating = false;
+                updateSelectedCount();
+            }
         }
 
         async function updateSelectedGroupId(
