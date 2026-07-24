@@ -1188,138 +1188,57 @@ function isZeroOrEmptyGroup(value) {
         }
 
         /*
-         * Finds a complete one-to-one assignment:
-         * every line position gets one unique phone number.
-         * This avoids using a number twice and avoids a greedy
-         * choice blocking a more restrictive later position.
+         * Select lines strictly by configured position:
+         * Line 1 is selected first and stays in position 1.
+         * Line 2 is selected second and cannot replace Line 1.
+         * The same rule applies to every following position.
+         *
+         * There is intentionally no balance sorting and no reassignment
+         * between positions, even when one number matches multiple rules.
          */
         function findCompleteGroup(
             availableLines,
             rules
         ) {
-            const candidatesByRule =
-                rules.map((rule) => {
-                    return availableLines
-                        .map((line, lineIndex) => ({
-                            line,
-                            lineIndex
-                        }))
-                        .filter(({ line }) =>
-                            passesLineRule(line, rule)
-                        )
-                        .map(({ lineIndex }) =>
-                            lineIndex
-                        );
-                });
+            const remainingLines = [
+                ...(Array.isArray(availableLines)
+                    ? availableLines
+                    : [])
+            ];
 
-            if (
-                candidatesByRule.some(
-                    (candidates) =>
-                        candidates.length === 0
-                )
-            ) {
-                return null;
-            }
-
-            const ruleOrder =
-                rules
-                    .map((_, ruleIndex) =>
-                        ruleIndex
-                    )
-                    .sort(
-                        (firstIndex, secondIndex) =>
-                            candidatesByRule[firstIndex]
-                                .length -
-                            candidatesByRule[secondIndex]
-                                .length
-                    );
-
-            const matchedRuleByLine =
-                new Map();
-
-            function tryAssignRule(
-                ruleIndex,
-                visitedLines
-            ) {
-                for (
-                    const lineIndex of
-                    candidatesByRule[ruleIndex]
-                ) {
-                    if (
-                        visitedLines.has(lineIndex)
-                    ) {
-                        continue;
-                    }
-
-                    visitedLines.add(lineIndex);
-
-                    const previousRule =
-                        matchedRuleByLine.get(
-                            lineIndex
-                        );
-
-                    if (
-                        previousRule === undefined ||
-                        tryAssignRule(
-                            previousRule,
-                            visitedLines
-                        )
-                    ) {
-                        matchedRuleByLine.set(
-                            lineIndex,
-                            ruleIndex
-                        );
-
-                        return true;
-                    }
-                }
-
-                return false;
-            }
+            const matches = [];
 
             for (
-                const ruleIndex of ruleOrder
+                let ruleIndex = 0;
+                ruleIndex < rules.length;
+                ruleIndex++
             ) {
-                const assigned =
-                    tryAssignRule(
-                        ruleIndex,
-                        new Set()
+                const matchingLineIndex =
+                    remainingLines.findIndex(
+                        (line) =>
+                            passesLineRule(
+                                line,
+                                rules[ruleIndex]
+                            )
                     );
 
-                if (!assigned) {
+                if (matchingLineIndex === -1) {
                     return null;
                 }
-            }
 
-            const lineIndexByRule =
-                new Array(rules.length);
+                const [selectedLine] =
+                    remainingLines.splice(
+                        matchingLineIndex,
+                        1
+                    );
 
-            for (
-                const [
-                    lineIndex,
+                matches.push({
+                    line: selectedLine,
                     ruleIndex
-                ] of matchedRuleByLine.entries()
-            ) {
-                lineIndexByRule[ruleIndex] =
-                    lineIndex;
+                });
             }
 
-            if (
-                lineIndexByRule.some(
-                    (lineIndex) =>
-                        lineIndex === undefined
-                )
-            ) {
-                return null;
-            }
-
-            return lineIndexByRule.map(
-                (lineIndex, ruleIndex) => ({
-                    line:
-                        availableLines[lineIndex],
-                    ruleIndex
-                })
-            );
+            return matches;
         }
 
         function createPlan(lines, settings) {
