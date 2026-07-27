@@ -128,10 +128,11 @@
           <h2 class="text-2xl font-black text-white sm:text-3xl">Categories, Subcategories &amp; Services</h2>
           <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-300">Create and manage the complete category tree without mixing it with recharge-card inventory.</p>
         </div>
-        <div class="grid grid-cols-3 gap-3">
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div class="rounded-2xl border border-purple-800 bg-purple-950/40 px-4 py-3 text-center"><div class="text-[10px] font-bold uppercase tracking-wide text-purple-400">Categories</div><div id="stat-categories" class="mt-1 text-xl font-black text-purple-300">0</div></div>
           <div class="rounded-2xl border border-blue-800 bg-blue-950/40 px-4 py-3 text-center"><div class="text-[10px] font-bold uppercase tracking-wide text-blue-400">Subcategories</div><div id="stat-subcategories" class="mt-1 text-xl font-black text-blue-300">0</div></div>
           <div class="rounded-2xl border border-pink-800 bg-pink-950/40 px-4 py-3 text-center"><div class="text-[10px] font-bold uppercase tracking-wide text-pink-400">Child Categories</div><div id="stat-childcategories" class="mt-1 text-xl font-black text-pink-300">0</div></div>
+          <div class="rounded-2xl border border-cyan-800 bg-cyan-950/40 px-4 py-3 text-center"><div class="text-[10px] font-bold uppercase tracking-wide text-cyan-400">Package Items</div><div id="stat-package-items" class="mt-1 text-xl font-black text-cyan-300">0</div></div>
         </div>
       </div>
     </section>
@@ -144,7 +145,7 @@
               <span class="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-400">Search Tree</span>
               <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                <input id="tree-search" type="search" oninput="renderCategoriesTree()" placeholder="Search category name..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-10 pr-4 text-white outline-none transition focus:border-emerald-500">
+                <input id="tree-search" type="search" oninput="renderCategoriesTree()" placeholder="Search category, child or item..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-10 pr-4 text-white outline-none transition focus:border-emerald-500">
               </div>
             </label>
 
@@ -236,6 +237,89 @@
     </div>
   </div>
 
+  <div id="item-modal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+    <div class="max-h-[94vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
+      <div class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-700 bg-gray-800 px-5 py-4">
+        <div>
+          <h3 id="item-modal-title" class="text-lg font-black text-white">Add Package Item</h3>
+          <p id="item-modal-subtitle" class="mt-1 text-xs text-gray-400"></p>
+        </div>
+        <button type="button" onclick="closeItemModal()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-gray-300 transition hover:bg-gray-600 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="item-form" onsubmit="submitItemForm(event)" class="p-5">
+        <input id="item-mode" type="hidden">
+        <input id="item-id" type="hidden">
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Child Category</span>
+            <select id="item-childcategory-id" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500"></select>
+          </label>
+
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Item Name</span>
+            <input id="item-name" type="text" required autocomplete="off" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-bold text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Description</span>
+            <textarea id="item-description" rows="3" class="w-full resize-y rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500"></textarea>
+          </label>
+
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Image URL</span>
+            <input id="item-image-url" type="url" placeholder="https://..." class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <div id="item-image-preview-wrapper" class="hidden overflow-hidden rounded-2xl border border-gray-700 bg-gray-900 p-3 md:col-span-2">
+            <img id="item-image-preview" alt="Item preview" class="mx-auto max-h-48 rounded-xl object-contain">
+          </div>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Cost</span>
+            <input id="item-cost" type="number" step="any" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Price</span>
+            <input id="item-price" type="number" step="any" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Package Value</span>
+            <input id="item-package-value" type="number" step="any" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Unit</span>
+            <input id="item-unit" type="text" placeholder="GB, USD, days..." class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Validity Days</span>
+            <input id="item-validity-days" type="number" step="1" min="0" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Status</span>
+            <select id="item-is-active" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500">
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="mt-6 flex gap-3">
+          <button type="button" onclick="closeItemModal()" class="flex-1 rounded-xl border border-gray-600 bg-gray-700 px-4 py-3 font-bold text-white transition hover:bg-gray-600">Cancel</button>
+          <button id="item-submit-button" type="submit" class="flex-1 rounded-xl bg-cyan-600 px-4 py-3 font-black text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-60">Save Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="./config.js"></script>
   <script src="./auth.js"></script>
 
@@ -251,11 +335,15 @@
       CREATE_CHILDCATEGORY: "/category/createChildcategory",
       EDIT_CHILDCATEGORY: "/category/editChildCategory",
       EDIT_IS_ACTIVE: "/category/editIsActive",
+      GET_ITEMS_PACKAGE: "/category/getAllItemsPackage",
+      EDIT_ITEM_PACKAGE: "/category/editItemPakage",
+      ADD_ITEM_PACKAGE: "/category/addItemPackage",
       ADD_CARD: "/api/ushare/addcard",
       GET_CARD_QUANTITY: "/api/ushare/getQuantiteCard",
     };
 
     let categoriesTree = [];
+    let packageItems = [];
     let cardInventory = [];
     const expandedCategories = new Set();
     const expandedSubcategories = new Set();
@@ -407,10 +495,50 @@
                 image_url: String(childcategory.image_url ?? childcategory.image ?? ""),
                 is_active: toBoolean(childcategory.is_active, true),
                 raw: childcategory,
+                items: [],
               })),
             };
           }),
         };
+      });
+    }
+
+    function normalizePackageItemsResponse(response) {
+      return getResponseArray(response, ["items", "packages", "itemsPackage", "packageItems"])
+        .map((item) => ({
+          id: item.id,
+          childcategory_id: item.childcategory_id ?? item.child_category_id ?? item.childcategoryId,
+          name: String(item.name ?? "Unnamed Item"),
+          description: String(item.description ?? ""),
+          image_url: String(item.image_url ?? item.image ?? ""),
+          cost: toNumericValue(item.cost ?? 0),
+          price: toNumericValue(item.price ?? 0),
+          package_value: toNumericValue(item.package_value ?? item.value ?? 0),
+          unit: String(item.unit ?? ""),
+          validity_days: Math.max(0, Math.trunc(toNumericValue(item.validity_days ?? 0))),
+          is_active: toBoolean(item.is_active, true),
+          raw: item,
+        }))
+        .filter((item) => item.id !== undefined && item.id !== null);
+    }
+
+    function attachPackageItemsToTree() {
+      const itemsByChild = new Map();
+
+      packageItems.forEach((item) => {
+        const key = String(item.childcategory_id ?? "");
+        if (!itemsByChild.has(key)) itemsByChild.set(key, []);
+        itemsByChild.get(key).push(item);
+      });
+
+      categoriesTree.forEach((category) => {
+        category.subcategories.forEach((subcategory) => {
+          subcategory.childcategories.forEach((childcategory) => {
+            childcategory.items = (itemsByChild.get(String(childcategory.id)) || [])
+              .slice()
+              .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+          });
+        });
       });
     }
 
@@ -438,14 +566,21 @@
       `;
 
       try {
-        const response = await sendRequest("GET_TREE");
-        categoriesTree = normalizeTreeResponse(response);
+        const [treeResponse, itemsResponse] = await Promise.all([
+          sendRequest("GET_TREE"),
+          sendRequest("GET_ITEMS_PACKAGE"),
+        ]);
+
+        categoriesTree = normalizeTreeResponse(treeResponse);
+        packageItems = normalizePackageItemsResponse(itemsResponse);
+        attachPackageItemsToTree();
 
         categoriesTree.forEach((category) => expandedCategories.add(String(category.id)));
         updateTreeStatistics();
         renderCategoriesTree();
       } catch (error) {
         categoriesTree = [];
+        packageItems = [];
         updateTreeStatistics();
         renderCategoriesTree();
         showStatus(error.message, "error");
@@ -461,6 +596,7 @@
       document.getElementById("stat-categories").textContent = categoriesTree.length;
       document.getElementById("stat-subcategories").textContent = subcategories.length;
       document.getElementById("stat-childcategories").textContent = childcategories.length;
+      document.getElementById("stat-package-items").textContent = packageItems.length;
     }
 
     function setAllTreeExpanded(expanded) {
@@ -523,9 +659,26 @@
 
         const subcategories = category.subcategories.reduce((subOutput, subcategory) => {
           const subcategoryMatches = subcategory.name.toLowerCase().includes(query);
-          const childcategories = subcategory.childcategories.filter((childcategory) =>
-            childcategory.name.toLowerCase().includes(query)
-          );
+
+          const childcategories = subcategory.childcategories.reduce((childOutput, childcategory) => {
+            const childMatches = childcategory.name.toLowerCase().includes(query);
+            const matchingItems = (childcategory.items || []).filter((item) =>
+              item.name.toLowerCase().includes(query) ||
+              item.description.toLowerCase().includes(query) ||
+              item.unit.toLowerCase().includes(query)
+            );
+
+            if (categoryMatches || subcategoryMatches || childMatches || matchingItems.length > 0) {
+              childOutput.push({
+                ...childcategory,
+                items: categoryMatches || subcategoryMatches || childMatches
+                  ? childcategory.items
+                  : matchingItems,
+              });
+            }
+
+            return childOutput;
+          }, []);
 
           if (categoryMatches || subcategoryMatches || childcategories.length > 0) {
             subOutput.push({
@@ -625,22 +778,72 @@
     }
 
     function renderChildcategoryNode(childcategory, subcategory) {
+      const items = Array.isArray(childcategory.items) ? childcategory.items : [];
+
       return `
-        <div class="rounded-xl border border-purple-900/60 bg-purple-950/20 p-3">
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex min-w-0 items-center gap-3">
-              ${renderEntityImage(childcategory, "h-9 w-9")}
-              <div class="min-w-0">
-                <div class="flex flex-wrap items-center gap-2">
-                  <h6 class="truncate font-bold text-purple-200">${escapeHtml(childcategory.name)}</h6>
-                  ${renderActiveBadge(childcategory.is_active)}
+        <div class="overflow-hidden rounded-xl border border-purple-900/60 bg-purple-950/20">
+          <div class="p-3">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex min-w-0 items-center gap-3">
+                ${renderEntityImage(childcategory, "h-9 w-9")}
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h6 class="truncate font-bold text-purple-200">${escapeHtml(childcategory.name)}</h6>
+                    ${renderActiveBadge(childcategory.is_active)}
+                  </div>
+                  <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">
+                    Child Category · ID ${escapeHtml(childcategory.id)} · ${items.length} package item(s)
+                  </p>
                 </div>
-                <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">Child Category · ID ${escapeHtml(childcategory.id)}</p>
               </div>
+              ${renderChildcategoryActions(childcategory, subcategory)}
             </div>
-            ${renderChildcategoryActions(childcategory, subcategory)}
+          </div>
+
+          <div class="border-t border-purple-900/50 bg-gray-950/25 p-3">
+            ${items.length
+              ? `<div class="grid grid-cols-1 gap-3">${items.map((item) => renderPackageItemNode(item)).join("")}</div>`
+              : `<div class="rounded-xl border border-dashed border-gray-700 px-4 py-5 text-center text-xs text-gray-500">No package items inside this child category.</div>`}
           </div>
         </div>
+      `;
+    }
+
+    function renderPackageItemNode(item) {
+      const valueText = item.unit
+        ? `${formatNumber(item.package_value)} ${escapeHtml(item.unit)}`
+        : formatNumber(item.package_value);
+
+      return `
+        <article class="rounded-xl border border-cyan-900/60 bg-cyan-950/15 p-3">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div class="flex min-w-0 items-start gap-3">
+              ${renderEntityImage(item, "h-12 w-12")}
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h6 class="font-black text-cyan-200">${escapeHtml(item.name)}</h6>
+                  ${renderActiveBadge(item.is_active)}
+                  <span class="rounded-lg border border-cyan-800 bg-cyan-950/40 px-2 py-1 text-[10px] font-black uppercase text-cyan-300">Item</span>
+                </div>
+                ${item.description ? `<p class="mt-1 text-xs leading-5 text-gray-400">${escapeHtml(item.description)}</p>` : ""}
+                <div class="mt-2 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-wide">
+                  <span class="rounded-lg border border-gray-700 bg-gray-900 px-2 py-1 text-gray-300">Value: ${valueText}</span>
+                  <span class="rounded-lg border border-green-900 bg-green-950/30 px-2 py-1 text-green-300">Price: ${formatNumber(item.price)}</span>
+                  <span class="rounded-lg border border-orange-900 bg-orange-950/30 px-2 py-1 text-orange-300">Cost: ${formatNumber(item.cost)}</span>
+                  <span class="rounded-lg border border-violet-900 bg-violet-950/30 px-2 py-1 text-violet-300">Validity: ${item.validity_days} day(s)</span>
+                  <span class="rounded-lg border border-gray-700 bg-gray-900 px-2 py-1 text-gray-400">ID ${escapeHtml(item.id)}</span>
+                </div>
+              </div>
+            </div>
+
+            ${isSuperAdmin ? `
+              <button type="button" onclick="openEditItemModal('${escapeJsString(item.id)}')" class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-cyan-800 bg-cyan-950/30 px-3 text-xs font-bold text-cyan-300 transition hover:bg-cyan-900/50" title="Edit package item">
+                <i class="fa-solid fa-pen"></i>
+                Edit
+              </button>
+            ` : ""}
+          </div>
+        </article>
       `;
     }
 
@@ -694,7 +897,10 @@
       if (!isSuperAdmin) return "";
 
       return `
-        <div class="flex shrink-0 items-center gap-2">
+        <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
+          <button type="button" onclick="openCreateItemModal('${escapeJsString(childcategory.id)}')" class="rounded-lg bg-cyan-600 px-3 py-2 text-xs font-black text-white transition hover:bg-cyan-700" title="Add package item">
+            <i class="fa-solid fa-plus mr-1"></i>Item
+          </button>
           <button type="button" onclick="openEditEntityModal('childcategory', '${escapeJsString(childcategory.id)}')" class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-600 bg-gray-700 text-xs text-gray-200 transition hover:bg-gray-600" title="Edit child category">
             <i class="fa-solid fa-pen"></i>
           </button>
@@ -740,6 +946,180 @@
       }
 
       return null;
+    }
+
+    function findPackageItem(id) {
+      const wantedId = String(id);
+      return packageItems.find((item) => String(item.id) === wantedId) || null;
+    }
+
+    function getAllChildcategories() {
+      return categoriesTree.flatMap((category) =>
+        category.subcategories.flatMap((subcategory) =>
+          subcategory.childcategories.map((childcategory) => ({
+            ...childcategory,
+            category_name: category.name,
+            subcategory_name: subcategory.name,
+          }))
+        )
+      );
+    }
+
+    function openCreateItemModal(childcategoryId) {
+      if (!isSuperAdmin) return;
+      prepareItemModal("create", null, childcategoryId);
+    }
+
+    function openEditItemModal(id) {
+      if (!isSuperAdmin) return;
+
+      const item = findPackageItem(id);
+      if (!item) {
+        showStatus("The selected package item was not found.", "error");
+        return;
+      }
+
+      prepareItemModal("edit", item, item.childcategory_id);
+    }
+
+    function prepareItemModal(mode, item, childcategoryId) {
+      document.getElementById("item-form").reset();
+      document.getElementById("item-mode").value = mode;
+      document.getElementById("item-id").value = item?.id ?? "";
+      document.getElementById("item-name").value = item?.name ?? "";
+      document.getElementById("item-description").value = item?.description ?? "";
+      document.getElementById("item-image-url").value = item?.image_url ?? "";
+      document.getElementById("item-cost").value = item?.cost ?? 0;
+      document.getElementById("item-price").value = item?.price ?? 0;
+      document.getElementById("item-package-value").value = item?.package_value ?? 0;
+      document.getElementById("item-unit").value = item?.unit ?? "";
+      document.getElementById("item-validity-days").value = item?.validity_days ?? 0;
+      document.getElementById("item-is-active").value = String(item?.is_active ?? true);
+
+      fillItemChildcategorySelect(childcategoryId);
+      updateItemImagePreview();
+
+      document.getElementById("item-modal-title").textContent =
+        mode === "create" ? "Add Package Item" : "Edit Package Item";
+      document.getElementById("item-modal-subtitle").textContent =
+        mode === "create"
+          ? "Create a new item under the selected child category."
+          : `Editing item ID ${item?.id}`;
+      document.getElementById("item-submit-button").textContent =
+        mode === "create" ? "Create Item" : "Save Changes";
+
+      const modal = document.getElementById("item-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      window.setTimeout(() => document.getElementById("item-name")?.focus(), 50);
+    }
+
+    function fillItemChildcategorySelect(selectedId) {
+      const select = document.getElementById("item-childcategory-id");
+      const childcategories = getAllChildcategories();
+
+      select.innerHTML = childcategories.map((childcategory) => `
+        <option value="${escapeHtml(childcategory.id)}" ${String(childcategory.id) === String(selectedId) ? "selected" : ""}>
+          ${escapeHtml(childcategory.category_name)} → ${escapeHtml(childcategory.subcategory_name)} → ${escapeHtml(childcategory.name)}
+        </option>
+      `).join("");
+    }
+
+    function closeItemModal() {
+      const modal = document.getElementById("item-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.getElementById("item-form").reset();
+      document.getElementById("item-image-preview-wrapper").classList.add("hidden");
+    }
+
+    function updateItemImagePreview() {
+      const url = getInputValue("item-image-url");
+      const wrapper = document.getElementById("item-image-preview-wrapper");
+      const image = document.getElementById("item-image-preview");
+
+      if (!url) {
+        wrapper.classList.add("hidden");
+        image.removeAttribute("src");
+        return;
+      }
+
+      image.src = url;
+      wrapper.classList.remove("hidden");
+    }
+
+    async function submitItemForm(event) {
+      event.preventDefault();
+      if (!isSuperAdmin) return;
+
+      const mode = getInputValue("item-mode");
+      const id = getInputValue("item-id");
+      const childcategory_id = getInputValue("item-childcategory-id");
+      const name = getInputValue("item-name");
+      const description = getInputValue("item-description");
+      const image_url = getInputValue("item-image-url");
+      const cost = Number(getInputValue("item-cost"));
+      const price = Number(getInputValue("item-price"));
+      const package_value = Number(getInputValue("item-package-value"));
+      const unit = getInputValue("item-unit");
+      const validity_days = Number(getInputValue("item-validity-days"));
+      const is_active = toBoolean(getInputValue("item-is-active"), true);
+      const submitButton = document.getElementById("item-submit-button");
+
+      if (!childcategory_id || !name) {
+        showStatus("Child category and item name are required.", "error");
+        return;
+      }
+
+      if (![cost, price, package_value, validity_days].every(Number.isFinite)) {
+        showStatus("Cost, price, package value and validity days must be valid numbers.", "error");
+        return;
+      }
+
+      if (!Number.isInteger(validity_days) || validity_days < 0) {
+        showStatus("Validity days must be a positive integer or zero.", "error");
+        return;
+      }
+
+      const body = {
+        childcategory_id,
+        name,
+        description: description || null,
+        image_url: image_url || null,
+        cost,
+        price,
+        package_value,
+        unit: unit || null,
+        validity_days,
+        is_active,
+      };
+
+      if (mode === "edit") body.id = id;
+
+      submitButton.disabled = true;
+
+      try {
+        await sendRequest(
+          mode === "create" ? "ADD_ITEM_PACKAGE" : "EDIT_ITEM_PACKAGE",
+          {
+            method: mode === "create" ? "POST" : "PUT",
+            body,
+          }
+        );
+
+        closeItemModal();
+        showStatus(
+          mode === "create"
+            ? "Package item created successfully."
+            : "Package item updated successfully.",
+          "success"
+        );
+        await loadCategoriesTree();
+      } catch (error) {
+        showStatus(error.message, "error");
+      } finally {
+        submitButton.disabled = false;
+      }
     }
 
     function openCreateEntityModal(type, parentId = "") {
@@ -852,6 +1232,11 @@
     document.getElementById("entity-image-url")?.addEventListener("input", updateImagePreview);
     document.getElementById("entity-image-preview")?.addEventListener("error", () => {
       document.getElementById("entity-image-preview-wrapper")?.classList.add("hidden");
+    });
+
+    document.getElementById("item-image-url")?.addEventListener("input", updateItemImagePreview);
+    document.getElementById("item-image-preview")?.addEventListener("error", () => {
+      document.getElementById("item-image-preview-wrapper")?.classList.add("hidden");
     });
 
     async function submitEntityForm(event) {
@@ -1149,8 +1534,15 @@
       if (event.target.id === "entity-modal") closeEntityModal();
     });
 
+    document.getElementById("item-modal")?.addEventListener("click", (event) => {
+      if (event.target.id === "item-modal") closeItemModal();
+    });
+
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeEntityModal();
+      if (event.key === "Escape") {
+        closeEntityModal();
+        closeItemModal();
+      }
     });
 
     loadCategoriesTree();
