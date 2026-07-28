@@ -445,6 +445,16 @@
 
                                 <button
                                     type="button"
+                                    onclick="copyYearShortcut('${escapeJsString(yearId)}')"
+                                    class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-cyan-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-cyan-700"
+                                    title="Copy number, balance before, balance after, returned split amount, and total received"
+                                >
+                                    <i class="fa-solid fa-bolt"></i>
+                                    Copy Shortcut
+                                </button>
+
+                                <button
+                                    type="button"
                                     onclick="checkWholeYear('${escapeJsString(yearId)}', this)"
                                     class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
@@ -965,6 +975,116 @@
                     : 'Unable to copy the year.',
                 copied ? 'success' : 'error'
             );
+        }
+
+        async function copyYearShortcut(yearId) {
+            const year = findYearById(yearId);
+
+            if (!year) {
+                showStatus('Year not found.', 'error');
+                return;
+            }
+
+            const text = formatYearShortcutText(year);
+            const copied = await copyText(text);
+
+            showStatus(
+                copied
+                    ? `Year ${getYearTitle(year)} shortcut copied.`
+                    : 'Unable to copy the year shortcut.',
+                copied ? 'success' : 'error'
+            );
+        }
+
+        function formatYearShortcutText(year) {
+            const splitAmounts = parseYearSplitAmounts(
+                year.split_text ??
+                year.splitText ??
+                ''
+            );
+
+            const lines = getYearNumbers(year).map((item, index) => {
+                const parts = [
+                    String(item.number ?? '0').trim() || '0',
+                    `${formatMoney(item.balanceBefore)}$`,
+                    `${formatMoney(item.balanceAfter)}$`
+                ];
+
+                // An unclear split text never blocks copying.
+                // "returned" is added only when the complete split format is understood.
+                if (splitAmounts !== null) {
+                    parts.push(
+                        `returned ${formatMoney(splitAmounts[index] ?? 0)}$`
+                    );
+                }
+
+                return parts.join(' | ');
+            });
+
+            const totalReceived = toNumber(
+                year.total_received ??
+                year.totalReceived ??
+                0
+            );
+
+            lines.push(`Total Received: $${formatMoney(totalReceived)}`);
+
+            return lines.join('\n');
+        }
+
+        function parseYearSplitAmounts(value) {
+            const rawText = String(value ?? '').trim();
+
+            if (
+                rawText === '' ||
+                rawText === '-' ||
+                rawText.toLowerCase() === 'null' ||
+                rawText.toLowerCase() === 'undefined'
+            ) {
+                return null;
+            }
+
+            /*
+             * Accepted examples:
+             * 31,31,11.5
+             * 31 | 31 | 11.5
+             * 31$ 31$ 11.5$
+             * returned 31, returned 31, returned 11.5
+             *
+             * Any unclear text returns null. Copying still continues without
+             * the returned amounts.
+             */
+            const cleanedText = rawText
+                .replace(/\b(?:returned|return|retuned)\b/gi, ' ')
+                .replace(/\$/g, ' ')
+                .trim();
+
+            const tokens = cleanedText
+                .split(/[\s,;|/]+/)
+                .map((token) => token.trim())
+                .filter(Boolean);
+
+            if (tokens.length === 0 || tokens.length > 4) {
+                return null;
+            }
+
+            const amounts = [];
+
+            for (const token of tokens) {
+                if (!/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)$/.test(token)) {
+                    return null;
+                }
+
+                const amount = Number(token);
+
+                if (!Number.isFinite(amount)) {
+                    return null;
+                }
+
+                amounts.push(amount);
+            }
+
+            return amounts;
         }
 
         function formatYearCopyText(year) {
