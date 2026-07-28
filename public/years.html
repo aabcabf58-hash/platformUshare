@@ -55,39 +55,22 @@
                     <button type="button" onclick="loadYearsData()" class="rounded-xl bg-blue-600 px-4 py-3 text-white"><i class="fa-solid fa-rotate"></i></button>
                 </div>
 
-                <div class="mt-3 grid grid-cols-1 gap-2 border-t border-gray-700 pt-3 sm:grid-cols-2 xl:grid-cols-4">
-                    <div>
-                        <label for="created-from-filter" class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
-                            Created From
-                        </label>
-                        <input id="created-from-filter" type="datetime-local" onchange="applyYearsSearch()" class="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-xs text-white outline-none focus:border-green-500">
-                    </div>
+                <div class="mt-3 border-t border-gray-700 pt-3">
+                    <label for="year-status-filter" class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                        Status
+                    </label>
 
-                    <div>
-                        <label for="created-to-filter" class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
-                            Created To
-                        </label>
-                        <input id="created-to-filter" type="datetime-local" onchange="applyYearsSearch()" class="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-xs text-white outline-none focus:border-green-500">
-                    </div>
-
-                    <div>
-                        <label for="checked-from-filter" class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
-                            Checked From
-                        </label>
-                        <input id="checked-from-filter" type="datetime-local" onchange="applyYearsSearch()" class="w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-xs text-white outline-none focus:border-blue-500">
-                    </div>
-
-                    <div>
-                        <label for="checked-to-filter" class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
-                            Checked To
-                        </label>
-                        <div class="flex gap-2">
-                            <input id="checked-to-filter" type="datetime-local" onchange="applyYearsSearch()" class="min-w-0 flex-1 rounded-lg border border-gray-600 bg-gray-900 px-3 py-2 text-xs text-white outline-none focus:border-blue-500">
-                            <button type="button" onclick="clearDateFilters()" class="rounded-lg bg-gray-700 px-3 py-2 text-xs font-bold text-white hover:bg-gray-600" title="Clear date filters">
-                                <i class="fa-solid fa-filter-circle-xmark"></i>
-                            </button>
-                        </div>
-                    </div>
+                    <select
+                        id="year-status-filter"
+                        onchange="renderYears()"
+                        class="w-full cursor-pointer rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-sm font-bold text-white outline-none focus:border-green-500"
+                    >
+                        <option value="all" selected>All</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="COMPLETE">Complete</option>
+                        <option value="CHEKING">Cheking</option>
+                        <option value="CREATED">Created</option>
+                    </select>
                 </div>
             </div>
         </section>
@@ -243,10 +226,12 @@
         }
 
         function getVisibleYears() {
-            const createdFrom = getFilterDateValue('created-from-filter');
-            const createdTo = getFilterDateValue('created-to-filter');
-            const checkedFrom = getFilterDateValue('checked-from-filter');
-            const checkedTo = getFilterDateValue('checked-to-filter');
+            const selectedStatus = String(
+                document.getElementById('year-status-filter')?.value ??
+                'all'
+            )
+                .trim()
+                .toUpperCase();
 
             return yearsData.filter((year) => {
                 if (yearsSearchQuery) {
@@ -257,89 +242,24 @@
                     }
                 }
 
-                const createdDate = parseDateValue(
-                    year.created_at ??
-                    year.createdAt
-                );
+                if (selectedStatus !== 'ALL') {
+                    const yearStatus = String(year.status ?? '')
+                        .trim()
+                        .toUpperCase();
 
-                const checkedDate = parseDateValue(
-                    year.checked_at ??
-                    year.checkedAt ??
-                    year.check_at ??
-                    year.checkAt ??
-                    year.last_checked_at ??
-                    year.lastCheckedAt ??
-                    year.updated_at ??
-                    year.updatedAt
-                );
+                    const statusMatches =
+                        selectedStatus === 'CHEKING'
+                            ? yearStatus === 'CHEKING' ||
+                              yearStatus === 'CHECKING'
+                            : yearStatus === selectedStatus;
 
-                if (!isDateInsideRange(createdDate, createdFrom, createdTo)) {
-                    return false;
-                }
-
-                if (!isDateInsideRange(checkedDate, checkedFrom, checkedTo)) {
-                    return false;
+                    if (!statusMatches) {
+                        return false;
+                    }
                 }
 
                 return true;
             });
-        }
-
-        function getFilterDateValue(inputId) {
-            const value = document.getElementById(inputId)?.value;
-
-            if (!value) {
-                return null;
-            }
-
-            const date = new Date(value);
-            return Number.isNaN(date.getTime()) ? null : date;
-        }
-
-        function parseDateValue(value) {
-            if (isEmptyValue(value)) {
-                return null;
-            }
-
-            const date = new Date(value);
-            return Number.isNaN(date.getTime()) ? null : date;
-        }
-
-        function isDateInsideRange(date, fromDate, toDate) {
-            if (!fromDate && !toDate) {
-                return true;
-            }
-
-            if (!date) {
-                return false;
-            }
-
-            if (fromDate && date < fromDate) {
-                return false;
-            }
-
-            if (toDate && date > toDate) {
-                return false;
-            }
-
-            return true;
-        }
-
-        function clearDateFilters() {
-            [
-                'created-from-filter',
-                'created-to-filter',
-                'checked-from-filter',
-                'checked-to-filter'
-            ].forEach((id) => {
-                const input = document.getElementById(id);
-
-                if (input) {
-                    input.value = '';
-                }
-            });
-
-            renderYears();
         }
 
         function renderYears() {
