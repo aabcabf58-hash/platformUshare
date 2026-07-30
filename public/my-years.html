@@ -175,6 +175,7 @@
             `${API_BASE_URL}/api/ushare/getMyYears`;
 
         let myYears = [];
+        let lastOrderedYear = null;
 
         function getJsonHeaders() {
             if (typeof authHeaders === 'function') {
@@ -243,6 +244,7 @@
 
                 const orderedYear = result.data ?? result.year ?? result;
 
+                lastOrderedYear = orderedYear;
                 renderOrderedYear(orderedYear);
                 showStatus(
                     result.message || 'Year requested successfully.',
@@ -347,16 +349,23 @@
             container.classList.remove('hidden');
             container.innerHTML = `
                 <div class="rounded-xl border border-emerald-700 bg-emerald-900/20 p-4">
-                    <div class="mb-2 flex items-center gap-2 font-bold text-emerald-300">
-                        <i class="fa-solid fa-circle-check"></i>
-                        Reserved Year
+                    <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2 font-bold text-emerald-300">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Reserved Year
+                        </div>
+                        <button type="button" onclick="copyOrderedYearNumbers()" class="flex cursor-pointer items-center gap-2 rounded-lg border border-emerald-600 bg-emerald-700 px-3 py-2 text-xs font-bold text-white transition hover:bg-emerald-600">
+                            <i class="fa-regular fa-copy"></i>
+                            Copy Numbers
+                        </button>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="mb-3 grid grid-cols-2 gap-2 text-sm">
                         ${smallDetail('ID', year.id)}
                         ${smallDetail('Status', year.status)}
                         ${smallDetail('Year', year.year_name)}
                         ${smallDetail('Split', year.split_text)}
                     </div>
+                    ${renderYearNumbersGrid(year, true)}
                 </div>
             `;
         }
@@ -385,7 +394,14 @@
                     year.number1,
                     year.number2,
                     year.number3,
-                    year.number4
+                    year.number4,
+                    ...(Array.isArray(year.numbers)
+                        ? year.numbers.flatMap((item) => [
+                            item.numberphone,
+                            item.balance_before,
+                            item.balance_after
+                        ])
+                        : [])
                 ].join(' ').toLowerCase();
 
                 return statusMatches && searchableText.includes(searchValue);
@@ -410,30 +426,6 @@
         }
 
         function renderYearCard(year) {
-            const numbers = [1, 2, 3, 4]
-                .map((index) => {
-                    const number = year[`number${index}`];
-
-                    if (number === undefined || number === null || number === '') {
-                        return '';
-                    }
-
-                    return `
-                        <div class="rounded-xl border border-gray-700 bg-gray-950/40 p-3">
-                            <div class="mb-2 font-bold text-indigo-300">
-                                <i class="fa-solid fa-mobile-screen-button mr-1"></i>
-                                ${escapeHtml(number)}
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                ${smallDetail('Before', year[`balance${index}_before`])}
-                                ${smallDetail('After', year[`balance${index}_after`])}
-                            </div>
-                        </div>
-                    `;
-                })
-                .filter(Boolean)
-                .join('');
-
             return `
                 <article class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-900/60">
                     <div class="flex flex-col justify-between gap-3 border-b border-gray-700 p-4 sm:flex-row sm:items-center">
@@ -448,9 +440,15 @@
                                 ID: ${escapeHtml(year.id ?? '-')} · Requested ${escapeHtml(formatDate(year.pending_at || year.created_at))}
                             </p>
                         </div>
-                        <div class="rounded-xl bg-indigo-600/15 px-4 py-2 text-center">
-                            <div class="text-[10px] font-bold uppercase text-gray-500">Split</div>
-                            <div class="font-bold text-indigo-300">${escapeHtml(year.split_text ?? '-')}</div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="rounded-xl bg-indigo-600/15 px-4 py-2 text-center">
+                                <div class="text-[10px] font-bold uppercase text-gray-500">Split</div>
+                                <div class="font-bold text-indigo-300">${escapeHtml(year.split_text ?? '-')}</div>
+                            </div>
+                            <button type="button" onclick="copyYearNumbersById('${escapeJsString(year.id)}')" class="flex cursor-pointer items-center gap-2 rounded-xl border border-indigo-600 bg-indigo-700 px-3 py-2 text-xs font-bold text-white transition hover:bg-indigo-600">
+                                <i class="fa-regular fa-copy"></i>
+                                Copy Numbers
+                            </button>
                         </div>
                     </div>
 
@@ -463,13 +461,147 @@
                         ${detail('Updated', formatDate(year.updated_at))}
                     </div>
 
-                    ${numbers ? `
-                        <div class="grid grid-cols-1 gap-3 border-t border-gray-700 p-4 sm:grid-cols-2 xl:grid-cols-4">
-                            ${numbers}
-                        </div>
-                    ` : ''}
+                    <div class="border-t border-gray-700 p-4">
+                        ${renderYearNumbersGrid(year)}
+                    </div>
                 </article>
             `;
+        }
+
+        function renderYearNumbersGrid(year, compact = false) {
+            const numbers = [1, 2, 3, 4]
+                .map((index) => {
+                    const numberData = getYearNumberData(year, index);
+                    const number = numberData.numberphone;
+                    const balanceBefore = numberData.balance_before;
+                    const balanceAfter = numberData.balance_after;
+
+                    return `
+                        <div class="rounded-xl border border-gray-700 bg-gray-950/40 p-3">
+                            <div class="mb-2">
+                                <div class="text-[10px] font-bold uppercase text-gray-500">Number ${index}</div>
+                                <div class="mt-1 font-bold text-indigo-300">
+                                    <i class="fa-solid fa-mobile-screen-button mr-1"></i>
+                                    ${escapeHtml(number ?? '-')}
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                ${smallDetail('Before', balanceBefore)}
+                                ${smallDetail('After', balanceAfter)}
+                            </div>
+                        </div>
+                    `;
+                })
+                .join('');
+
+            return `
+                <div class="grid grid-cols-1 gap-3 ${compact ? 'sm:grid-cols-2' : 'sm:grid-cols-2 xl:grid-cols-4'}">
+                    ${numbers}
+                </div>
+            `;
+        }
+
+        function getYearNumberData(year, index) {
+            const nestedNumber = Array.isArray(year?.numbers)
+                ? year.numbers.find(
+                    (item) => Number(item?.number_index) === Number(index)
+                )
+                : null;
+
+            return {
+                numberphone:
+                    nestedNumber?.numberphone ??
+                    year?.[`number${index}`] ??
+                    null,
+                balance_before:
+                    nestedNumber?.balance_before ??
+                    year?.[`balance${index}_before`] ??
+                    null,
+                balance_after:
+                    nestedNumber?.balance_after ??
+                    year?.[`balance${index}_after`] ??
+                    null
+            };
+        }
+
+        function copyOrderedYearNumbers() {
+            if (!lastOrderedYear) {
+                showStatus('No newly ordered year is available to copy.', 'error');
+                return;
+            }
+
+            copyYearNumbers(lastOrderedYear);
+        }
+
+        function copyYearNumbersById(yearId) {
+            const year = myYears.find(
+                (item) => String(item.id) === String(yearId)
+            );
+
+            if (!year) {
+                showStatus('The selected year was not found.', 'error');
+                return;
+            }
+
+            copyYearNumbers(year);
+        }
+
+        async function copyYearNumbers(year) {
+            const numberLines = [1, 2, 3, 4]
+                .map((index) => {
+                    const numberData = getYearNumberData(year, index);
+                    const number = numberData.numberphone;
+
+                    if (number === undefined || number === null || number === '') {
+                        return '';
+                    }
+
+                    const before = numberData.balance_before ?? '-';
+                    const after = numberData.balance_after ?? '-';
+
+                    return `${number}: ${before} → ${after}`;
+                })
+                .filter(Boolean);
+
+            if (numberLines.length === 0) {
+                showStatus(
+                    'This year does not contain number details in the API response.',
+                    'error'
+                );
+                return;
+            }
+
+            const compactText = numberLines.join('\n');
+
+            try {
+                await copyText(compactText);
+                showStatus('Year numbers copied successfully.', 'success');
+            } catch (error) {
+                console.error('Copy numbers error:', error);
+                showStatus(`Unable to copy numbers: ${error.message}`, 'error');
+            }
+        }
+
+        async function copyText(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(text);
+                return;
+            }
+
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+
+            const copied = document.execCommand('copy');
+            textarea.remove();
+
+            if (!copied) {
+                throw new Error('Clipboard access was rejected');
+            }
         }
 
         function statusBadge(status) {
@@ -556,6 +688,12 @@
                 .replaceAll('>', '&gt;')
                 .replaceAll('"', '&quot;')
                 .replaceAll("'", '&#039;');
+        }
+
+        function escapeJsString(value) {
+            return String(value ?? '')
+                .replaceAll('\\', '\\\\')
+                .replaceAll("'", "\\'");
         }
 
         document
