@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zouzou App - Order Year</title>
+
+    <script src="./theme.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./theme.css">
+
+    <style>
+        html.light-mode #global-status[data-status-type="info"] {
+            background-color: #eff6ff !important;
+            border-color: #2563eb !important;
+            color: #1e3a8a !important;
+        }
+
+        html.light-mode #global-status[data-status-type="success"] {
+            background-color: #f0fdf4 !important;
+            border-color: #16a34a !important;
+            color: #14532d !important;
+        }
+
+        html.light-mode #global-status[data-status-type="error"] {
+            background-color: #fef2f2 !important;
+            border-color: #dc2626 !important;
+            color: #991b1b !important;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gray-900 font-sans text-gray-100">
+    <header class="sticky top-0 z-50 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+        <div class="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
+            <div class="flex items-center gap-3">
+                <div class="rounded-lg bg-emerald-600 p-2 text-white">
+                    <i class="fa-solid fa-calendar-plus text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold text-emerald-400">
+                    Zouzou App
+                    <span class="text-base font-normal text-white">| Order Year</span>
+                </h1>
+            </div>
+
+            <nav class="flex flex-wrap items-center justify-center gap-2">
+                <button data-theme-toggle type="button" onclick="toggleTheme()" class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600">
+                    <i data-theme-icon class="fa-solid fa-sun"></i>
+                    <span data-theme-label>Light Mode</span>
+                </button>
+                <a href="./index.html" class="flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600">
+                    <i class="fa-solid fa-table"></i>Main Table
+                </a>
+                <a href="./groups.html" class="flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600">
+                    <i class="fa-solid fa-object-group"></i>Groups
+                </a>
+                <a href="./years.html" class="flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600">
+                    <i class="fa-solid fa-calendar-days"></i>Years
+                </a>
+                <a href="./my-years.html" class="flex items-center gap-2 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-emerald-700">
+                    <i class="fa-solid fa-cart-plus"></i>Order Year
+                </a>
+                <button type="button" onclick="logout()" class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700">
+                    <i class="fa-solid fa-right-from-bracket"></i>Logout
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="mx-auto w-full max-w-7xl px-3 py-5 sm:px-5">
+        <div id="global-status" class="mb-4 hidden w-full whitespace-pre-wrap break-words rounded-xl border p-3 text-sm shadow-xl"></div>
+
+        <section class="grid grid-cols-1 items-start gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-5 shadow-xl">
+                <div class="mb-5 flex items-center gap-3">
+                    <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600/20 text-emerald-400">
+                        <i class="fa-solid fa-cart-plus text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Request a Year</h2>
+                        <p class="text-xs text-gray-400">Choose the required first split value.</p>
+                    </div>
+                </div>
+
+                <form id="order-year-form" class="space-y-4">
+                    <div>
+                        <label for="split1" class="mb-1.5 block text-sm font-semibold text-gray-300">
+                            First split (split1)
+                        </label>
+                        <input
+                            id="split1"
+                            name="split1"
+                            type="number"
+                            step="any"
+                            min="0"
+                            inputmode="decimal"
+                            placeholder="Example: 40"
+                            class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition placeholder:text-gray-600 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                        >
+                        <p class="mt-2 text-xs leading-5 text-gray-400">
+                            Enter <strong class="text-gray-300">0</strong> or leave it empty to request any available CREATED year.
+                        </p>
+                    </div>
+
+                    <button id="order-button" type="submit" class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 font-bold text-white shadow transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        <span>Request Year</span>
+                    </button>
+                </form>
+
+                <div id="ordered-year-result" class="mt-5 hidden"></div>
+            </div>
+
+            <div class="min-w-0 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl sm:p-5">
+                <div class="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600/20 text-indigo-400">
+                            <i class="fa-solid fa-list-check text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-white">My Requested Years</h2>
+                            <p id="years-count" class="text-xs text-gray-400">Loading...</p>
+                        </div>
+                    </div>
+
+                    <button id="refresh-button" type="button" onclick="loadMyYears()" class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-60">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        Refresh
+                    </button>
+                </div>
+
+                <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input id="year-search" type="search" oninput="renderYears()" placeholder="Search by year, client or number..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2.5 pl-9 pr-3 text-sm text-white outline-none focus:border-indigo-500">
+                    </div>
+
+                    <select id="status-filter" onchange="renderYears()" class="rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500">
+                        <option value="">All statuses</option>
+                        <option value="CREATED">CREATED</option>
+                        <option value="PENDING">PENDING</option>
+                        <option value="CHECKING">CHECKING</option>
+                        <option value="COMPLETE">COMPLETE</option>
+                    </select>
+                </div>
+
+                <div id="years-list" class="space-y-4">
+                    <div class="rounded-xl border border-gray-700 bg-gray-900/50 p-10 text-center text-gray-500">
+                        <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-indigo-400"></i>
+                        <p>Loading requested years...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="./config.js"></script>
+    <script src="./auth.js"></script>
+    <script>
+        if (typeof requireRole === 'function') {
+            requireRole(['admin', 'super_admin']);
+        }
+    </script>
+
+    <script>
+        const API_BASE_URL =
+            window.APP_CONFIG?.API_BASE_URL ||
+            'https://abdd-production.up.railway.app';
+
+        const ORDER_YEAR_API =
+            `${API_BASE_URL}/api/ushare/getYearsByAdmin`;
+
+        const MY_YEARS_API =
+            `${API_BASE_URL}/api/ushare/getMyYears`;
+
+        let myYears = [];
+
+        function getJsonHeaders() {
+            if (typeof authHeaders === 'function') {
+                return authHeaders();
+            }
+
+            return {
+                'Content-Type': 'application/json'
+            };
+        }
+
+        async function readJsonResponse(response) {
+            const text = await response.text();
+
+            if (!text) {
+                return {};
+            }
+
+            try {
+                return JSON.parse(text);
+            } catch {
+                throw new Error('The server returned a non-JSON response.');
+            }
+        }
+
+        async function orderYear(event) {
+            event.preventDefault();
+
+            const input = document.getElementById('split1');
+            const orderButton = document.getElementById('order-button');
+            const rawValue = String(input.value ?? '').trim();
+
+            let split1 = 0;
+
+            if (rawValue !== '') {
+                split1 = Number(rawValue);
+
+                if (!Number.isFinite(split1) || split1 < 0) {
+                    showStatus('split1 must be a valid number equal to or greater than zero.', 'error');
+                    return;
+                }
+            }
+
+            orderButton.disabled = true;
+            orderButton.innerHTML = `
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Requesting...</span>
+            `;
+            showStatus('Requesting an available year...', 'info');
+
+            try {
+                const response = await fetch(ORDER_YEAR_API, {
+                    method: 'POST',
+                    headers: getJsonHeaders(),
+                    body: JSON.stringify({ split1 })
+                });
+
+                const result = await readJsonResponse(response);
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(
+                        result.message ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                const orderedYear = result.data ?? result.year ?? result;
+
+                renderOrderedYear(orderedYear);
+                showStatus(
+                    result.message || 'Year requested successfully.',
+                    'success'
+                );
+
+                await loadMyYears(false);
+            } catch (error) {
+                console.error('Order year error:', error);
+                showStatus(`Unable to request year: ${error.message}`, 'error');
+            } finally {
+                orderButton.disabled = false;
+                orderButton.innerHTML = `
+                    <i class="fa-solid fa-calendar-plus"></i>
+                    <span>Request Year</span>
+                `;
+            }
+        }
+
+        async function loadMyYears(showLoadingStatus = true) {
+            const refreshButton = document.getElementById('refresh-button');
+            const list = document.getElementById('years-list');
+
+            refreshButton.disabled = true;
+
+            if (showLoadingStatus) {
+                showStatus('Loading your requested years...', 'info');
+            }
+
+            if (myYears.length === 0) {
+                list.innerHTML = `
+                    <div class="rounded-xl border border-gray-700 bg-gray-900/50 p-10 text-center text-gray-500">
+                        <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-indigo-400"></i>
+                        <p>Loading requested years...</p>
+                    </div>
+                `;
+            }
+
+            try {
+                const response = await fetch(MY_YEARS_API, {
+                    method: 'GET',
+                    headers: getJsonHeaders()
+                });
+
+                const result = await readJsonResponse(response);
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(
+                        result.message ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                const data = Array.isArray(result.data)
+                    ? result.data
+                    : Array.isArray(result.years)
+                        ? result.years
+                        : Array.isArray(result)
+                            ? result
+                            : [];
+
+                myYears = data;
+                renderYears();
+
+                if (showLoadingStatus) {
+                    showStatus(
+                        `${myYears.length} requested year(s) loaded.`,
+                        'success'
+                    );
+                }
+            } catch (error) {
+                console.error('My years loading error:', error);
+
+                list.innerHTML = `
+                    <div class="rounded-xl border border-red-800 bg-red-900/20 p-10 text-center text-red-300">
+                        <i class="fa-solid fa-triangle-exclamation mb-3 text-3xl"></i>
+                        <p class="font-semibold">Unable to load requested years.</p>
+                        <p class="mt-2 text-sm">${escapeHtml(error.message)}</p>
+                    </div>
+                `;
+
+                document.getElementById('years-count').textContent =
+                    'Unable to load data';
+
+                showStatus(
+                    `Unable to load requested years: ${error.message}`,
+                    'error'
+                );
+            } finally {
+                refreshButton.disabled = false;
+            }
+        }
+
+        function renderOrderedYear(year) {
+            const container = document.getElementById('ordered-year-result');
+
+            if (!year || typeof year !== 'object') {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = `
+                <div class="rounded-xl border border-emerald-700 bg-emerald-900/20 p-4">
+                    <div class="mb-2 flex items-center gap-2 font-bold text-emerald-300">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Reserved Year
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        ${smallDetail('ID', year.id)}
+                        ${smallDetail('Status', year.status)}
+                        ${smallDetail('Year', year.year_name)}
+                        ${smallDetail('Split', year.split_text)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderYears() {
+            const list = document.getElementById('years-list');
+            const searchValue = String(
+                document.getElementById('year-search')?.value ?? ''
+            ).trim().toLowerCase();
+            const statusValue = String(
+                document.getElementById('status-filter')?.value ?? ''
+            ).trim().toUpperCase();
+
+            const filteredYears = myYears.filter((year) => {
+                const statusMatches =
+                    !statusValue ||
+                    String(year.status ?? '').toUpperCase() === statusValue;
+
+                const searchableText = [
+                    year.id,
+                    year.year_name,
+                    year.status,
+                    year.split_text,
+                    year.number_client,
+                    year.buyer_numberphone,
+                    year.number1,
+                    year.number2,
+                    year.number3,
+                    year.number4
+                ].join(' ').toLowerCase();
+
+                return statusMatches && searchableText.includes(searchValue);
+            });
+
+            document.getElementById('years-count').textContent =
+                `${filteredYears.length} of ${myYears.length} year(s)`;
+
+            if (filteredYears.length === 0) {
+                list.innerHTML = `
+                    <div class="rounded-xl border border-gray-700 bg-gray-900/50 p-10 text-center text-gray-500">
+                        <i class="fa-regular fa-folder-open mb-3 text-3xl"></i>
+                        <p>No requested years found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = filteredYears
+                .map(renderYearCard)
+                .join('');
+        }
+
+        function renderYearCard(year) {
+            const numbers = [1, 2, 3, 4]
+                .map((index) => {
+                    const number = year[`number${index}`];
+
+                    if (number === undefined || number === null || number === '') {
+                        return '';
+                    }
+
+                    return `
+                        <div class="rounded-xl border border-gray-700 bg-gray-950/40 p-3">
+                            <div class="mb-2 font-bold text-indigo-300">
+                                <i class="fa-solid fa-mobile-screen-button mr-1"></i>
+                                ${escapeHtml(number)}
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                ${smallDetail('Before', year[`balance${index}_before`])}
+                                ${smallDetail('After', year[`balance${index}_after`])}
+                            </div>
+                        </div>
+                    `;
+                })
+                .filter(Boolean)
+                .join('');
+
+            return `
+                <article class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-900/60">
+                    <div class="flex flex-col justify-between gap-3 border-b border-gray-700 p-4 sm:flex-row sm:items-center">
+                        <div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <h3 class="text-lg font-bold text-white">
+                                    ${escapeHtml(year.year_name || `Year #${year.id ?? '-'}`)}
+                                </h3>
+                                ${statusBadge(year.status)}
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">
+                                ID: ${escapeHtml(year.id ?? '-')} · Requested ${escapeHtml(formatDate(year.pending_at || year.created_at))}
+                            </p>
+                        </div>
+                        <div class="rounded-xl bg-indigo-600/15 px-4 py-2 text-center">
+                            <div class="text-[10px] font-bold uppercase text-gray-500">Split</div>
+                            <div class="font-bold text-indigo-300">${escapeHtml(year.split_text ?? '-')}</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 p-4 md:grid-cols-3 xl:grid-cols-6">
+                        ${detail('Client', year.number_client)}
+                        ${detail('Buyer', year.buyer_numberphone)}
+                        ${detail('Final price', year.final_year_price)}
+                        ${detail('Refund', year.refund_amount)}
+                        ${detail('Total received', year.total_received)}
+                        ${detail('Updated', formatDate(year.updated_at))}
+                    </div>
+
+                    ${numbers ? `
+                        <div class="grid grid-cols-1 gap-3 border-t border-gray-700 p-4 sm:grid-cols-2 xl:grid-cols-4">
+                            ${numbers}
+                        </div>
+                    ` : ''}
+                </article>
+            `;
+        }
+
+        function statusBadge(status) {
+            const cleanStatus = String(status ?? 'UNKNOWN').toUpperCase();
+            const colors = {
+                CREATED: 'border-gray-600 bg-gray-700 text-gray-200',
+                PENDING: 'border-amber-600 bg-amber-900/30 text-amber-300',
+                CHECKING: 'border-blue-600 bg-blue-900/30 text-blue-300',
+                COMPLETE: 'border-emerald-600 bg-emerald-900/30 text-emerald-300'
+            };
+
+            return `
+                <span class="rounded-full border px-2.5 py-1 text-[11px] font-bold ${colors[cleanStatus] || colors.CREATED}">
+                    ${escapeHtml(cleanStatus)}
+                </span>
+            `;
+        }
+
+        function detail(label, value) {
+            return `
+                <div class="min-w-0 rounded-xl border border-gray-700 bg-gray-800 p-3">
+                    <div class="text-[10px] font-bold uppercase text-gray-500">${escapeHtml(label)}</div>
+                    <div class="mt-1 truncate text-sm font-semibold text-gray-200" title="${escapeHtml(value ?? '-')}">
+                        ${escapeHtml(value ?? '-')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function smallDetail(label, value) {
+            return `
+                <div>
+                    <div class="text-[10px] font-bold uppercase text-gray-500">${escapeHtml(label)}</div>
+                    <div class="truncate font-semibold text-gray-200" title="${escapeHtml(value ?? '-')}">
+                        ${escapeHtml(value ?? '-')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function formatDate(value) {
+            if (!value) {
+                return '-';
+            }
+
+            const date = new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return String(value);
+            }
+
+            return new Intl.DateTimeFormat('en-GB', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            }).format(date);
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('global-status');
+
+            status.className =
+                'mb-4 block w-full whitespace-pre-wrap break-words rounded-xl border p-3 text-sm shadow-xl';
+            status.dataset.statusType =
+                type === 'info' || type === 'success' ? type : 'error';
+
+            if (type === 'info') {
+                status.classList.add('border-blue-500', 'bg-blue-900/40', 'text-blue-300');
+            } else if (type === 'success') {
+                status.classList.add('border-green-500', 'bg-green-900/40', 'text-green-300');
+            } else {
+                status.classList.add('border-red-500', 'bg-red-900/40', 'text-red-300');
+            }
+
+            status.textContent = message;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        document
+            .getElementById('order-year-form')
+            .addEventListener('submit', orderYear);
+
+        window.addEventListener('load', () => loadMyYears());
+    </script>
+</body>
+</html>
