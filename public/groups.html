@@ -34,6 +34,20 @@
             border-color: #dc2626 !important;
             color: #991b1b !important;
         }
+
+        html,
+        body {
+            min-height: 100%;
+            height: auto !important;
+            overflow-y: auto !important;
+        }
+
+        main,
+        #groups-grid,
+        .group-lines-list {
+            max-height: none !important;
+            overflow-y: visible !important;
+        }
     </style>
 </head>
 
@@ -660,7 +674,7 @@
                                 ${renderYearControls(groupId, groupLines)}
                             </div>
 
-                            <div class="max-h-[72vh] space-y-1 overflow-y-auto p-2">
+                            <div class="group-lines-list space-y-1 p-2">
                                 ${groupLines
                                     .map(
                                         (line) =>

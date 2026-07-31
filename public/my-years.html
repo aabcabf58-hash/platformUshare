@@ -28,6 +28,86 @@
             border-color: #dc2626 !important;
             color: #991b1b !important;
         }
+
+        html.light-mode body {
+            background: #eef1f4 !important;
+            color: #1f2937 !important;
+        }
+
+        html.light-mode header {
+            background: #f8fafc !important;
+            border-color: #d1d5db !important;
+        }
+
+        html.light-mode header h1 .text-white,
+        html.light-mode main .text-white:not(button):not(a) {
+            color: #1f2937 !important;
+        }
+
+        html.light-mode [class*="border-gray-"] {
+            border-color: #d1d5db !important;
+        }
+
+        html.light-mode header [class*="bg-gray-"],
+        html.light-mode main [class*="bg-gray-"] {
+            background-color: #f8fafc !important;
+        }
+
+        html.light-mode [class*="text-gray-200"],
+        html.light-mode [class*="text-gray-300"] {
+            color: #374151 !important;
+        }
+
+        html.light-mode [class*="text-gray-400"],
+        html.light-mode [class*="text-gray-500"],
+        html.light-mode [class*="text-gray-600"] {
+            color: #6b7280 !important;
+        }
+
+        html.light-mode input,
+        html.light-mode select {
+            background: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #111827 !important;
+        }
+
+        html.light-mode input::placeholder {
+            color: #9ca3af !important;
+        }
+
+        html.light-mode main [class*="bg-emerald-900"],
+        html.light-mode main [class*="bg-green-900"] {
+            background-color: #ecfdf5 !important;
+        }
+
+        html.light-mode main [class*="bg-blue-900"] {
+            background-color: #eff6ff !important;
+        }
+
+        html.light-mode main [class*="bg-amber-900"] {
+            background-color: #fffbeb !important;
+        }
+
+        html.light-mode main [class*="bg-red-900"] {
+            background-color: #fef2f2 !important;
+        }
+
+        html.light-mode main [class*="text-emerald-300"],
+        html.light-mode main [class*="text-green-300"] {
+            color: #047857 !important;
+        }
+
+        html.light-mode main [class*="text-blue-300"] {
+            color: #1d4ed8 !important;
+        }
+
+        html.light-mode main [class*="text-amber-300"] {
+            color: #92400e !important;
+        }
+
+        html.light-mode main [class*="text-red-300"] {
+            color: #991b1b !important;
+        }
     </style>
 </head>
 
@@ -115,7 +195,7 @@
             <div class="min-w-0 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl sm:p-5">
                 <div class="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                     <div class="flex items-center gap-3">
-                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-600/20 text-indigo-400">
+                        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600/20 text-emerald-400">
                             <i class="fa-solid fa-list-check text-xl"></i>
                         </div>
                         <div>
@@ -133,13 +213,14 @@
                 <div class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_180px]">
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                        <input id="year-search" type="search" oninput="renderYears()" placeholder="Search by year, client or number..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2.5 pl-9 pr-3 text-sm text-white outline-none focus:border-indigo-500">
+                        <input id="year-search" type="search" oninput="renderYears()" placeholder="Search by year, client or number..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2.5 pl-9 pr-3 text-sm text-white outline-none focus:border-emerald-500">
                     </div>
 
-                    <select id="status-filter" onchange="renderYears()" class="rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 text-sm text-white outline-none focus:border-indigo-500">
+                    <select id="status-filter" onchange="renderYears()" class="rounded-xl border border-gray-600 bg-gray-900 px-3 py-2.5 text-sm text-white outline-none focus:border-emerald-500">
                         <option value="">All statuses</option>
                         <option value="CREATED">CREATED</option>
                         <option value="PENDING">PENDING</option>
+                       
                         <option value="CHECKING">CHECKING</option>
                         <option value="COMPLETE">COMPLETE</option>
                     </select>
@@ -147,7 +228,7 @@
 
                 <div id="years-list" class="space-y-4">
                     <div class="rounded-xl border border-gray-700 bg-gray-900/50 p-10 text-center text-gray-500">
-                        <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-indigo-400"></i>
+                        <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-emerald-400"></i>
                         <p>Loading requested years...</p>
                     </div>
                 </div>
@@ -173,6 +254,14 @@
 
         const MY_YEARS_API =
             `${API_BASE_URL}/api/ushare/getMyYears`;
+
+        const CHECK_YEAR_API =
+            `${API_BASE_URL}/api/ushare/chekyear`;
+
+        const EDIT_STATUS_YEARS_API =
+            `${API_BASE_URL}/api/ushare/editStatusYears`;
+
+        const CHECK_TIMEOUT_MS = 300000;
 
         let myYears = [];
         let lastOrderedYear = null;
@@ -277,7 +366,7 @@
             if (myYears.length === 0) {
                 list.innerHTML = `
                     <div class="rounded-xl border border-gray-700 bg-gray-900/50 p-10 text-center text-gray-500">
-                        <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-indigo-400"></i>
+                        <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-emerald-400"></i>
                         <p>Loading requested years...</p>
                     </div>
                 `;
@@ -441,14 +530,15 @@
                             </p>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <div class="rounded-xl bg-indigo-600/15 px-4 py-2 text-center">
+                            <div class="rounded-xl bg-emerald-600/15 px-4 py-2 text-center">
                                 <div class="text-[10px] font-bold uppercase text-gray-500">Split</div>
-                                <div class="font-bold text-indigo-300">${escapeHtml(year.split_text ?? '-')}</div>
+                                <div class="font-bold text-emerald-300">${escapeHtml(year.split_text ?? '-')}</div>
                             </div>
-                            <button type="button" onclick="copyYearNumbersById('${escapeJsString(year.id)}')" class="flex cursor-pointer items-center gap-2 rounded-xl border border-indigo-600 bg-indigo-700 px-3 py-2 text-xs font-bold text-white transition hover:bg-indigo-600">
+                            <button type="button" onclick="copyYearNumbersById('${escapeJsString(year.id)}')" class="flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-600 bg-emerald-700 px-3 py-2 text-xs font-bold text-white transition hover:bg-emerald-600">
                                 <i class="fa-regular fa-copy"></i>
-                                Copy Numbers
+                                Copy Details
                             </button>
+                            ${renderCheckYearControls(year)}
                         </div>
                     </div>
 
@@ -475,19 +565,23 @@
                     const number = numberData.numberphone;
                     const balanceBefore = numberData.balance_before;
                     const balanceAfter = numberData.balance_after;
+                    const returnedAmount = numberData.returned_amount;
+                    const receivedAmount = numberData.received_amount;
 
                     return `
                         <div class="rounded-xl border border-gray-700 bg-gray-950/40 p-3">
                             <div class="mb-2">
                                 <div class="text-[10px] font-bold uppercase text-gray-500">Number ${index}</div>
-                                <div class="mt-1 font-bold text-indigo-300">
+                                <div class="mt-1 font-bold text-emerald-300">
                                     <i class="fa-solid fa-mobile-screen-button mr-1"></i>
                                     ${escapeHtml(number ?? '-')}
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-2 text-xs">
-                                ${smallDetail('Before', balanceBefore)}
-                                ${smallDetail('After', balanceAfter)}
+                                ${smallDetail('Before', formatMoneyWithDollar(balanceBefore))}
+                                ${smallDetail('After', formatMoneyWithDollar(balanceAfter))}
+                                ${smallDetail('Returned', formatMoneyWithDollar(returnedAmount))}
+                                ${smallDetail('Received', formatMoneyWithDollar(receivedAmount))}
                             </div>
                         </div>
                     `;
@@ -508,19 +602,285 @@
                 )
                 : null;
 
+            const balanceBefore =
+                nestedNumber?.balance_before ??
+                year?.[`balance${index}_before`] ??
+                null;
+
+            const balanceAfter =
+                nestedNumber?.balance_after ??
+                year?.[`balance${index}_after`] ??
+                null;
+
+            const beforeNumber = toFiniteNumberOrNull(balanceBefore);
+            const afterNumber = toFiniteNumberOrNull(balanceAfter);
+            const splitAmounts = parseYearSplitAmounts(year?.split_text);
+
+            const calculatedReceived =
+                beforeNumber !== null && afterNumber !== null
+                    ? roundMoney(afterNumber - beforeNumber)
+                    : null;
+
             return {
                 numberphone:
                     nestedNumber?.numberphone ??
                     year?.[`number${index}`] ??
                     null,
-                balance_before:
-                    nestedNumber?.balance_before ??
-                    year?.[`balance${index}_before`] ??
-                    null,
-                balance_after:
-                    nestedNumber?.balance_after ??
-                    year?.[`balance${index}_after`] ??
-                    null
+                balance_before: balanceBefore,
+                balance_after: balanceAfter,
+                returned_amount:
+                    nestedNumber?.returned_amount ??
+                    splitAmounts?.[index - 1] ??
+                    0,
+                received_amount:
+                    calculatedReceived ??
+                    nestedNumber?.balance_difference ??
+                    nestedNumber?.arrived_amount ??
+                    0
+            };
+        }
+
+        function renderCheckYearControls(year) {
+            const status = String(year?.status ?? '').trim().toUpperCase();
+            const yearId = String(year?.id ?? '');
+            const domKey = getYearDomKey(yearId);
+            const statusOptions = [
+                'CREATED',
+                'PENDING',
+                'CHECKING',
+                'COMPLETE'
+            ]
+                .map((option) => `
+                    <option value="${option}" ${option === status ? 'selected' : ''}>
+                        ${option}
+                    </option>
+                `)
+                .join('');
+
+            return `
+                <button
+                    id="check-year-${domKey}"
+                    type="button"
+                    onclick="checkMyYearById('${escapeJsString(yearId)}', this)"
+                    class="flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-600 bg-emerald-700 px-3 py-2 text-xs font-bold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    Check Year
+                </button>
+                <div class="flex items-stretch overflow-hidden rounded-xl border border-green-600">
+                    <select
+                        id="edit-status-${domKey}"
+                        class="cursor-pointer border-0 border-r border-green-600 bg-gray-800 px-3 py-2 text-xs font-bold text-gray-200 outline-none focus:ring-0"
+                        aria-label="Select year status"
+                    >
+                        ${statusOptions}
+                    </select>
+                    <button
+                        id="edit-status-button-${domKey}"
+                        type="button"
+                        onclick="saveMyYearStatusById('${escapeJsString(yearId)}', this)"
+                        class="flex cursor-pointer items-center gap-2 border-0 bg-green-700 px-3 py-2 text-xs font-bold text-white transition hover:bg-green-600 disabled:cursor-not-allowed disabled:opacity-45"
+                    >
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Save Status
+                    </button>
+                </div>
+            `;
+        }
+
+        async function checkMyYearById(yearId, buttonElement) {
+            const year = myYears.find(
+                (item) => String(item?.id) === String(yearId)
+            );
+
+            if (!year) {
+                showStatus('The selected year was not found.', 'error');
+                return;
+            }
+
+            const originalHtml = buttonElement?.innerHTML ?? '';
+            const controller = new AbortController();
+            const timeoutId = setTimeout(
+                () => controller.abort(),
+                CHECK_TIMEOUT_MS
+            );
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Checking...
+                `;
+            }
+
+            showStatus(
+                `Checking ${year.year_name || `Year #${year.id}`}...`,
+                'info'
+            );
+
+            try {
+                const response = await fetch(CHECK_YEAR_API, {
+                    method: 'POST',
+                    headers: getJsonHeaders(),
+                    body: JSON.stringify({
+                        id: year.id,
+                        year_id: year.id,
+                        yearId: year.id,
+                        source_group_id:
+                            year.source_group_id ??
+                            year.group_id ??
+                            null,
+                        group_id:
+                            year.group_id ??
+                            year.source_group_id ??
+                            null,
+                        year_name:
+                            year.year_name ??
+                            `Year #${year.id}`
+                    }),
+                    signal: controller.signal
+                });
+
+                const result = await readJsonResponse(response);
+
+                if (!response.ok || result.success === false) {
+                    throw new Error(
+                        [result.message, result.error]
+                            .filter(Boolean)
+                            .join(': ') ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                await loadMyYears(false);
+
+                showStatus(
+                    result.message || 'Year checked successfully.',
+                    'success'
+                );
+            } catch (error) {
+                const message = error.name === 'AbortError'
+                    ? 'Year check timed out.'
+                    : error.message;
+
+                console.error('Check my year error:', error);
+                showStatus(`Unable to check year: ${message}`, 'error');
+
+                if (buttonElement?.isConnected) {
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = originalHtml;
+                }
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        async function saveMyYearStatusById(yearId, buttonElement) {
+            const year = myYears.find(
+                (item) => String(item?.id) === String(yearId)
+            );
+
+            if (!year) {
+                showStatus('The selected year was not found.', 'error');
+                return;
+            }
+
+            const domKey = getYearDomKey(yearId);
+            const statusSelect = document.getElementById(
+                `edit-status-${domKey}`
+            );
+            const newStatus = String(statusSelect?.value ?? '')
+                .trim()
+                .toUpperCase();
+
+            if (!newStatus) {
+                showStatus('Select a status first.', 'error');
+                return;
+            }
+
+            const originalHtml = buttonElement?.innerHTML ?? '';
+
+            if (buttonElement) {
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = `
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    Saving...
+                `;
+            }
+
+            showStatus(
+                `Updating ${year.year_name || `Year #${year.id}`} to ${newStatus}...`,
+                'info'
+            );
+
+            try {
+                const result = await sendYearStatusRequest({
+                    id: year.id,
+                    year_id: year.id,
+                    status: newStatus
+                });
+
+                await loadMyYears(false);
+
+                showStatus(
+                    result.message || `Year status changed to ${newStatus}.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error('Edit my year status error:', error);
+                showStatus(
+                    `Unable to update year status: ${error.message}`,
+                    'error'
+                );
+
+                if (buttonElement?.isConnected) {
+                    buttonElement.disabled = false;
+                    buttonElement.innerHTML = originalHtml;
+                }
+            }
+        }
+
+        async function sendYearStatusRequest(body) {
+            const putResult = await sendYearStatusMethod('PUT', body);
+
+            if (putResult.shouldFallbackToPost) {
+                const postResult = await sendYearStatusMethod('POST', body);
+                return postResult.result;
+            }
+
+            return putResult.result;
+        }
+
+        async function sendYearStatusMethod(method, body) {
+            const response = await fetch(EDIT_STATUS_YEARS_API, {
+                method,
+                headers: getJsonHeaders(),
+                body: JSON.stringify(body)
+            });
+
+            const result = await readJsonResponse(response);
+            const shouldFallbackToPost =
+                method === 'PUT' &&
+                (
+                    response.status === 404 ||
+                    response.status === 405 ||
+                    String(result.message ?? '').includes('Cannot PUT')
+                );
+
+            if (
+                !shouldFallbackToPost &&
+                (!response.ok || result.success === false)
+            ) {
+                throw new Error(
+                    result.message ||
+                    result.error ||
+                    `Server returned ${response.status}`
+                );
+            }
+
+            return {
+                result,
+                shouldFallbackToPost
             };
         }
 
@@ -552,14 +912,15 @@
                     const numberData = getYearNumberData(year, index);
                     const number = numberData.numberphone;
 
-                    if (number === undefined || number === null || number === '') {
+                    if (!isValidYearNumber(number)) {
                         return '';
                     }
 
-                    const before = numberData.balance_before ?? '-';
-                    const after = numberData.balance_after ?? '-';
+                    const before = formatMoney(numberData.balance_before);
+                    const after = formatMoney(numberData.balance_after);
+                    const returned = formatMoney(numberData.returned_amount);
 
-                    return `${number}: ${before} → ${after}`;
+                    return `${number} | ${before}$ | ${after}$ | returned ${returned}$`;
                 })
                 .filter(Boolean);
 
@@ -570,6 +931,17 @@
                 );
                 return;
             }
+
+            const totalReceived = toFiniteNumberOrNull(year?.total_received);
+            const calculatedTotal = [1, 2, 3, 4]
+                .map((index) => getYearNumberData(year, index).received_amount)
+                .reduce((total, value) => {
+                    return total + (toFiniteNumberOrNull(value) ?? 0);
+                }, 0);
+
+            numberLines.push(
+                `Total Received: $${formatMoney(totalReceived ?? calculatedTotal)}`
+            );
 
             const compactText = numberLines.join('\n');
 
@@ -629,6 +1001,103 @@
                     </div>
                 </div>
             `;
+        }
+
+        function parseYearSplitAmounts(value) {
+            const rawText = String(value ?? '').trim();
+
+            if (
+                rawText === '' ||
+                rawText === '-' ||
+                rawText.toLowerCase() === 'null' ||
+                rawText.toLowerCase() === 'undefined'
+            ) {
+                return null;
+            }
+
+            const tokens = rawText
+                .replace(/\b(?:returned|return|retuned)\b/gi, ' ')
+                .replace(/\$/g, ' ')
+                .trim()
+                .split(/[\s,;|/]+/)
+                .map((token) => token.trim())
+                .filter(Boolean);
+
+            if (tokens.length === 0 || tokens.length > 4) {
+                return null;
+            }
+
+            const amounts = [];
+
+            for (const token of tokens) {
+                if (!/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)$/.test(token)) {
+                    return null;
+                }
+
+                const amount = Number(token);
+
+                if (!Number.isFinite(amount)) {
+                    return null;
+                }
+
+                amounts.push(amount);
+            }
+
+            return amounts;
+        }
+
+        function getYearDomKey(yearId) {
+            const text = String(yearId ?? '');
+            let hash = 0;
+
+            for (let index = 0; index < text.length; index += 1) {
+                hash = ((hash << 5) - hash) + text.charCodeAt(index);
+                hash |= 0;
+            }
+
+            return `year_${Math.abs(hash)}`;
+        }
+
+        function isValidYearNumber(value) {
+            const text = String(value ?? '').trim().toLowerCase();
+
+            return (
+                text !== '' &&
+                text !== '0' &&
+                text !== 'null' &&
+                text !== 'undefined' &&
+                text !== '-'
+            );
+        }
+
+        function toFiniteNumberOrNull(value) {
+            if (
+                value === null ||
+                value === undefined ||
+                String(value).trim() === ''
+            ) {
+                return null;
+            }
+
+            const number = Number(value);
+            return Number.isFinite(number) ? number : null;
+        }
+
+        function roundMoney(value) {
+            const number = toFiniteNumberOrNull(value) ?? 0;
+            return Math.round((number + Number.EPSILON) * 100) / 100;
+        }
+
+        function formatMoney(value) {
+            const number = toFiniteNumberOrNull(value) ?? 0;
+
+            return Number.isInteger(number)
+                ? String(number)
+                : number.toFixed(2);
+        }
+
+        function formatMoneyWithDollar(value) {
+            return `${formatMoney(value)}$`;
         }
 
         function smallDetail(label, value) {

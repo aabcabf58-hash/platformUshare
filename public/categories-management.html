@@ -5,16 +5,95 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zouzou App - Categories Management</title>
 
-  <script src="./theme.js?v=admin-colors-20260727-2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   >
-  <link rel="stylesheet" href="./theme.css?v=admin-colors-20260727-2">
-
   <style>
+    :root {
+      color-scheme: light;
+    }
+
+    body {
+      background: #edf0f4 !important;
+      color: #273244 !important;
+    }
+
+    .bg-gray-900 { background-color: #f1f3f6 !important; }
+    .bg-gray-800 { background-color: #f8fafc !important; }
+    .bg-gray-700 { background-color: #e7ebf0 !important; }
+    [class*="bg-gray-950"] { background-color: #e9edf2 !important; }
+    [class*="bg-purple-950"] { background-color: #f1ebfa !important; }
+    [class*="bg-blue-950"] { background-color: #eaf2fb !important; }
+    [class*="bg-cyan-950"] { background-color: #e7f7f8 !important; }
+    [class*="bg-green-950"] { background-color: #eaf7ef !important; }
+    [class*="bg-red-950"] { background-color: #fbecec !important; }
+    [class*="bg-orange-950"] { background-color: #fff1e5 !important; }
+    [class*="bg-violet-950"] { background-color: #f2edfb !important; }
+    [class*="bg-amber-950"] { background-color: #fff5dd !important; }
+
+    .border-gray-700,
+    .border-gray-600 { border-color: #ccd3dc !important; }
+    [class*="border-purple-9"],
+    [class*="border-purple-8"] { border-color: #d6c3ec !important; }
+    [class*="border-blue-9"],
+    [class*="border-blue-8"] { border-color: #bdd5ee !important; }
+    [class*="border-cyan-9"],
+    [class*="border-cyan-8"] { border-color: #b6dfe3 !important; }
+    [class*="border-green-9"],
+    [class*="border-green-8"] { border-color: #b9dfc6 !important; }
+    [class*="border-red-9"],
+    [class*="border-red-8"] { border-color: #efc1c1 !important; }
+
+    .text-white,
+    .text-gray-100,
+    .text-gray-200 { color: #263244 !important; }
+    .text-gray-300 { color: #455468 !important; }
+    .text-gray-400 { color: #66758a !important; }
+    .text-gray-500 { color: #7b8798 !important; }
+    .text-purple-200,
+    .text-purple-300,
+    .text-purple-400 { color: #6d3aa3 !important; }
+    .text-blue-200,
+    .text-blue-300,
+    .text-blue-400 { color: #27659d !important; }
+    .text-cyan-200,
+    .text-cyan-300,
+    .text-cyan-400 { color: #16727b !important; }
+    .text-green-300,
+    .text-green-400 { color: #267a47 !important; }
+    .text-red-300 { color: #b63b3b !important; }
+    .text-orange-300 { color: #a95a18 !important; }
+    .text-violet-300 { color: #6942a4 !important; }
+
+    .bg-purple-600.text-white,
+    .bg-blue-600.text-white,
+    .bg-cyan-600.text-white,
+    .bg-emerald-600.text-white,
+    .bg-red-600.text-white,
+    .bg-green-600.text-white {
+      color: #fff !important;
+    }
+
+    input,
+    textarea,
+    select {
+      color: #273244 !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #96a0ae !important;
+    }
+
+    .soft-panel {
+      background: #f8fafc;
+      border-color: #ccd3dc;
+      box-shadow: 0 14px 34px rgba(44, 58, 78, 0.09);
+    }
+
     .loading-spin { animation: loading-spin 0.8s linear infinite; }
     @keyframes loading-spin { to { transform: rotate(360deg); } }
 
@@ -25,7 +104,7 @@
       top: 0;
       bottom: 0;
       width: 1px;
-      background: rgba(75, 85, 99, 0.75);
+      background: #c7ced8;
     }
 
     .inventory-scroll::-webkit-scrollbar,
@@ -36,27 +115,20 @@
 
     .inventory-scroll::-webkit-scrollbar-track,
     .tree-scroll::-webkit-scrollbar-track {
-      background: rgba(17, 24, 39, 0.7);
+      background: #e4e8ed;
     }
 
     .inventory-scroll::-webkit-scrollbar-thumb,
     .tree-scroll::-webkit-scrollbar-thumb {
-      background: rgba(75, 85, 99, 0.9);
+      background: #a7b0bd;
       border-radius: 999px;
-    }
-
-    .tab-button.active {
-      background: rgb(5 150 105);
-      border-color: rgb(16 185 129);
-      color: white;
-      box-shadow: 0 8px 22px rgba(5, 150, 105, 0.24);
     }
 
     .number-cell { font-variant-numeric: tabular-nums; }
   </style>
 </head>
 
-<body class="min-h-screen bg-gray-900 font-sans text-gray-100">
+<body class="min-h-screen font-sans">
   <header class="sticky top-0 z-40 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
     <div class="flex w-full flex-col items-center justify-between gap-4 xl:flex-row">
       <div class="flex items-center gap-3">
@@ -73,16 +145,6 @@
       </div>
 
       <nav class="flex flex-wrap items-center justify-center gap-2">
-        <button
-          data-theme-toggle
-          type="button"
-          onclick="toggleTheme()"
-          class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600"
-        >
-          <i data-theme-icon class="fa-solid fa-sun"></i>
-          <span data-theme-label>Light Mode</span>
-        </button>
-
         <a href="./index.html" class="flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600">
           <i class="fa-solid fa-table"></i>
           Main Table
@@ -118,7 +180,7 @@
   <main class="mx-auto w-full max-w-[1900px] px-3 py-5 sm:px-5">
     <div id="global-status" class="mb-4 hidden rounded-xl border p-3 text-sm"></div>
 
-    <section class="mb-5 overflow-hidden rounded-3xl border border-purple-800 bg-gradient-to-br from-purple-950/80 via-gray-900 to-gray-900 shadow-2xl">
+    <section class="soft-panel mb-5 overflow-hidden rounded-3xl border">
       <div class="flex flex-col gap-5 p-5 xl:flex-row xl:items-center xl:justify-between">
         <div>
           <div class="mb-2 flex flex-wrap items-center gap-2">
@@ -128,16 +190,19 @@
           <h2 class="text-2xl font-black text-white sm:text-3xl">Categories, Subcategories &amp; Services</h2>
           <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-300">Create and manage the complete category tree without mixing it with recharge-card inventory.</p>
         </div>
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div class="rounded-2xl border border-purple-800 bg-purple-950/40 px-4 py-3 text-center"><div class="text-[10px] font-bold uppercase tracking-wide text-purple-400">Categories</div><div id="stat-categories" class="mt-1 text-xl font-black text-purple-300">0</div></div>
-          <div class="rounded-2xl border border-blue-800 bg-blue-950/40 px-4 py-3 text-center"><div class="text-[10px] font-bold uppercase tracking-wide text-blue-400">Subcategories</div><div id="stat-subcategories" class="mt-1 text-xl font-black text-blue-300">0</div></div>
-          <div class="rounded-2xl border border-pink-800 bg-pink-950/40 px-4 py-3 text-center"><div class="text-[10px] font-bold uppercase tracking-wide text-pink-400">Child Categories</div><div id="stat-childcategories" class="mt-1 text-xl font-black text-pink-300">0</div></div>
-          <div class="rounded-2xl border border-cyan-800 bg-cyan-950/40 px-4 py-3 text-center"><div class="text-[10px] font-bold uppercase tracking-wide text-cyan-400">Package Items</div><div id="stat-package-items" class="mt-1 text-xl font-black text-cyan-300">0</div></div>
-        </div>
       </div>
     </section>
 
-    <section id="tab-categories" class="tab-panel">
+    <div class="grid grid-cols-1 items-start gap-4 lg:grid-cols-[138px_minmax(0,1fr)]">
+      <aside class="grid grid-cols-2 gap-2 sm:grid-cols-5 lg:sticky lg:top-[92px] lg:grid-cols-1">
+        <div class="rounded-xl border border-purple-800 bg-purple-950/40 px-2 py-3 text-center"><div class="text-[9px] font-bold uppercase tracking-wide text-purple-400">Categories</div><div id="stat-categories" class="mt-1 text-xl font-black text-purple-300">0</div></div>
+        <div class="rounded-xl border border-blue-800 bg-blue-950/40 px-2 py-3 text-center"><div class="text-[9px] font-bold uppercase tracking-wide text-blue-400">Subcategories</div><div id="stat-subcategories" class="mt-1 text-xl font-black text-blue-300">0</div></div>
+        <div class="rounded-xl border border-pink-800 bg-pink-50 px-2 py-3 text-center"><div class="text-[9px] font-bold uppercase tracking-wide text-pink-600">Child Categories</div><div id="stat-childcategories" class="mt-1 text-xl font-black text-pink-700">0</div></div>
+        <div class="rounded-xl border border-cyan-800 bg-cyan-950/40 px-2 py-3 text-center"><div class="text-[9px] font-bold uppercase tracking-wide text-cyan-400">Packages</div><div id="stat-package-items" class="mt-1 text-xl font-black text-cyan-300">0</div></div>
+        <div class="rounded-xl border border-green-800 bg-green-950/40 px-2 py-3 text-center"><div class="text-[9px] font-bold uppercase tracking-wide text-green-400">Counters</div><div id="stat-counter-items" class="mt-1 text-xl font-black text-green-300">0</div></div>
+      </aside>
+
+    <section id="tab-categories">
       <div class="mb-4 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
         <div class="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
           <div class="grid flex-1 grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto]">
@@ -159,7 +224,7 @@
           </div>
 
           <div class="flex gap-2">
-            <button id="reload-tree-button" type="button" onclick="loadCategoriesTree()" class="rounded-xl border border-emerald-700 bg-emerald-950/40 px-4 py-3 font-bold text-emerald-300 transition hover:bg-emerald-900/60" title="Reload categories">
+            <button id="reload-tree-button" type="button" onclick="initializePage()" class="rounded-xl border border-emerald-700 bg-emerald-950/40 px-4 py-3 font-bold text-emerald-300 transition hover:bg-emerald-900/60" title="Reload categories and all items">
               <i class="fa-solid fa-rotate"></i>
             </button>
 
@@ -182,7 +247,7 @@
           </div>
         </div>
 
-        <div id="categories-tree" class="tree-scroll min-h-[360px] max-h-[68vh] overflow-auto p-4">
+        <div id="categories-tree" class="min-h-[360px] p-4">
           <div class="py-16 text-center text-gray-500">
             <i class="fa-solid fa-spinner loading-spin mb-3 block text-4xl text-emerald-400"></i>
             Loading categories...
@@ -190,7 +255,51 @@
         </div>
       </div>
     </section>
+
+    </div>
   </main>
+
+  <div id="item-type-modal" class="fixed inset-0 z-[95] hidden items-center justify-center bg-black/55 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-2xl rounded-3xl border border-gray-700 bg-gray-800 p-5 shadow-2xl">
+      <input id="item-type-childcategory-id" type="hidden">
+
+      <div class="mb-5 flex items-start justify-between gap-4">
+        <div>
+          <h3 class="text-xl font-black text-white">Choose Item Type</h3>
+          <p id="item-type-subtitle" class="mt-1 text-sm text-gray-500">Select the item you want to add.</p>
+        </div>
+        <button type="button" onclick="closeItemTypeModal()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-gray-700 transition hover:bg-gray-600">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <button type="button" onclick="chooseItemType('package')" class="rounded-2xl border border-cyan-200 bg-cyan-50 p-5 text-left transition hover:border-cyan-500 hover:shadow-lg">
+          <span class="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-600 text-white">
+            <i class="fa-solid fa-box"></i>
+          </span>
+          <strong class="block text-cyan-800">Package Item</strong>
+          <span class="mt-2 block text-xs leading-5 text-gray-500">Fixed package with price, value and validity days.</span>
+        </button>
+
+        <button type="button" onclick="chooseItemType('counter')" class="rounded-2xl border border-green-200 bg-green-50 p-5 text-left transition hover:border-green-500 hover:shadow-lg">
+          <span class="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-green-600 text-white">
+            <i class="fa-solid fa-calculator"></i>
+          </span>
+          <strong class="block text-green-800">Counter Item</strong>
+          <span class="mt-2 block text-xs leading-5 text-gray-500">Quantity-based item with minimum, maximum and step.</span>
+        </button>
+
+        <button type="button" onclick="chooseItemType('balance')" class="rounded-2xl border border-purple-200 bg-purple-50 p-5 text-left transition hover:border-purple-500 hover:shadow-lg">
+          <span class="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-purple-600 text-white">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </span>
+          <strong class="block text-purple-800">Balance Item</strong>
+          <span class="mt-2 block text-xs leading-5 text-gray-500">Dollar balance item with message limits and pricing.</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <div id="entity-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
     <div class="w-full max-w-lg overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
@@ -320,6 +429,188 @@
     </div>
   </div>
 
+  <div id="counter-modal" class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/55 p-4 backdrop-blur-sm">
+    <div class="max-h-[94vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
+      <div class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-700 bg-gray-800 px-5 py-4">
+        <div>
+          <h3 id="counter-modal-title" class="text-lg font-black text-white">Add Counter Item</h3>
+          <p id="counter-modal-subtitle" class="mt-1 text-xs text-gray-500"></p>
+        </div>
+        <button type="button" onclick="closeCounterModal()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-gray-700 transition hover:bg-gray-600">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="counter-form" onsubmit="submitCounterForm(event)" class="p-5">
+        <input id="counter-mode" type="hidden">
+        <input id="counter-id" type="hidden">
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Child Category</span>
+            <select id="counter-childcategory-id" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 outline-none focus:border-emerald-500"></select>
+          </label>
+
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Name</span>
+            <input id="counter-name" type="text" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-bold outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Description</span>
+            <textarea id="counter-description" rows="3" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 outline-none focus:border-emerald-500"></textarea>
+          </label>
+
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Image URL</span>
+            <input id="counter-image-url" type="url" placeholder="https://..." class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Cost per Unit</span>
+            <input id="counter-cost-per-unit" type="number" step="any" min="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Price per Unit</span>
+            <input id="counter-price-per-unit" type="number" step="any" min="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Minimum Amount</span>
+            <input id="counter-minimum-amount" type="number" step="any" min="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Maximum Amount</span>
+            <input id="counter-maximum-amount" type="number" step="any" min="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Step Amount</span>
+            <input id="counter-step-amount" type="number" step="any" min="0.000001" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Unit</span>
+            <input id="counter-unit" type="text" placeholder="USD, GB, point..." required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Sort Order</span>
+            <input id="counter-sort-order" type="number" step="1" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Status</span>
+            <select id="counter-is-active" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 outline-none focus:border-emerald-500">
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button id="delete-counter-button" type="button" onclick="deleteCounterItemFromModal()" class="hidden rounded-xl bg-red-600 px-4 py-3 font-bold text-white transition hover:bg-red-700">
+            <i class="fa-solid fa-trash mr-2"></i>Delete
+          </button>
+          <div class="flex min-w-[260px] flex-1 gap-3">
+            <button type="button" onclick="closeCounterModal()" class="flex-1 rounded-xl border border-gray-600 bg-gray-700 px-4 py-3 font-bold text-gray-700 transition hover:bg-gray-600">Cancel</button>
+            <button id="counter-submit-button" type="submit" class="flex-1 rounded-xl bg-emerald-600 px-4 py-3 font-black text-white transition hover:bg-emerald-700 disabled:opacity-60">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="balance-modal" class="fixed inset-0 z-[130] hidden items-center justify-center bg-black/55 p-4 backdrop-blur-sm">
+    <div class="max-h-[94vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
+      <div class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-700 bg-gray-800 px-5 py-4">
+        <div>
+          <h3 id="balance-modal-title" class="text-lg font-black text-white">Add Balance Item</h3>
+          <p id="balance-modal-subtitle" class="mt-1 text-xs text-gray-500"></p>
+        </div>
+        <button type="button" onclick="closeBalanceModal()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-gray-700 transition hover:bg-gray-600">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="balance-form" onsubmit="submitBalanceForm(event)" class="p-5">
+        <input id="balance-mode" type="hidden">
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <label id="balance-id-field" class="hidden block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Item ID</span>
+            <input id="balance-id" type="number" step="1" min="1" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Child Category</span>
+            <select id="balance-childcategory-id" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 outline-none focus:border-purple-500"></select>
+          </label>
+
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Name</span>
+            <input id="balance-name" type="text" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-bold outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Cost per Dollar</span>
+            <input id="balance-cost-per-dollar" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Price per Dollar</span>
+            <input id="balance-price-per-dollar" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Message Cost</span>
+            <input id="balance-message-cost" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Maximum per Message</span>
+            <input id="balance-maximum-per-message" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Minimum Amount</span>
+            <input id="balance-minimum-amount" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Maximum Amount</span>
+            <input id="balance-maximum-amount" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Step Amount</span>
+            <input id="balance-step-amount" type="number" step="any" min="0.000001" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Status</span>
+            <select id="balance-is-active" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 outline-none focus:border-purple-500">
+              <option value="">Keep current value</option>
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </label>
+        </div>
+
+        <p id="balance-edit-note" class="mt-4 hidden rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-xs text-blue-700">
+          In edit mode, enter the ID and only the fields you want to change.
+        </p>
+
+        <div class="mt-6 flex gap-3">
+          <button type="button" onclick="closeBalanceModal()" class="flex-1 rounded-xl border border-gray-600 bg-gray-700 px-4 py-3 font-bold text-gray-700 transition hover:bg-gray-600">Cancel</button>
+          <button id="balance-submit-button" type="submit" class="flex-1 rounded-xl bg-purple-600 px-4 py-3 font-black text-white transition hover:bg-purple-700 disabled:opacity-60">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="./config.js"></script>
   <script src="./auth.js"></script>
 
@@ -338,13 +629,18 @@
       GET_ITEMS_PACKAGE: "/category/getAllItemsPackage",
       EDIT_ITEM_PACKAGE: "/category/editItemPakage",
       ADD_ITEM_PACKAGE: "/category/addItemPackage",
-      ADD_CARD: "/api/ushare/addcard",
-      GET_CARD_QUANTITY: "/api/ushare/getQuantiteCard",
+      GET_ITEMS_COUNTER: "/category/getAllItemsCounter",
+      ADD_ITEMS_COUNTER: "/category/addItemsCounter",
+      EDIT_ITEMS_COUNTER: "/category/editItemsCounter",
+      DELETE_ITEMS_COUNTER: "/category/deleteItemsCounter",
+      ADD_ITEMS_BALANCE: "/category/addItemsBalance",
+      EDIT_ITEMS_BALANCE: "/category/editItemsBalance",
+      DELETE_ITEMS_BALANCE: "/category/deleteItemsBalance",
     };
 
     let categoriesTree = [];
     let packageItems = [];
-    let cardInventory = [];
+    let counterItems = [];
     const expandedCategories = new Set();
     const expandedSubcategories = new Set();
 
@@ -412,9 +708,9 @@
     function showStatus(message, type = "info") {
       const box = document.getElementById("global-status");
       const classes = {
-        info: "border-blue-800 bg-blue-900/30 text-blue-300",
-        success: "border-green-800 bg-green-900/30 text-green-300",
-        error: "border-red-800 bg-red-900/30 text-red-300",
+        info: "border-blue-200 bg-blue-50 text-blue-800",
+        success: "border-green-200 bg-green-50 text-green-800",
+        error: "border-red-200 bg-red-50 text-red-800",
       };
 
       box.className = `mb-4 rounded-xl border p-3 text-sm ${classes[type] || classes.info}`;
@@ -424,16 +720,6 @@
       if (type === "success") {
         window.setTimeout(() => box.classList.add("hidden"), 4000);
       }
-    }
-
-    function openTab(tabName) {
-      document.querySelectorAll(".tab-panel").forEach((panel) => {
-        panel.classList.toggle("hidden", panel.id !== `tab-${tabName}`);
-      });
-
-      document.querySelectorAll(".tab-button").forEach((button) => {
-        button.classList.toggle("active", button.dataset.tab === tabName);
-      });
     }
 
     function setButtonLoading(buttonId, isLoading) {
@@ -496,6 +782,7 @@
                 is_active: toBoolean(childcategory.is_active, true),
                 raw: childcategory,
                 items: [],
+                counter_items: [],
               })),
             };
           }),
@@ -522,13 +809,50 @@
         .filter((item) => item.id !== undefined && item.id !== null);
     }
 
+    function normalizeCounterItemsResponse(response) {
+      return getResponseArray(response, ["items", "counters", "itemsCounter", "counterItems"])
+        .map((item) => ({
+          id: item.id,
+          childcategory_id:
+            item.childcategory_id ??
+            item.child_category_id ??
+            item.childcategoryId,
+          name: String(item.name ?? "Unnamed Counter Item"),
+          description: String(item.description ?? ""),
+          image_url: String(item.image_url ?? item.image ?? ""),
+          cost_per_unit: toNumericValue(item.cost_per_unit),
+          price_per_unit: toNumericValue(item.price_per_unit),
+          minimum_amount: toNumericValue(item.minimum_amount),
+          maximum_amount: toNumericValue(item.maximum_amount),
+          step_amount: toNumericValue(item.step_amount),
+          unit: String(item.unit ?? ""),
+          is_active: toBoolean(item.is_active, true),
+          sort_order: Math.trunc(toNumericValue(item.sort_order)),
+          created_at: item.created_at ?? null,
+          update_at: item.update_at ?? item.updated_at ?? null,
+          raw: item,
+        }))
+        .filter((item) => item.id !== undefined && item.id !== null)
+        .sort((a, b) =>
+          a.sort_order - b.sort_order ||
+          a.name.localeCompare(b.name, undefined, { numeric: true })
+        );
+    }
+
     function attachPackageItemsToTree() {
       const itemsByChild = new Map();
+      const countersByChild = new Map();
 
       packageItems.forEach((item) => {
         const key = String(item.childcategory_id ?? "");
         if (!itemsByChild.has(key)) itemsByChild.set(key, []);
         itemsByChild.get(key).push(item);
+      });
+
+      counterItems.forEach((item) => {
+        const key = String(item.childcategory_id ?? "");
+        if (!countersByChild.has(key)) countersByChild.set(key, []);
+        countersByChild.get(key).push(item);
       });
 
       categoriesTree.forEach((category) => {
@@ -537,6 +861,15 @@
             childcategory.items = (itemsByChild.get(String(childcategory.id)) || [])
               .slice()
               .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+            childcategory.counter_items = (
+              countersByChild.get(String(childcategory.id)) || []
+            )
+              .slice()
+              .sort((a, b) =>
+                a.sort_order - b.sort_order ||
+                a.name.localeCompare(b.name, undefined, { numeric: true })
+              );
           });
         });
       });
@@ -589,6 +922,22 @@
       }
     }
 
+    async function loadCounterItems() {
+      try {
+        const response = await sendRequest("GET_ITEMS_COUNTER");
+        counterItems = normalizeCounterItemsResponse(response);
+        attachPackageItemsToTree();
+        updateTreeStatistics();
+        renderCategoriesTree();
+      } catch (error) {
+        counterItems = [];
+        attachPackageItemsToTree();
+        updateTreeStatistics();
+        renderCategoriesTree();
+        showStatus(error.message, "error");
+      }
+    }
+
     function updateTreeStatistics() {
       const subcategories = categoriesTree.flatMap((category) => category.subcategories);
       const childcategories = subcategories.flatMap((subcategory) => subcategory.childcategories);
@@ -597,6 +946,7 @@
       document.getElementById("stat-subcategories").textContent = subcategories.length;
       document.getElementById("stat-childcategories").textContent = childcategories.length;
       document.getElementById("stat-package-items").textContent = packageItems.length;
+      document.getElementById("stat-counter-items").textContent = counterItems.length;
     }
 
     function setAllTreeExpanded(expanded) {
@@ -667,13 +1017,27 @@
               item.description.toLowerCase().includes(query) ||
               item.unit.toLowerCase().includes(query)
             );
+            const matchingCounters = (childcategory.counter_items || []).filter((item) =>
+              item.name.toLowerCase().includes(query) ||
+              item.description.toLowerCase().includes(query) ||
+              item.unit.toLowerCase().includes(query)
+            );
 
-            if (categoryMatches || subcategoryMatches || childMatches || matchingItems.length > 0) {
+            if (
+              categoryMatches ||
+              subcategoryMatches ||
+              childMatches ||
+              matchingItems.length > 0 ||
+              matchingCounters.length > 0
+            ) {
               childOutput.push({
                 ...childcategory,
                 items: categoryMatches || subcategoryMatches || childMatches
                   ? childcategory.items
                   : matchingItems,
+                counter_items: categoryMatches || subcategoryMatches || childMatches
+                  ? childcategory.counter_items
+                  : matchingCounters,
               });
             }
 
@@ -779,6 +1143,10 @@
 
     function renderChildcategoryNode(childcategory, subcategory) {
       const items = Array.isArray(childcategory.items) ? childcategory.items : [];
+      const counters = Array.isArray(childcategory.counter_items)
+        ? childcategory.counter_items
+        : [];
+      const totalItems = items.length + counters.length;
 
       return `
         <div class="overflow-hidden rounded-xl border border-purple-900/60 bg-purple-950/20">
@@ -792,7 +1160,7 @@
                     ${renderActiveBadge(childcategory.is_active)}
                   </div>
                   <p class="mt-1 text-[10px] uppercase tracking-wide text-gray-500">
-                    Child Category · ID ${escapeHtml(childcategory.id)} · ${items.length} package item(s)
+                    Child Category · ID ${escapeHtml(childcategory.id)} · ${totalItems} item(s)
                   </p>
                 </div>
               </div>
@@ -801,9 +1169,14 @@
           </div>
 
           <div class="border-t border-purple-900/50 bg-gray-950/25 p-3">
-            ${items.length
-              ? `<div class="grid grid-cols-1 gap-3">${items.map((item) => renderPackageItemNode(item)).join("")}</div>`
-              : `<div class="rounded-xl border border-dashed border-gray-700 px-4 py-5 text-center text-xs text-gray-500">No package items inside this child category.</div>`}
+            ${totalItems
+              ? `
+                <div class="grid grid-cols-1 gap-3">
+                  ${items.map((item) => renderPackageItemNode(item)).join("")}
+                  ${counters.map((item) => renderCounterItemNode(item)).join("")}
+                </div>
+              `
+              : `<div class="rounded-xl border border-dashed border-gray-700 px-4 py-5 text-center text-xs text-gray-500">No items inside this child category.</div>`}
           </div>
         </div>
       `;
@@ -823,7 +1196,7 @@
                 <div class="flex flex-wrap items-center gap-2">
                   <h6 class="font-black text-cyan-200">${escapeHtml(item.name)}</h6>
                   ${renderActiveBadge(item.is_active)}
-                  <span class="rounded-lg border border-cyan-800 bg-cyan-950/40 px-2 py-1 text-[10px] font-black uppercase text-cyan-300">Item</span>
+                  <span class="rounded-lg border border-cyan-800 bg-cyan-950/40 px-2 py-1 text-[10px] font-black uppercase text-cyan-300">Package</span>
                 </div>
                 ${item.description ? `<p class="mt-1 text-xs leading-5 text-gray-400">${escapeHtml(item.description)}</p>` : ""}
                 <div class="mt-2 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-wide">
@@ -838,6 +1211,41 @@
 
             ${isSuperAdmin ? `
               <button type="button" onclick="openEditItemModal('${escapeJsString(item.id)}')" class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-cyan-800 bg-cyan-950/30 px-3 text-xs font-bold text-cyan-300 transition hover:bg-cyan-900/50" title="Edit package item">
+                <i class="fa-solid fa-pen"></i>
+                Edit
+              </button>
+            ` : ""}
+          </div>
+        </article>
+      `;
+    }
+
+    function renderCounterItemNode(item) {
+      return `
+        <article class="rounded-xl border border-green-200 bg-green-50 p-3">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div class="flex min-w-0 items-start gap-3">
+              ${renderEntityImage(item, "h-12 w-12")}
+              <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <h6 class="font-black text-green-800">${escapeHtml(item.name)}</h6>
+                  ${renderActiveBadge(item.is_active)}
+                  <span class="rounded-lg border border-green-300 bg-green-100 px-2 py-1 text-[10px] font-black uppercase text-green-800">Counter</span>
+                </div>
+                ${item.description ? `<p class="mt-1 text-xs leading-5 text-gray-500">${escapeHtml(item.description)}</p>` : ""}
+                <div class="mt-2 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-wide">
+                  <span class="rounded-lg border border-gray-700 bg-gray-800 px-2 py-1 text-gray-700">Unit: ${escapeHtml(item.unit || "-")}</span>
+                  <span class="rounded-lg border border-green-200 bg-green-100 px-2 py-1 text-green-800">Price / Unit: ${formatNumber(item.price_per_unit)}</span>
+                  <span class="rounded-lg border border-orange-200 bg-orange-50 px-2 py-1 text-orange-700">Cost / Unit: ${formatNumber(item.cost_per_unit)}</span>
+                  <span class="rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-blue-700">Range: ${formatNumber(item.minimum_amount)} → ${formatNumber(item.maximum_amount)}</span>
+                  <span class="rounded-lg border border-purple-200 bg-purple-50 px-2 py-1 text-purple-700">Step: ${formatNumber(item.step_amount)}</span>
+                  <span class="rounded-lg border border-gray-700 bg-gray-800 px-2 py-1 text-gray-500">ID ${escapeHtml(item.id)}</span>
+                </div>
+              </div>
+            </div>
+
+            ${isSuperAdmin ? `
+              <button type="button" onclick="openCounterModal('edit', '${escapeJsString(item.id)}')" class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-green-300 bg-green-100 px-3 text-xs font-bold text-green-800 transition hover:bg-green-200" title="Edit counter item">
                 <i class="fa-solid fa-pen"></i>
                 Edit
               </button>
@@ -898,8 +1306,8 @@
 
       return `
         <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
-          <button type="button" onclick="openCreateItemModal('${escapeJsString(childcategory.id)}')" class="rounded-lg bg-cyan-600 px-3 py-2 text-xs font-black text-white transition hover:bg-cyan-700" title="Add package item">
-            <i class="fa-solid fa-plus mr-1"></i>Item
+          <button type="button" onclick="openItemTypeModal('${escapeJsString(childcategory.id)}')" class="rounded-lg bg-cyan-600 px-3 py-2 text-xs font-black text-white transition hover:bg-cyan-700" title="Choose and add an item">
+            <i class="fa-solid fa-plus mr-1"></i>Add Item
           </button>
           <button type="button" onclick="openEditEntityModal('childcategory', '${escapeJsString(childcategory.id)}')" class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-600 bg-gray-700 text-xs text-gray-200 transition hover:bg-gray-600" title="Edit child category">
             <i class="fa-solid fa-pen"></i>
@@ -963,6 +1371,44 @@
           }))
         )
       );
+    }
+
+    function openItemTypeModal(childcategoryId) {
+      if (!isSuperAdmin) return;
+
+      const childcategory = findEntity("childcategory", childcategoryId);
+
+      document.getElementById("item-type-childcategory-id").value =
+        childcategoryId;
+      document.getElementById("item-type-subtitle").textContent =
+        childcategory
+          ? `Add an item inside "${childcategory.name}".`
+          : "Select the item type you want to add.";
+
+      const modal = document.getElementById("item-type-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeItemTypeModal() {
+      const modal = document.getElementById("item-type-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
+
+    function chooseItemType(type) {
+      const childcategoryId =
+        getInputValue("item-type-childcategory-id");
+
+      closeItemTypeModal();
+
+      if (type === "package") {
+        openCreateItemModal(childcategoryId);
+      } else if (type === "counter") {
+        openCounterModal("create", "", childcategoryId);
+      } else if (type === "balance") {
+        openBalanceModal("create", childcategoryId);
+      }
     }
 
     function openCreateItemModal(childcategoryId) {
@@ -1119,6 +1565,336 @@
         showStatus(error.message, "error");
       } finally {
         submitButton.disabled = false;
+      }
+    }
+
+    function fillChildcategorySelect(selectId, selectedId = "", includeEmpty = false) {
+      const select = document.getElementById(selectId);
+      const childcategories = getAllChildcategories();
+      const options = childcategories.map((childcategory) => `
+        <option value="${escapeHtml(childcategory.id)}" ${String(childcategory.id) === String(selectedId) ? "selected" : ""}>
+          ${escapeHtml(childcategory.category_name)} → ${escapeHtml(childcategory.subcategory_name)} → ${escapeHtml(childcategory.name)}
+        </option>
+      `).join("");
+
+      select.innerHTML = includeEmpty
+        ? `<option value="">Keep current value</option>${options}`
+        : options;
+    }
+
+    function openCounterModal(mode, id = "", childcategoryId = "") {
+      if (!isSuperAdmin) return;
+
+      const item = mode === "edit"
+        ? counterItems.find((entry) => String(entry.id) === String(id))
+        : null;
+
+      if (mode === "edit" && !item) {
+        showStatus("The selected counter item was not found.", "error");
+        return;
+      }
+
+      document.getElementById("counter-form").reset();
+      document.getElementById("counter-mode").value = mode;
+      document.getElementById("counter-id").value = item?.id ?? "";
+      document.getElementById("counter-name").value = item?.name ?? "";
+      document.getElementById("counter-description").value = item?.description ?? "";
+      document.getElementById("counter-image-url").value = item?.image_url ?? "";
+      document.getElementById("counter-cost-per-unit").value = item?.cost_per_unit ?? 0;
+      document.getElementById("counter-price-per-unit").value = item?.price_per_unit ?? 0;
+      document.getElementById("counter-minimum-amount").value = item?.minimum_amount ?? 0;
+      document.getElementById("counter-maximum-amount").value = item?.maximum_amount ?? 0;
+      document.getElementById("counter-step-amount").value = item?.step_amount ?? 1;
+      document.getElementById("counter-unit").value = item?.unit ?? "";
+      document.getElementById("counter-sort-order").value = item?.sort_order ?? 0;
+      document.getElementById("counter-is-active").value = String(item?.is_active ?? true);
+
+      fillChildcategorySelect(
+        "counter-childcategory-id",
+        item?.childcategory_id ?? childcategoryId
+      );
+
+      document.getElementById("counter-modal-title").textContent =
+        mode === "create" ? "Add Counter Item" : "Edit Counter Item";
+      document.getElementById("counter-modal-subtitle").textContent =
+        mode === "create"
+          ? "Create a new counter-based service."
+          : `Editing counter item ID ${item.id}`;
+      document.getElementById("counter-submit-button").textContent =
+        mode === "create" ? "Create Item" : "Save Changes";
+      document.getElementById("delete-counter-button").classList.toggle(
+        "hidden",
+        mode !== "edit"
+      );
+
+      const modal = document.getElementById("counter-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      window.setTimeout(() => document.getElementById("counter-name")?.focus(), 50);
+    }
+
+    function closeCounterModal() {
+      const modal = document.getElementById("counter-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.getElementById("counter-form").reset();
+    }
+
+    async function submitCounterForm(event) {
+      event.preventDefault();
+      if (!isSuperAdmin) return;
+
+      const mode = getInputValue("counter-mode");
+      const id = getInputValue("counter-id");
+      const body = {
+        childcategory_id: getInputValue("counter-childcategory-id"),
+        name: getInputValue("counter-name"),
+        description: getInputValue("counter-description") || null,
+        image_url: getInputValue("counter-image-url") || null,
+        cost_per_unit: Number(getInputValue("counter-cost-per-unit")),
+        price_per_unit: Number(getInputValue("counter-price-per-unit")),
+        minimum_amount: Number(getInputValue("counter-minimum-amount")),
+        maximum_amount: Number(getInputValue("counter-maximum-amount")),
+        step_amount: Number(getInputValue("counter-step-amount")),
+        unit: getInputValue("counter-unit"),
+        is_active: toBoolean(getInputValue("counter-is-active"), true),
+        sort_order: Number(getInputValue("counter-sort-order")),
+      };
+
+      if (mode === "edit") body.id = id;
+
+      if (!body.childcategory_id || !body.name || !body.unit) {
+        showStatus("Child category, name and unit are required.", "error");
+        return;
+      }
+
+      const numericValues = [
+        body.cost_per_unit,
+        body.price_per_unit,
+        body.minimum_amount,
+        body.maximum_amount,
+        body.step_amount,
+        body.sort_order,
+      ];
+
+      if (!numericValues.every(Number.isFinite)) {
+        showStatus("All counter numeric fields must contain valid numbers.", "error");
+        return;
+      }
+
+      const submitButton = document.getElementById("counter-submit-button");
+      submitButton.disabled = true;
+
+      try {
+        await sendRequest(
+          mode === "create" ? "ADD_ITEMS_COUNTER" : "EDIT_ITEMS_COUNTER",
+          {
+            method: mode === "create" ? "POST" : "PUT",
+            body,
+          }
+        );
+
+        closeCounterModal();
+        showStatus(
+          mode === "create"
+            ? "Counter item created successfully."
+            : "Counter item updated successfully.",
+          "success"
+        );
+        await loadCounterItems();
+      } catch (error) {
+        showStatus(error.message, "error");
+      } finally {
+        submitButton.disabled = false;
+      }
+    }
+
+    async function deleteCounterItemFromModal() {
+      if (!isSuperAdmin) return;
+
+      const id = getInputValue("counter-id");
+      const item = counterItems.find((entry) => String(entry.id) === String(id));
+
+      if (!id || !window.confirm(`Delete "${item?.name || `item #${id}`}" permanently?`)) {
+        return;
+      }
+
+      try {
+        await sendRequest("DELETE_ITEMS_COUNTER", {
+          method: "DELETE",
+          body: { id },
+        });
+        closeCounterModal();
+        showStatus("Counter item deleted successfully.", "success");
+        await loadCounterItems();
+      } catch (error) {
+        showStatus(error.message, "error");
+      }
+    }
+
+    function openBalanceModal(mode, childcategoryId = "") {
+      if (!isSuperAdmin) return;
+
+      const form = document.getElementById("balance-form");
+      form.reset();
+      document.getElementById("balance-mode").value = mode;
+
+      const isCreate = mode === "create";
+      document.getElementById("balance-id-field").classList.toggle("hidden", isCreate);
+      document.getElementById("balance-edit-note").classList.toggle("hidden", isCreate);
+      document.getElementById("balance-id").required = !isCreate;
+      document.getElementById("balance-is-active").value = isCreate ? "true" : "";
+
+      const requiredIds = [
+        "balance-childcategory-id",
+        "balance-name",
+        "balance-cost-per-dollar",
+        "balance-price-per-dollar",
+        "balance-message-cost",
+        "balance-maximum-per-message",
+        "balance-minimum-amount",
+        "balance-maximum-amount",
+        "balance-step-amount",
+      ];
+
+      requiredIds.forEach((fieldId) => {
+        document.getElementById(fieldId).required = isCreate;
+      });
+
+      fillChildcategorySelect(
+        "balance-childcategory-id",
+        childcategoryId,
+        !isCreate
+      );
+
+      document.getElementById("balance-modal-title").textContent =
+        isCreate ? "Add Balance Item" : "Edit Balance Item";
+      document.getElementById("balance-modal-subtitle").textContent =
+        isCreate
+          ? "Create a new balance-based service."
+          : "Enter the item ID and only the values you want to change.";
+      document.getElementById("balance-submit-button").textContent =
+        isCreate ? "Create Item" : "Save Changes";
+
+      const modal = document.getElementById("balance-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeBalanceModal() {
+      const modal = document.getElementById("balance-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.getElementById("balance-form").reset();
+    }
+
+    async function submitBalanceForm(event) {
+      event.preventDefault();
+      if (!isSuperAdmin) return;
+
+      const mode = getInputValue("balance-mode");
+      const isCreate = mode === "create";
+      const body = {};
+
+      if (!isCreate) {
+        const id = getInputValue("balance-id");
+
+        if (!id) {
+          showStatus("Item ID is required for editing.", "error");
+          return;
+        }
+
+        body.id = id;
+      }
+
+      const textFields = {
+        childcategory_id: "balance-childcategory-id",
+        name: "balance-name",
+      };
+
+      const numericFields = {
+        cost_per_dollar: "balance-cost-per-dollar",
+        price_per_dollar: "balance-price-per-dollar",
+        message_cost: "balance-message-cost",
+        maximum_per_message: "balance-maximum-per-message",
+        minimum_amount: "balance-minimum-amount",
+        maximum_amount: "balance-maximum-amount",
+        step_amount: "balance-step-amount",
+      };
+
+      Object.entries(textFields).forEach(([field, inputId]) => {
+        const value = getInputValue(inputId);
+        if (isCreate || value !== "") body[field] = value;
+      });
+
+      for (const [field, inputId] of Object.entries(numericFields)) {
+        const value = getInputValue(inputId);
+
+        if (isCreate || value !== "") {
+          const numericValue = Number(value);
+
+          if (!Number.isFinite(numericValue)) {
+            showStatus(`${field} must be a valid number.`, "error");
+            return;
+          }
+
+          body[field] = numericValue;
+        }
+      }
+
+      const activeValue = getInputValue("balance-is-active");
+      if (isCreate || activeValue !== "") {
+        body.is_active = toBoolean(activeValue, true);
+      }
+
+      if (!isCreate && Object.keys(body).length === 1) {
+        showStatus("Enter at least one field to update.", "error");
+        return;
+      }
+
+      const submitButton = document.getElementById("balance-submit-button");
+      submitButton.disabled = true;
+
+      try {
+        await sendRequest(
+          isCreate ? "ADD_ITEMS_BALANCE" : "EDIT_ITEMS_BALANCE",
+          {
+            method: isCreate ? "POST" : "PUT",
+            body,
+          }
+        );
+
+        closeBalanceModal();
+        showStatus(
+          isCreate
+            ? "Balance item created successfully."
+            : "Balance item updated successfully.",
+          "success"
+        );
+      } catch (error) {
+        showStatus(error.message, "error");
+      } finally {
+        submitButton.disabled = false;
+      }
+    }
+
+    async function deleteBalanceItem() {
+      if (!isSuperAdmin) return;
+
+      const id = String(window.prompt("Enter the Balance Item ID to delete:") ?? "").trim();
+
+      if (!id || !window.confirm(`Delete Balance Item #${id} permanently?`)) {
+        return;
+      }
+
+      try {
+        await sendRequest("DELETE_ITEMS_BALANCE", {
+          method: "DELETE",
+          body: { id },
+        });
+        showStatus("Balance item deleted successfully.", "success");
+      } catch (error) {
+        showStatus(error.message, "error");
       }
     }
 
@@ -1319,184 +2095,6 @@
       }
     }
 
-    async function loadCardInventory() {
-      setButtonLoading("reload-inventory-button", true);
-      document.getElementById("inventory-table-body").innerHTML = `
-        <tr><td colspan="4" class="px-4 py-16 text-center text-gray-400"><i class="fa-solid fa-spinner loading-spin mb-3 block text-4xl text-emerald-400"></i>Loading inventory...</td></tr>
-      `;
-
-      try {
-        const response = await sendRequest("GET_CARD_QUANTITY");
-        cardInventory = normalizeInventoryResponse(response);
-        renderCardInventory();
-        updateAvailableCardsStatistic();
-      } catch (error) {
-        cardInventory = [];
-        renderCardInventory();
-        updateAvailableCardsStatistic();
-        showStatus(error.message, "error");
-      } finally {
-        setButtonLoading("reload-inventory-button", false);
-      }
-    }
-
-    function normalizeInventoryResponse(response) {
-      return getResponseArray(response, ["cards", "inventory", "quantities"])
-        .map((item) => ({
-          company: String(item.company ?? item.compagny ?? "-").trim().toUpperCase(),
-          quantity_balance: toNumericValue(
-            item.quantity_balance ?? item.balance_quantity ?? item.card_type ?? 0
-          ),
-          available_quantity: Math.max(0, Math.trunc(toNumericValue(
-            item.available_quantity ?? item.quantity ?? item.count ?? item.quantite ?? 0
-          ))),
-        }));
-    }
-
-    function updateAvailableCardsStatistic() {
-      const total = cardInventory.reduce((sum, item) => sum + item.available_quantity, 0);
-      document.getElementById("stat-available-cards").textContent = total;
-    }
-
-    function renderCardInventory() {
-      const tbody = document.getElementById("inventory-table-body");
-      const companyFilter = getInputValue("inventory-company-filter") || "all";
-      const search = getInputValue("inventory-search").toLowerCase();
-
-      const rows = cardInventory
-        .filter((item) => companyFilter === "all" || item.company === companyFilter)
-        .filter((item) => !search || String(item.quantity_balance).includes(search))
-        .sort((a, b) => a.company.localeCompare(b.company) || a.quantity_balance - b.quantity_balance);
-
-      document.getElementById("inventory-summary").textContent =
-        `${rows.length} card type(s) shown · ${rows.reduce((sum, item) => sum + item.available_quantity, 0)} card(s) available.`;
-
-      if (rows.length === 0) {
-        tbody.innerHTML = `
-          <tr><td colspan="4" class="px-4 py-16 text-center text-gray-500"><i class="fa-solid fa-box-open mb-3 block text-4xl text-gray-600"></i>No available card types found.</td></tr>
-        `;
-        return;
-      }
-
-      tbody.innerHTML = rows.map((item, index) => `
-        <tr class="bg-gray-800 transition hover:bg-gray-700/50">
-          <td class="px-5 py-4 text-xs font-bold text-gray-500">${index + 1}</td>
-          <td class="px-5 py-4">
-            <span class="inline-flex rounded-xl border px-3 py-1.5 text-xs font-black ${item.company === "ALFA" ? "border-red-800 bg-red-950/30 text-red-300" : "border-blue-800 bg-blue-950/30 text-blue-300"}">
-              ${escapeHtml(item.company)}
-            </span>
-          </td>
-          <td class="number-cell px-5 py-4 text-center font-mono text-lg font-black text-white">${formatNumber(item.quantity_balance)}</td>
-          <td class="number-cell px-5 py-4 text-center">
-            <span class="inline-flex min-w-20 justify-center rounded-xl border border-green-800 bg-green-950/30 px-4 py-2 font-mono text-lg font-black text-green-300">${item.available_quantity}</span>
-          </td>
-        </tr>
-      `).join("");
-    }
-
-    function fillImportExample(company) {
-      const textarea = document.getElementById("cards-import-text");
-
-      textarea.value = company === "MTC"
-        ? `mtc days:30, 10.00$\n\nserial 20000001\npin 12 34 56 78 90 12 34\n\nseri 20000002\nsecret 98 76 54 32 10 98 76`
-        : `alfa days:365, 77.28$\n\nserial 10000001\npin 123 456 789 012 345\n\nseri 10000002\nsecret 987 654 321 098 765`;
-    }
-
-    function clearCardsImport() {
-      document.getElementById("cards-import-form").reset();
-      document.getElementById("import-result").classList.add("hidden");
-      document.getElementById("import-result").innerHTML = "";
-    }
-
-    async function submitCardsImport(event) {
-      event.preventDefault();
-
-      if (!isSuperAdmin) {
-        showStatus("Only super_admin can import recharge cards.", "error");
-        return;
-      }
-
-      const price_lbp = Number(getInputValue("cards-price-lbp"));
-      const text = String(document.getElementById("cards-import-text")?.value ?? "").trim();
-      const button = document.getElementById("import-cards-button");
-
-      if (!Number.isFinite(price_lbp) || price_lbp < 0) {
-        showStatus("Enter a valid price_lbp value.", "error");
-        return;
-      }
-
-      if (!text) {
-        showStatus("Cards text is required.", "error");
-        return;
-      }
-
-      button.disabled = true;
-
-      try {
-        const response = await sendRequest("ADD_CARD", {
-          method: "POST",
-          body: { text, price_lbp },
-        });
-
-        renderImportResult(response);
-        showStatus(response.message || "Recharge cards imported successfully.", "success");
-        await loadCardInventory();
-      } catch (error) {
-        renderImportResult({ success: false, message: error.message });
-        showStatus(error.message, "error");
-      } finally {
-        button.disabled = false;
-      }
-    }
-
-    function renderImportResult(response) {
-      const box = document.getElementById("import-result");
-      const success = response?.success !== false;
-      const invalidCards = Array.isArray(response?.invalid_cards) ? response.invalid_cards : [];
-
-      box.className = `rounded-2xl border p-5 shadow-xl ${success ? "border-green-800 bg-green-950/20" : "border-red-800 bg-red-950/20"}`;
-      box.innerHTML = `
-        <div class="flex items-center gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-xl ${success ? "bg-green-600" : "bg-red-600"} text-white">
-            <i class="fa-solid ${success ? "fa-check" : "fa-triangle-exclamation"}"></i>
-          </div>
-          <div>
-            <h3 class="font-black text-white">${success ? "Import Result" : "Import Failed"}</h3>
-            <p class="mt-1 text-xs text-gray-300">${escapeHtml(response?.message || "Request completed.")}</p>
-          </div>
-        </div>
-
-        <div class="mt-4 grid grid-cols-2 gap-3 text-center">
-          ${renderResultStat("Inserted", response?.inserted_cards_count ?? response?.inserted_count ?? response?.count ?? "-")}
-          ${renderResultStat("Invalid", response?.invalid_cards_count ?? invalidCards.length ?? "-")}
-          ${renderResultStat("Company", response?.company ?? "-")}
-          ${renderResultStat("Balance", response?.quantity_balance ?? "-")}
-        </div>
-
-        ${invalidCards.length ? `
-          <div class="mt-4 max-h-56 overflow-auto rounded-xl border border-red-900/60 bg-gray-950/40 p-3">
-            <div class="mb-2 text-xs font-black uppercase tracking-wide text-red-300">Invalid Cards</div>
-            ${invalidCards.map((card) => `
-              <div class="mb-2 rounded-lg border border-gray-700 bg-gray-900 p-2 text-xs last:mb-0">
-                <div class="font-mono text-gray-300">${escapeHtml(card.serial_number ?? "No serial")}</div>
-                <div class="mt-1 text-red-300">${escapeHtml(card.reason ?? "Invalid card")}</div>
-              </div>
-            `).join("")}
-          </div>
-        ` : ""}
-      `;
-      box.classList.remove("hidden");
-    }
-
-    function renderResultStat(label, value) {
-      return `
-        <div class="rounded-xl border border-gray-700 bg-gray-900/70 px-3 py-3">
-          <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">${escapeHtml(label)}</div>
-          <div class="number-cell mt-1 font-mono text-base font-black text-white">${escapeHtml(value)}</div>
-        </div>
-      `;
-    }
-
     function toNumericValue(value) {
       const parsed = Number(String(value ?? 0).replaceAll(",", "").trim());
       return Number.isFinite(parsed) ? parsed : 0;
@@ -1534,18 +2132,38 @@
       if (event.target.id === "entity-modal") closeEntityModal();
     });
 
+    document.getElementById("item-type-modal")?.addEventListener("click", (event) => {
+      if (event.target.id === "item-type-modal") closeItemTypeModal();
+    });
+
     document.getElementById("item-modal")?.addEventListener("click", (event) => {
       if (event.target.id === "item-modal") closeItemModal();
     });
 
+    document.getElementById("counter-modal")?.addEventListener("click", (event) => {
+      if (event.target.id === "counter-modal") closeCounterModal();
+    });
+
+    document.getElementById("balance-modal")?.addEventListener("click", (event) => {
+      if (event.target.id === "balance-modal") closeBalanceModal();
+    });
+
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
+        closeItemTypeModal();
         closeEntityModal();
         closeItemModal();
+        closeCounterModal();
+        closeBalanceModal();
       }
     });
 
-    loadCategoriesTree();
+    async function initializePage() {
+      await loadCategoriesTree();
+      await loadCounterItems();
+    }
+
+    initializePage();
   </script>
 </body>
 </html>
