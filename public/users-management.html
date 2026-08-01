@@ -40,6 +40,157 @@
     @keyframes loading-spin {
       to { transform: rotate(360deg); }
     }
+
+    html.light-mode body {
+      background: #eef1f4 !important;
+      color: #1f2937 !important;
+    }
+
+    html.light-mode header {
+      background: #f8fafc !important;
+      border-color: #d1d5db !important;
+    }
+
+    html.light-mode header h1 span {
+      color: #1f2937 !important;
+    }
+
+    html.light-mode header nav [class*="bg-gray-"] {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #374151 !important;
+    }
+
+    html.light-mode header nav [class*="bg-gray-"]:hover {
+      background: #e5e7eb !important;
+    }
+
+    html.light-mode main > section:first-of-type {
+      background-color: #f8fafc !important;
+      background-image: linear-gradient(135deg, #ecfeff, #f8fafc 58%, #ffffff) !important;
+      border-color: #a5f3fc !important;
+    }
+
+    html.light-mode main > section:not(:first-of-type),
+    html.light-mode #action-modal > div,
+    html.light-mode #add-user-modal > div {
+      background: #f8fafc !important;
+      border-color: #d1d5db !important;
+      color: #1f2937 !important;
+    }
+
+    html.light-mode main [class*="bg-gray-"],
+    html.light-mode #action-modal [class*="bg-gray-"],
+    html.light-mode #add-user-modal [class*="bg-gray-"] {
+      background-color: #ffffff !important;
+    }
+
+    html.light-mode main [class*="border-gray-"],
+    html.light-mode #action-modal [class*="border-gray-"],
+    html.light-mode #add-user-modal [class*="border-gray-"] {
+      border-color: #d1d5db !important;
+    }
+
+    html.light-mode main .text-white:not(button):not(a),
+    html.light-mode #action-modal .text-white:not(button):not(a),
+    html.light-mode #add-user-modal .text-white:not(button):not(a) {
+      color: #1f2937 !important;
+    }
+
+    html.light-mode [class*="text-gray-100"],
+    html.light-mode [class*="text-gray-200"],
+    html.light-mode [class*="text-gray-300"] {
+      color: #374151 !important;
+    }
+
+    html.light-mode [class*="text-gray-400"],
+    html.light-mode [class*="text-gray-500"],
+    html.light-mode [class*="text-gray-600"] {
+      color: #6b7280 !important;
+    }
+
+    html.light-mode input,
+    html.light-mode select,
+    html.light-mode textarea {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #111827 !important;
+    }
+
+    html.light-mode input::placeholder,
+    html.light-mode textarea::placeholder {
+      color: #9ca3af !important;
+    }
+
+    html.light-mode main [class*="bg-cyan-9"] {
+      background: #ecfeff !important;
+    }
+
+    html.light-mode main [class*="bg-blue-9"] {
+      background: #eff6ff !important;
+    }
+
+    html.light-mode main [class*="bg-purple-9"] {
+      background: #faf5ff !important;
+    }
+
+    html.light-mode main [class*="bg-amber-9"] {
+      background: #fffbeb !important;
+    }
+
+    html.light-mode main [class*="bg-emerald-9"] {
+      background: #ecfdf5 !important;
+    }
+
+    html.light-mode main [class*="bg-green-9"],
+    html.light-mode #global-status[class*="bg-green-9"] {
+      background: #f0fdf4 !important;
+    }
+
+    html.light-mode main [class*="bg-red-9"],
+    html.light-mode #global-status[class*="bg-red-9"] {
+      background: #fef2f2 !important;
+    }
+
+    html.light-mode #global-status[class*="bg-blue-9"] {
+      background: #eff6ff !important;
+    }
+
+    html.light-mode main [class*="text-cyan-300"],
+    html.light-mode main [class*="text-cyan-400"] {
+      color: #0e7490 !important;
+    }
+
+    html.light-mode main [class*="text-blue-300"],
+    html.light-mode main [class*="text-blue-400"] {
+      color: #1d4ed8 !important;
+    }
+
+    html.light-mode main [class*="text-purple-300"],
+    html.light-mode main [class*="text-purple-400"] {
+      color: #7e22ce !important;
+    }
+
+    html.light-mode main [class*="text-amber-300"],
+    html.light-mode main [class*="text-amber-400"] {
+      color: #a16207 !important;
+    }
+
+    html.light-mode main [class*="text-green-300"] {
+      color: #15803d !important;
+    }
+
+    html.light-mode main [class*="text-red-300"] {
+      color: #b91c1c !important;
+    }
+
+    html.light-mode .users-table-scroll::-webkit-scrollbar-track {
+      background: #e5e7eb;
+    }
+
+    html.light-mode .users-table-scroll::-webkit-scrollbar-thumb {
+      background: #9ca3af;
+    }
   </style>
 </head>
 
@@ -151,7 +302,7 @@
     </section>
 
     <section class="mb-5 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
-      <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[1.2fr_1.2fr_1fr_1fr_auto]">
+      <div class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-[1.2fr_1.2fr_1fr_auto]">
         <label class="block">
           <span class="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-400">Numberphone</span>
           <div class="relative">
@@ -180,29 +331,17 @@
           </div>
         </label>
 
-        <label class="block">
-          <span class="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-400">Minimum LBP Balance</span>
-          <input
-            id="filter-min-balance"
-            type="number"
-            step="any"
-            oninput="applyFilters(true)"
-            placeholder="From balance"
-            class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-cyan-500"
+        <div class="flex items-end">
+          <button
+            id="open-add-user-button"
+            type="button"
+            onclick="openAddUserModal()"
+            class="flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 font-bold text-white shadow transition hover:bg-green-700"
           >
-        </label>
-
-        <label class="block">
-          <span class="mb-1.5 block text-[11px] font-bold uppercase tracking-wide text-gray-400">Maximum LBP Balance</span>
-          <input
-            id="filter-max-balance"
-            type="number"
-            step="any"
-            oninput="applyFilters(true)"
-            placeholder="To balance"
-            class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-cyan-500"
-          >
-        </label>
+            <i class="fa-solid fa-user-plus"></i>
+            Add User
+          </button>
+        </div>
 
         <div class="flex items-end gap-2">
           <button
@@ -387,6 +526,102 @@
     </div>
   </div>
 
+  <div id="add-user-modal" class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-2xl overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
+        <div>
+          <h3 class="text-lg font-black text-white">Add User</h3>
+          <p class="mt-1 text-xs text-gray-400">Create a new user account.</p>
+        </div>
+
+        <button type="button" onclick="closeAddUserModal()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-gray-300 transition hover:bg-gray-600 hover:text-white">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="add-user-form" onsubmit="submitAddUser(event)" class="p-5">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">User Name</span>
+            <input
+              id="add-user-name"
+              name="name_user"
+              type="text"
+              required
+              autocomplete="name"
+              placeholder="Enter user name"
+              class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition focus:border-cyan-500"
+            >
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Numberphone</span>
+            <input
+              id="add-user-numberphone"
+              name="numberphone"
+              type="tel"
+              required
+              inputmode="numeric"
+              autocomplete="tel"
+              placeholder="Example: 70123456"
+              class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-cyan-500"
+            >
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Password</span>
+            <input
+              id="add-user-password"
+              name="password"
+              type="password"
+              required
+              autocomplete="new-password"
+              placeholder="Enter password"
+              class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition focus:border-cyan-500"
+            >
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Starting Balance</span>
+            <input
+              id="add-user-balance"
+              name="balance"
+              type="number"
+              step="any"
+              value="0"
+              class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-cyan-500"
+            >
+          </label>
+
+          <label class="block sm:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Role</span>
+            <select
+              id="add-user-role"
+              name="role"
+              class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition focus:border-cyan-500"
+            >
+              <option value="client" selected>Client</option>
+              <option value="reseller">Reseller</option>
+              <option value="admin">Admin</option>
+              <option value="super_admin">Super Admin</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="mt-5 flex gap-3">
+          <button type="button" onclick="closeAddUserModal()" class="flex-1 rounded-xl border border-gray-600 bg-gray-700 px-4 py-3 font-bold text-white transition hover:bg-gray-600">
+            Cancel
+          </button>
+
+          <button id="add-user-submit-button" type="submit" class="flex-1 rounded-xl bg-green-600 px-4 py-3 font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60">
+            <i class="fa-solid fa-user-plus mr-1"></i>
+            Add User
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="./config.js"></script>
   <script src="./auth.js"></script>
 
@@ -401,6 +636,7 @@
     */
     const ADMIN_APIS = {
       GET_ALL_USERS: "/auth/getAllUser",
+      ADD_USER: "/auth/adduser",
       ADD_BALANCE: "/auth/addBalance",
       EDIT_MIN_BALANCE_LBP: "/auth/editMinBalanceLbp",
       EDIT_MIN_BALANCE_USD: "/auth/editMinBalanceUsd",
@@ -654,10 +890,6 @@
     function applyFilters(resetPage = false) {
       const phoneQuery = getInputValue("filter-phone").toLowerCase();
       const nameQuery = getInputValue("filter-name").toLowerCase();
-      const minBalanceRaw = getInputValue("filter-min-balance");
-      const maxBalanceRaw = getInputValue("filter-max-balance");
-      const minBalance = minBalanceRaw === "" ? null : Number(minBalanceRaw);
-      const maxBalance = maxBalanceRaw === "" ? null : Number(maxBalanceRaw);
       const sortValue = getInputValue("sort-users") || "phone_asc";
 
       filteredUsersData = allUsersData.filter((user) => {
@@ -678,22 +910,6 @@
         if (
           nameQuery &&
           !user.name.toLowerCase().includes(nameQuery)
-        ) {
-          return false;
-        }
-
-        if (
-          minBalance !== null &&
-          Number.isFinite(minBalance) &&
-          user.balanceLbp < minBalance
-        ) {
-          return false;
-        }
-
-        if (
-          maxBalance !== null &&
-          Number.isFinite(maxBalance) &&
-          user.balanceLbp > maxBalance
         ) {
           return false;
         }
@@ -735,8 +951,6 @@
     function resetFilters() {
       document.getElementById("filter-phone").value = "";
       document.getElementById("filter-name").value = "";
-      document.getElementById("filter-min-balance").value = "";
-      document.getElementById("filter-max-balance").value = "";
       document.getElementById("sort-users").value = "phone_asc";
       setRoleFilter("all");
     }
@@ -1288,6 +1502,121 @@
       });
     }
 
+    function openAddUserModal() {
+      const form = document.getElementById("add-user-form");
+      const modal = document.getElementById("add-user-modal");
+
+      form.reset();
+      document.getElementById("add-user-balance").value = "0";
+      document.getElementById("add-user-role").value = "client";
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+
+      window.setTimeout(() => {
+        document.getElementById("add-user-name")?.focus();
+      }, 50);
+    }
+
+    function closeAddUserModal() {
+      const modal = document.getElementById("add-user-modal");
+
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.getElementById("add-user-form")?.reset();
+    }
+
+    async function submitAddUser(event) {
+      event.preventDefault();
+
+      const nameUser = getInputValue("add-user-name");
+      const numberphone = getInputValue("add-user-numberphone");
+      const password = String(
+        document.getElementById("add-user-password")?.value ?? ""
+      );
+      const balanceRaw = getInputValue("add-user-balance");
+      const balance = balanceRaw === "" ? 0 : Number(balanceRaw);
+      const role = normalizeRole(
+        getInputValue("add-user-role") || "client"
+      );
+      const allowedRoles = [
+        "client",
+        "reseller",
+        "admin",
+        "super_admin"
+      ];
+      const submitButton = document.getElementById(
+        "add-user-submit-button"
+      );
+
+      if (!nameUser) {
+        showStatus("User name is required.", "error");
+        return;
+      }
+
+      if (!numberphone) {
+        showStatus("Numberphone is required.", "error");
+        return;
+      }
+
+      if (!password) {
+        showStatus("Password is required.", "error");
+        return;
+      }
+
+      if (!Number.isFinite(balance)) {
+        showStatus("Balance must be a valid number.", "error");
+        return;
+      }
+
+      if (!allowedRoles.includes(role)) {
+        showStatus("Select a valid role.", "error");
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.innerHTML = `
+        <i class="fa-solid fa-spinner loading-spin mr-1"></i>
+        Adding...
+      `;
+
+      try {
+        const response = await sendAdminRequest("ADD_USER", {
+          method: "POST",
+          body: {
+            name_user: nameUser,
+            numberphone,
+            password,
+            balance,
+            role,
+          },
+        });
+
+        if (response?.success === false) {
+          throw new Error(
+            response.message ||
+            response.error ||
+            "Failed to add user."
+          );
+        }
+
+        closeAddUserModal();
+        showStatus(
+          response?.message || "User added successfully.",
+          "success"
+        );
+        await runGetAllUsers();
+      } catch (error) {
+        showStatus(error.message, "error");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.innerHTML = `
+          <i class="fa-solid fa-user-plus mr-1"></i>
+          Add User
+        `;
+      }
+    }
+
     function openActionModal(config) {
       document.getElementById("modal-action").value = config.action;
       document.getElementById("modal-numberphone").value = config.numberphone;
@@ -1435,9 +1764,16 @@
       }
     });
 
+    document.getElementById("add-user-modal")?.addEventListener("click", (event) => {
+      if (event.target.id === "add-user-modal") {
+        closeAddUserModal();
+      }
+    });
+
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         closeActionModal();
+        closeAddUserModal();
       }
     });
 

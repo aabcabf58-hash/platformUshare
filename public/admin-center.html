@@ -11,6 +11,120 @@
   <style>
     .admin-card { transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
     .admin-card:hover { transform: translateY(-5px); }
+
+    html.light-mode body {
+      background: #eef1f4 !important;
+      color: #1f2937 !important;
+    }
+
+    html.light-mode header {
+      background: #f8fafc !important;
+      border-color: #d1d5db !important;
+    }
+
+    html.light-mode header h1 span {
+      color: #1f2937 !important;
+    }
+
+    html.light-mode header nav [class*="bg-gray-"] {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #374151 !important;
+    }
+
+    html.light-mode header nav [class*="bg-gray-"]:hover {
+      background-color: #e5e7eb !important;
+    }
+
+    html.light-mode main > section:first-child {
+      background-color: #f8fafc !important;
+      background-image: linear-gradient(135deg, #ecfeff, #f8fafc 58%, #ffffff) !important;
+      border-color: #a5f3fc !important;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08) !important;
+    }
+
+    html.light-mode main > section:first-child h2 {
+      color: #164e63 !important;
+    }
+
+    html.light-mode main > section:first-child p {
+      color: #4b5563 !important;
+    }
+
+    html.light-mode #current-role-badge {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #374151 !important;
+    }
+
+    html.light-mode main > section:first-child [class*="bg-cyan-950"] {
+      background: #cffafe !important;
+      border-color: #67e8f9 !important;
+    }
+
+    html.light-mode main > section:first-child [class*="bg-cyan-900"] {
+      background: #cffafe !important;
+      border-color: #67e8f9 !important;
+      color: #0e7490 !important;
+    }
+
+    html.light-mode main > section:first-child [class*="text-cyan-300"],
+    html.light-mode main > section:first-child [class*="text-cyan-400"] {
+      color: #0e7490 !important;
+    }
+
+    html.light-mode main > section.grid > a[href="./users-management.html"] {
+      background-color: #ecfeff !important;
+      background-image: linear-gradient(135deg, #ecfeff, #ffffff) !important;
+      border-color: #67e8f9 !important;
+    }
+
+    html.light-mode main > section.grid > a[href="./categories-management.html"] {
+      background-color: #faf5ff !important;
+      background-image: linear-gradient(135deg, #faf5ff, #ffffff) !important;
+      border-color: #d8b4fe !important;
+    }
+
+    html.light-mode main > section.grid > a[href="./recharge-cards.html"] {
+      background-color: #fffbeb !important;
+      background-image: linear-gradient(135deg, #fffbeb, #ffffff) !important;
+      border-color: #fcd34d !important;
+    }
+
+    html.light-mode .admin-card h3,
+    html.light-mode main > section.grid > article h3 {
+      color: #1f2937 !important;
+    }
+
+    html.light-mode .admin-card p,
+    html.light-mode main > section.grid > article p {
+      color: #4b5563 !important;
+    }
+
+    html.light-mode main > section.grid > article {
+      background: #f8fafc !important;
+      border-color: #d1d5db !important;
+      color: #374151 !important;
+      opacity: 0.9 !important;
+    }
+
+    html.light-mode main > section.grid > article [class*="bg-gray-"] {
+      background: #e5e7eb !important;
+      border-color: #cbd5e1 !important;
+      color: #4b5563 !important;
+    }
+
+    html.light-mode .admin-card [class*="text-cyan-300"] {
+      color: #0e7490 !important;
+    }
+
+    html.light-mode .admin-card [class*="text-purple-300"] {
+      color: #7e22ce !important;
+    }
+
+    html.light-mode .admin-card [class*="text-amber-300"] {
+      color: #a16207 !important;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gray-900 font-sans text-gray-100">
