@@ -374,6 +374,11 @@
           </label>
 
           <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Company</span>
+            <input id="item-company" type="text" required autocomplete="off" placeholder="ALFA, MTC, OGERO..." class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-bold uppercase text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <label class="block md:col-span-2">
             <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Description</span>
             <textarea id="item-description" rows="3" class="w-full resize-y rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500"></textarea>
           </label>
@@ -388,13 +393,23 @@
           </div>
 
           <label class="block">
-            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Cost</span>
-            <input id="item-cost" type="number" step="any" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Cost LBP</span>
+            <input id="item-cost-lbp" type="number" step="any" min="0" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
           </label>
 
           <label class="block">
-            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Price</span>
-            <input id="item-price" type="number" step="any" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Price LBP</span>
+            <input id="item-price-lbp" type="number" step="any" min="0" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Cost USD</span>
+            <input id="item-cost-usd" type="number" step="any" min="0" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Price USD</span>
+            <input id="item-price-usd" type="number" step="any" min="0" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
           </label>
 
           <label class="block">
@@ -796,10 +811,13 @@
           id: item.id,
           childcategory_id: item.childcategory_id ?? item.child_category_id ?? item.childcategoryId,
           name: String(item.name ?? "Unnamed Item"),
+          company: String(item.company ?? "").trim().toUpperCase(),
           description: String(item.description ?? ""),
           image_url: String(item.image_url ?? item.image ?? ""),
-          cost: toNumericValue(item.cost ?? 0),
-          price: toNumericValue(item.price ?? 0),
+          cost_lbp: toNumericValue(item.cost_lbp ?? item.cost ?? 0),
+          price_lbp: toNumericValue(item.price_lbp ?? item.price ?? 0),
+          cost_usd: toNumericValue(item.cost_usd ?? 0),
+          price_usd: toNumericValue(item.price_usd ?? 0),
           package_value: toNumericValue(item.package_value ?? item.value ?? 0),
           unit: String(item.unit ?? ""),
           validity_days: Math.max(0, Math.trunc(toNumericValue(item.validity_days ?? 0))),
@@ -1197,12 +1215,15 @@
                   <h6 class="font-black text-cyan-200">${escapeHtml(item.name)}</h6>
                   ${renderActiveBadge(item.is_active)}
                   <span class="rounded-lg border border-cyan-800 bg-cyan-950/40 px-2 py-1 text-[10px] font-black uppercase text-cyan-300">Package</span>
+                  <span class="rounded-lg border border-blue-800 bg-blue-950/30 px-2 py-1 text-[10px] font-black uppercase text-blue-300">${escapeHtml(item.company || "No company")}</span>
                 </div>
                 ${item.description ? `<p class="mt-1 text-xs leading-5 text-gray-400">${escapeHtml(item.description)}</p>` : ""}
                 <div class="mt-2 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-wide">
                   <span class="rounded-lg border border-gray-700 bg-gray-900 px-2 py-1 text-gray-300">Value: ${valueText}</span>
-                  <span class="rounded-lg border border-green-900 bg-green-950/30 px-2 py-1 text-green-300">Price: ${formatNumber(item.price)}</span>
-                  <span class="rounded-lg border border-orange-900 bg-orange-950/30 px-2 py-1 text-orange-300">Cost: ${formatNumber(item.cost)}</span>
+                  <span class="rounded-lg border border-green-900 bg-green-950/30 px-2 py-1 text-green-300">Price LBP: ${formatNumber(item.price_lbp)}</span>
+                  <span class="rounded-lg border border-orange-900 bg-orange-950/30 px-2 py-1 text-orange-300">Cost LBP: ${formatNumber(item.cost_lbp)}</span>
+                  <span class="rounded-lg border border-green-900 bg-green-950/30 px-2 py-1 text-green-300">Price USD: $${formatNumber(item.price_usd)}</span>
+                  <span class="rounded-lg border border-orange-900 bg-orange-950/30 px-2 py-1 text-orange-300">Cost USD: $${formatNumber(item.cost_usd)}</span>
                   <span class="rounded-lg border border-violet-900 bg-violet-950/30 px-2 py-1 text-violet-300">Validity: ${item.validity_days} day(s)</span>
                   <span class="rounded-lg border border-gray-700 bg-gray-900 px-2 py-1 text-gray-400">ID ${escapeHtml(item.id)}</span>
                 </div>
@@ -1433,10 +1454,13 @@
       document.getElementById("item-mode").value = mode;
       document.getElementById("item-id").value = item?.id ?? "";
       document.getElementById("item-name").value = item?.name ?? "";
+      document.getElementById("item-company").value = item?.company ?? "";
       document.getElementById("item-description").value = item?.description ?? "";
       document.getElementById("item-image-url").value = item?.image_url ?? "";
-      document.getElementById("item-cost").value = item?.cost ?? 0;
-      document.getElementById("item-price").value = item?.price ?? 0;
+      document.getElementById("item-cost-lbp").value = item?.cost_lbp ?? 0;
+      document.getElementById("item-price-lbp").value = item?.price_lbp ?? 0;
+      document.getElementById("item-cost-usd").value = item?.cost_usd ?? 0;
+      document.getElementById("item-price-usd").value = item?.price_usd ?? 0;
       document.getElementById("item-package-value").value = item?.package_value ?? 0;
       document.getElementById("item-unit").value = item?.unit ?? "";
       document.getElementById("item-validity-days").value = item?.validity_days ?? 0;
@@ -1502,23 +1526,31 @@
       const id = getInputValue("item-id");
       const childcategory_id = getInputValue("item-childcategory-id");
       const name = getInputValue("item-name");
+      const company = getInputValue("item-company").toUpperCase();
       const description = getInputValue("item-description");
       const image_url = getInputValue("item-image-url");
-      const cost = Number(getInputValue("item-cost"));
-      const price = Number(getInputValue("item-price"));
+      const cost_lbp = Number(getInputValue("item-cost-lbp"));
+      const price_lbp = Number(getInputValue("item-price-lbp"));
+      const cost_usd = Number(getInputValue("item-cost-usd"));
+      const price_usd = Number(getInputValue("item-price-usd"));
       const package_value = Number(getInputValue("item-package-value"));
       const unit = getInputValue("item-unit");
       const validity_days = Number(getInputValue("item-validity-days"));
       const is_active = toBoolean(getInputValue("item-is-active"), true);
       const submitButton = document.getElementById("item-submit-button");
 
-      if (!childcategory_id || !name) {
-        showStatus("Child category and item name are required.", "error");
+      if (!childcategory_id || !name || !company) {
+        showStatus("Child category, item name and company are required.", "error");
         return;
       }
 
-      if (![cost, price, package_value, validity_days].every(Number.isFinite)) {
-        showStatus("Cost, price, package value and validity days must be valid numbers.", "error");
+      if (![cost_lbp, price_lbp, cost_usd, price_usd, package_value, validity_days].every(Number.isFinite)) {
+        showStatus("LBP/USD costs, prices, package value and validity days must be valid numbers.", "error");
+        return;
+      }
+
+      if ([cost_lbp, price_lbp, cost_usd, price_usd].some((value) => value < 0)) {
+        showStatus("LBP and USD costs and prices cannot be negative.", "error");
         return;
       }
 
@@ -1530,10 +1562,13 @@
       const body = {
         childcategory_id,
         name,
+        company,
         description: description || null,
         image_url: image_url || null,
-        cost,
-        price,
+        cost_lbp,
+        price_lbp,
+        cost_usd,
+        price_usd,
         package_value,
         unit: unit || null,
         validity_days,
