@@ -53,6 +53,202 @@
     }
 
     .number-cell { font-variant-numeric: tabular-nums; }
+
+    /* Force every dark surface to a light surface when the shared theme is light. */
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) body {
+      background: #f4f7fa !important;
+      color: #1f2937 !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) :is(
+      [class*="bg-gray-950"],
+      [class*="bg-gray-900"],
+      [class*="bg-gray-800"]
+    ) {
+      background-color: #ffffff !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) [class*="bg-gray-700"] {
+      background-color: #eef2f6 !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) [class*="from-amber-950"] {
+      background: #fffaf0 !important;
+      background-image: none !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) :is(
+      [class*="bg-amber-950"],
+      [class*="bg-emerald-950"]
+    ) {
+      background-color: #ecfdf5 !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) [class*="bg-red-950"] {
+      background-color: #fff1f2 !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) [class*="bg-blue-950"] {
+      background-color: #eff6ff !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) [class*="bg-green-950"] {
+      background-color: #f0fdf4 !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) [class*="border-gray-"] {
+      border-color: #d9e0e7 !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) :is(.text-white, .text-gray-100, .text-gray-200, .text-gray-300) {
+      color: #1f2937 !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) :is(.text-gray-400, .text-gray-500) {
+      color: #64748b !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) :is(input, select, textarea) {
+      background: #ffffff !important;
+      color: #111827 !important;
+      border-color: #cbd5e1 !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) :is(
+      [class*="bg-amber-600"],
+      [class*="bg-cyan-600"],
+      [class*="bg-emerald-600"],
+      [class*="bg-green-600"],
+      [class*="bg-red-600"],
+      [class*="bg-blue-600"],
+      [class*="bg-purple-600"]
+    ) {
+      color: #ffffff !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) .tree-line::before {
+      background: #d9e0e7 !important;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) :is(.inventory-scroll, .tree-scroll)::-webkit-scrollbar-track {
+      background: #edf1f5;
+    }
+
+    :is(
+      html[data-theme="light"],
+      html.light,
+      html.light-mode,
+      html:has(body[data-theme="light"]),
+      html:has(body.light),
+      html:has(body.light-mode)
+    ) :is(.inventory-scroll, .tree-scroll)::-webkit-scrollbar-thumb {
+      background: #bac4cf;
+    }
   </style>
 </head>
 
@@ -195,7 +391,7 @@
               <p class="mt-1 text-xs text-gray-400">Paste the formatted cards text exactly as received.</p>
             </div>
             <span class="rounded-full border border-emerald-800 bg-emerald-950/40 px-3 py-1 text-xs font-bold text-emerald-300">
-              ALFA: 15 digits · MTC: 14 digits
+              ALFA: 15 or 17 digits · MTC: 14 digits
             </span>
           </div>
 
@@ -206,7 +402,7 @@
 
           <label class="mt-4 block">
             <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Cards Text</span>
-            <textarea id="cards-import-text" required spellcheck="false" rows="18" placeholder="alfa days:365, 77.28$&#10;&#10;serial 10000001&#10;pin 123 456 789 012 345" class="w-full resize-y rounded-2xl border border-gray-600 bg-gray-900 px-4 py-4 font-mono text-sm leading-7 text-white outline-none transition focus:border-emerald-500"></textarea>
+            <textarea id="cards-import-text" required spellcheck="false" rows="18" placeholder="alfa days:365, 77.28$&#10;&#10;serial 10000001&#10;pin 123 456 789 012 345 67" class="w-full resize-y rounded-2xl border border-gray-600 bg-gray-900 px-4 py-4 font-mono text-sm leading-7 text-white outline-none transition focus:border-emerald-500"></textarea>
           </label>
 
           <div class="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -1034,7 +1230,70 @@
 
       textarea.value = company === "MTC"
         ? `mtc days:30, 10.00$\n\nserial 20000001\npin 12 34 56 78 90 12 34\n\nseri 20000002\nsecret 98 76 54 32 10 98 76`
-        : `alfa days:365, 77.28$\n\nserial 10000001\npin 123 456 789 012 345\n\nseri 10000002\nsecret 987 654 321 098 765`;
+        : `alfa days:365, 77.28$\n\nserial 10000001\npin 123 456 789 012 345\n\nseri 10000002\nsecret 987 654 321 098 765 43`;
+    }
+
+    function validateRechargeCardCodes(text) {
+      const header = String(text)
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .find(Boolean) || "";
+
+      const company = /^alfa\b/i.test(header)
+        ? "ALFA"
+        : /^mtc\b/i.test(header)
+          ? "MTC"
+          : "";
+
+      if (!company) {
+        return {
+          valid: false,
+          message: "The first line must start with alfa or mtc.",
+        };
+      }
+
+      const acceptedLengths = company === "ALFA"
+        ? [15, 17]
+        : [14];
+
+      const codeLines = String(text)
+        .split(/\r?\n/)
+        .map((line, index) => ({
+          lineNumber: index + 1,
+          text: line.trim(),
+        }))
+        .filter((line) => /^(pin|secret|code)\b/i.test(line.text));
+
+      if (codeLines.length === 0) {
+        return {
+          valid: false,
+          message: "No pin, secret, or code lines were found.",
+        };
+      }
+
+      const invalidLines = codeLines
+        .map((line) => ({
+          ...line,
+          digits: line.text
+            .replace(/^(pin|secret|code)\b\s*[:=-]?\s*/i, "")
+            .replace(/\D/g, ""),
+        }))
+        .filter((line) => !acceptedLengths.includes(line.digits.length));
+
+      if (invalidLines.length > 0) {
+        const expectedText = company === "ALFA"
+          ? "15 or 17 digits"
+          : "14 digits";
+
+        return {
+          valid: false,
+          message:
+            `${company} card code must contain ${expectedText}. ` +
+            `Invalid line(s): ${invalidLines.map((line) => line.lineNumber).join(", ")}.`,
+        };
+      }
+
+      return { valid: true, company };
     }
 
     function clearCardsImport() {
@@ -1062,6 +1321,13 @@
 
       if (!text) {
         showStatus("Cards text is required.", "error");
+        return;
+      }
+
+      const codeValidation = validateRechargeCardCodes(text);
+
+      if (!codeValidation.valid) {
+        showStatus(codeValidation.message, "error");
         return;
       }
 
