@@ -334,6 +334,11 @@
           <input id="entity-image-url" type="url" placeholder="https://..." class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-emerald-500">
         </label>
 
+        <label class="mt-4 block">
+          <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Sort Order</span>
+          <input id="entity-sort-order" type="number" step="1" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-emerald-500">
+        </label>
+
         <div id="entity-image-preview-wrapper" class="mt-4 hidden overflow-hidden rounded-2xl border border-gray-700 bg-gray-900 p-3">
           <img id="entity-image-preview" alt="Preview" class="mx-auto max-h-44 rounded-xl object-contain">
         </div>
@@ -428,6 +433,11 @@
           </label>
 
           <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Sort Order</span>
+            <input id="item-sort-order" type="number" step="1" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
+          </label>
+
+          <label class="block">
             <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Status</span>
             <select id="item-is-active" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500">
               <option value="true">Active</option>
@@ -472,6 +482,11 @@
           </label>
 
           <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Company</span>
+            <input id="counter-company" type="text" required autocomplete="off" placeholder="ALFA, MTC, OGERO..." class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-bold uppercase outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block md:col-span-2">
             <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Description</span>
             <textarea id="counter-description" rows="3" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 outline-none focus:border-emerald-500"></textarea>
           </label>
@@ -482,13 +497,23 @@
           </label>
 
           <label class="block">
-            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Cost per Unit</span>
-            <input id="counter-cost-per-unit" type="number" step="any" min="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Cost per Unit LBP</span>
+            <input id="counter-cost-per-unit-lbp" type="number" step="any" min="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
           </label>
 
           <label class="block">
-            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Price per Unit</span>
-            <input id="counter-price-per-unit" type="number" step="any" min="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Price per Unit LBP</span>
+            <input id="counter-price-per-unit-lbp" type="number" step="any" min="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Cost per Unit USD</span>
+            <input id="counter-cost-per-unit-usd" type="number" step="any" min="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Price per Unit USD</span>
+            <input id="counter-price-per-unit-usd" type="number" step="any" min="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-emerald-500">
           </label>
 
           <label class="block">
@@ -602,6 +627,11 @@
           <label class="block">
             <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Step Amount</span>
             <input id="balance-step-amount" type="number" step="any" min="0.000001" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Sort Order</span>
+            <input id="balance-sort-order" type="number" step="1" value="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
           </label>
 
           <label class="block">
@@ -773,6 +803,7 @@
           name: String(category.name ?? category.category_name ?? "Unnamed Category"),
           image_url: String(category.image_url ?? category.image ?? ""),
           is_active: toBoolean(category.is_active, true),
+          sort_order: Math.trunc(toNumericValue(category.sort_order)),
           raw: category,
           subcategories: subcategories.map((subcategory) => {
             const childcategories = getChildArray(subcategory, [
@@ -788,6 +819,7 @@
               name: String(subcategory.name ?? subcategory.subcategory_name ?? "Unnamed Subcategory"),
               image_url: String(subcategory.image_url ?? subcategory.image ?? ""),
               is_active: toBoolean(subcategory.is_active, true),
+              sort_order: Math.trunc(toNumericValue(subcategory.sort_order)),
               raw: subcategory,
               childcategories: childcategories.map((childcategory) => ({
                 id: childcategory.id,
@@ -795,6 +827,7 @@
                 name: String(childcategory.name ?? childcategory.childcategory_name ?? "Unnamed Child Category"),
                 image_url: String(childcategory.image_url ?? childcategory.image ?? ""),
                 is_active: toBoolean(childcategory.is_active, true),
+                sort_order: Math.trunc(toNumericValue(childcategory.sort_order)),
                 raw: childcategory,
                 items: [],
                 counter_items: [],
@@ -822,6 +855,7 @@
           unit: String(item.unit ?? ""),
           validity_days: Math.max(0, Math.trunc(toNumericValue(item.validity_days ?? 0))),
           is_active: toBoolean(item.is_active, true),
+          sort_order: Math.trunc(toNumericValue(item.sort_order)),
           raw: item,
         }))
         .filter((item) => item.id !== undefined && item.id !== null);
@@ -836,10 +870,17 @@
             item.child_category_id ??
             item.childcategoryId,
           name: String(item.name ?? "Unnamed Counter Item"),
+          company: String(item.company ?? "").trim().toUpperCase(),
           description: String(item.description ?? ""),
           image_url: String(item.image_url ?? item.image ?? ""),
-          cost_per_unit: toNumericValue(item.cost_per_unit),
-          price_per_unit: toNumericValue(item.price_per_unit),
+          cost_per_unit_lbp: toNumericValue(
+            item.cost_per_unit_lbp ?? item.cost_per_unit
+          ),
+          price_per_unit_lbp: toNumericValue(
+            item.price_per_unit_lbp ?? item.price_per_unit
+          ),
+          cost_per_unit_usd: toNumericValue(item.cost_per_unit_usd),
+          price_per_unit_usd: toNumericValue(item.price_per_unit_usd),
           minimum_amount: toNumericValue(item.minimum_amount),
           maximum_amount: toNumericValue(item.maximum_amount),
           step_amount: toNumericValue(item.step_amount),
@@ -878,7 +919,10 @@
           subcategory.childcategories.forEach((childcategory) => {
             childcategory.items = (itemsByChild.get(String(childcategory.id)) || [])
               .slice()
-              .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+              .sort((a, b) =>
+                a.sort_order - b.sort_order ||
+                a.name.localeCompare(b.name, undefined, { numeric: true })
+              );
 
             childcategory.counter_items = (
               countersByChild.get(String(childcategory.id)) || []
@@ -1252,12 +1296,15 @@
                   <h6 class="font-black text-green-800">${escapeHtml(item.name)}</h6>
                   ${renderActiveBadge(item.is_active)}
                   <span class="rounded-lg border border-green-300 bg-green-100 px-2 py-1 text-[10px] font-black uppercase text-green-800">Counter</span>
+                  <span class="rounded-lg border border-blue-300 bg-blue-100 px-2 py-1 text-[10px] font-black uppercase text-blue-800">${escapeHtml(item.company || "No company")}</span>
                 </div>
                 ${item.description ? `<p class="mt-1 text-xs leading-5 text-gray-500">${escapeHtml(item.description)}</p>` : ""}
                 <div class="mt-2 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-wide">
                   <span class="rounded-lg border border-gray-700 bg-gray-800 px-2 py-1 text-gray-700">Unit: ${escapeHtml(item.unit || "-")}</span>
-                  <span class="rounded-lg border border-green-200 bg-green-100 px-2 py-1 text-green-800">Price / Unit: ${formatNumber(item.price_per_unit)}</span>
-                  <span class="rounded-lg border border-orange-200 bg-orange-50 px-2 py-1 text-orange-700">Cost / Unit: ${formatNumber(item.cost_per_unit)}</span>
+                  <span class="rounded-lg border border-green-200 bg-green-100 px-2 py-1 text-green-800">LBP Price: ${formatNumber(item.price_per_unit_lbp)}</span>
+                  <span class="rounded-lg border border-orange-200 bg-orange-50 px-2 py-1 text-orange-700">LBP Cost: ${formatNumber(item.cost_per_unit_lbp)}</span>
+                  <span class="rounded-lg border border-green-200 bg-green-100 px-2 py-1 text-green-800">USD Price: ${formatNumber(item.price_per_unit_usd)}</span>
+                  <span class="rounded-lg border border-orange-200 bg-orange-50 px-2 py-1 text-orange-700">USD Cost: ${formatNumber(item.cost_per_unit_usd)}</span>
                   <span class="rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-blue-700">Range: ${formatNumber(item.minimum_amount)} → ${formatNumber(item.maximum_amount)}</span>
                   <span class="rounded-lg border border-purple-200 bg-purple-50 px-2 py-1 text-purple-700">Step: ${formatNumber(item.step_amount)}</span>
                   <span class="rounded-lg border border-gray-700 bg-gray-800 px-2 py-1 text-gray-500">ID ${escapeHtml(item.id)}</span>
@@ -1464,6 +1511,7 @@
       document.getElementById("item-package-value").value = item?.package_value ?? 0;
       document.getElementById("item-unit").value = item?.unit ?? "";
       document.getElementById("item-validity-days").value = item?.validity_days ?? 0;
+      document.getElementById("item-sort-order").value = item?.sort_order ?? 0;
       document.getElementById("item-is-active").value = String(item?.is_active ?? true);
 
       fillItemChildcategorySelect(childcategoryId);
@@ -1536,6 +1584,7 @@
       const package_value = Number(getInputValue("item-package-value"));
       const unit = getInputValue("item-unit");
       const validity_days = Number(getInputValue("item-validity-days"));
+      const sort_order = Number(getInputValue("item-sort-order"));
       const is_active = toBoolean(getInputValue("item-is-active"), true);
       const submitButton = document.getElementById("item-submit-button");
 
@@ -1544,8 +1593,8 @@
         return;
       }
 
-      if (![cost_lbp, price_lbp, cost_usd, price_usd, package_value, validity_days].every(Number.isFinite)) {
-        showStatus("LBP/USD costs, prices, package value and validity days must be valid numbers.", "error");
+      if (![cost_lbp, price_lbp, cost_usd, price_usd, package_value, validity_days, sort_order].every(Number.isFinite)) {
+        showStatus("LBP/USD costs, prices, package value, validity days and sort order must be valid numbers.", "error");
         return;
       }
 
@@ -1556,6 +1605,11 @@
 
       if (!Number.isInteger(validity_days) || validity_days < 0) {
         showStatus("Validity days must be a positive integer or zero.", "error");
+        return;
+      }
+
+      if (!Number.isInteger(sort_order)) {
+        showStatus("Sort order must be an integer.", "error");
         return;
       }
 
@@ -1573,6 +1627,7 @@
         unit: unit || null,
         validity_days,
         is_active,
+        sort_order,
       };
 
       if (mode === "edit") body.id = id;
@@ -1633,10 +1688,13 @@
       document.getElementById("counter-mode").value = mode;
       document.getElementById("counter-id").value = item?.id ?? "";
       document.getElementById("counter-name").value = item?.name ?? "";
+      document.getElementById("counter-company").value = item?.company ?? "";
       document.getElementById("counter-description").value = item?.description ?? "";
       document.getElementById("counter-image-url").value = item?.image_url ?? "";
-      document.getElementById("counter-cost-per-unit").value = item?.cost_per_unit ?? 0;
-      document.getElementById("counter-price-per-unit").value = item?.price_per_unit ?? 0;
+      document.getElementById("counter-cost-per-unit-lbp").value = item?.cost_per_unit_lbp ?? 0;
+      document.getElementById("counter-price-per-unit-lbp").value = item?.price_per_unit_lbp ?? 0;
+      document.getElementById("counter-cost-per-unit-usd").value = item?.cost_per_unit_usd ?? 0;
+      document.getElementById("counter-price-per-unit-usd").value = item?.price_per_unit_usd ?? 0;
       document.getElementById("counter-minimum-amount").value = item?.minimum_amount ?? 0;
       document.getElementById("counter-maximum-amount").value = item?.maximum_amount ?? 0;
       document.getElementById("counter-step-amount").value = item?.step_amount ?? 1;
@@ -1684,10 +1742,13 @@
       const body = {
         childcategory_id: getInputValue("counter-childcategory-id"),
         name: getInputValue("counter-name"),
+        company: getInputValue("counter-company").toLowerCase(),
         description: getInputValue("counter-description") || null,
         image_url: getInputValue("counter-image-url") || null,
-        cost_per_unit: Number(getInputValue("counter-cost-per-unit")),
-        price_per_unit: Number(getInputValue("counter-price-per-unit")),
+        cost_per_unit_lbp: Number(getInputValue("counter-cost-per-unit-lbp")),
+        price_per_unit_lbp: Number(getInputValue("counter-price-per-unit-lbp")),
+        cost_per_unit_usd: Number(getInputValue("counter-cost-per-unit-usd")),
+        price_per_unit_usd: Number(getInputValue("counter-price-per-unit-usd")),
         minimum_amount: Number(getInputValue("counter-minimum-amount")),
         maximum_amount: Number(getInputValue("counter-maximum-amount")),
         step_amount: Number(getInputValue("counter-step-amount")),
@@ -1698,14 +1759,16 @@
 
       if (mode === "edit") body.id = id;
 
-      if (!body.childcategory_id || !body.name || !body.unit) {
-        showStatus("Child category, name and unit are required.", "error");
+      if (!body.childcategory_id || !body.name || !body.company || !body.unit) {
+        showStatus("Child category, name, company and unit are required.", "error");
         return;
       }
 
       const numericValues = [
-        body.cost_per_unit,
-        body.price_per_unit,
+        body.cost_per_unit_lbp,
+        body.price_per_unit_lbp,
+        body.cost_per_unit_usd,
+        body.price_per_unit_usd,
         body.minimum_amount,
         body.maximum_amount,
         body.step_amount,
@@ -1779,6 +1842,7 @@
       document.getElementById("balance-edit-note").classList.toggle("hidden", isCreate);
       document.getElementById("balance-id").required = !isCreate;
       document.getElementById("balance-is-active").value = isCreate ? "true" : "";
+      document.getElementById("balance-sort-order").value = isCreate ? "0" : "";
 
       const requiredIds = [
         "balance-childcategory-id",
@@ -1790,6 +1854,7 @@
         "balance-minimum-amount",
         "balance-maximum-amount",
         "balance-step-amount",
+        "balance-sort-order",
       ];
 
       requiredIds.forEach((fieldId) => {
@@ -1855,6 +1920,7 @@
         minimum_amount: "balance-minimum-amount",
         maximum_amount: "balance-maximum-amount",
         step_amount: "balance-step-amount",
+        sort_order: "balance-sort-order",
       };
 
       Object.entries(textFields).forEach(([field, inputId]) => {
@@ -1970,6 +2036,7 @@
       document.getElementById("entity-current-active").value = String(entity?.is_active ?? true);
       document.getElementById("entity-name").value = entity?.name ?? "";
       document.getElementById("entity-image-url").value = entity?.image_url ?? "";
+      document.getElementById("entity-sort-order").value = entity?.sort_order ?? 0;
 
       document.getElementById("entity-modal-title").textContent =
         `${mode === "create" ? "Create" : "Edit"} ${labels[type]}`;
@@ -2061,11 +2128,17 @@
       const parentId = getInputValue("entity-parent-id");
       const name = getInputValue("entity-name");
       const image_url = getInputValue("entity-image-url");
+      const sort_order = Number(getInputValue("entity-sort-order"));
       const currentActive = toBoolean(getInputValue("entity-current-active"), true);
       const submitButton = document.getElementById("entity-submit-button");
 
       if (!name) {
         showStatus("Name is required.", "error");
+        return;
+      }
+
+      if (!Number.isInteger(sort_order)) {
+        showStatus("Sort order must be an integer.", "error");
         return;
       }
 
@@ -2077,20 +2150,20 @@
         apiKey = mode === "create" ? "CREATE_CATEGORY" : "EDIT_CATEGORY";
         method = mode === "create" ? "POST" : "PUT";
         body = mode === "create"
-          ? { name, image_url }
-          : { id, name, image_url, is_active: currentActive };
+          ? { name, image_url, sort_order }
+          : { id, name, image_url, is_active: currentActive, sort_order };
       } else if (type === "subcategory") {
         apiKey = mode === "create" ? "CREATE_SUBCATEGORY" : "EDIT_SUBCATEGORY";
         method = mode === "create" ? "POST" : "PUT";
         body = mode === "create"
-          ? { category_id: parentId, name, image_url }
-          : { id, category_id: parentId, name, image_url };
+          ? { category_id: parentId, name, image_url, sort_order }
+          : { id, category_id: parentId, name, image_url, sort_order };
       } else if (type === "childcategory") {
         apiKey = mode === "create" ? "CREATE_CHILDCATEGORY" : "EDIT_CHILDCATEGORY";
         method = mode === "create" ? "POST" : "PUT";
         body = mode === "create"
-          ? { subcategory_id: parentId, name, image_url, is_active: true }
-          : { id, subcategory_id: parentId, name, image_url };
+          ? { subcategory_id: parentId, name, image_url, is_active: true, sort_order }
+          : { id, subcategory_id: parentId, name, image_url, sort_order };
       } else {
         showStatus("Unknown catalog item type.", "error");
         return;
