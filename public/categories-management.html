@@ -594,14 +594,29 @@
             <input id="balance-name" type="text" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-bold outline-none focus:border-purple-500">
           </label>
 
-          <label class="block">
-            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Cost per Dollar</span>
-            <input id="balance-cost-per-dollar" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          <label class="block md:col-span-2">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Company / Balance Type</span>
+            <input id="balance-company" type="text" placeholder="alfa or touch" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-bold outline-none focus:border-purple-500">
           </label>
 
           <label class="block">
-            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Price per Dollar</span>
-            <input id="balance-price-per-dollar" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Cost per Dollar LBP</span>
+            <input id="balance-cost-per-dollar-lbp" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Price per Dollar LBP</span>
+            <input id="balance-price-per-dollar-lbp" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Cost per Dollar USD</span>
+            <input id="balance-cost-per-dollar-usd" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
+          </label>
+
+          <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Price per Dollar USD</span>
+            <input id="balance-price-per-dollar-usd" type="number" step="any" min="0" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-purple-500">
           </label>
 
           <label class="block">
@@ -678,6 +693,7 @@
       ADD_ITEMS_COUNTER: "/category/addItemsCounter",
       EDIT_ITEMS_COUNTER: "/category/editItemsCounter",
       DELETE_ITEMS_COUNTER: "/category/deleteItemsCounter",
+      GET_ITEMS_BALANCE: "/category/getAllItemsBalance",
       ADD_ITEMS_BALANCE: "/category/addItemsBalance",
       EDIT_ITEMS_BALANCE: "/category/editItemsBalance",
       DELETE_ITEMS_BALANCE: "/category/deleteItemsBalance",
@@ -686,6 +702,7 @@
     let categoriesTree = [];
     let packageItems = [];
     let counterItems = [];
+    let balanceItems = [];
     const expandedCategories = new Set();
     const expandedSubcategories = new Set();
 
@@ -898,9 +915,35 @@
         );
     }
 
+    function normalizeBalanceItemsResponse(response) {
+      return getResponseArray(response, ["items", "balances", "itemsBalance", "items_balance"])
+        .map((item) => ({
+          ...item,
+          id: item.id,
+          childcategory_id: item.childcategory_id,
+          name: String(item.name ?? "Unnamed Balance Item"),
+          company: String(item.company ?? "").trim().toLowerCase(),
+          description: String(item.description ?? ""),
+          image_url: String(item.image_url ?? ""),
+          cost_per_dollar_lbp: toNumericValue(item.cost_per_dollar_lbp),
+          price_per_dollar_lbp: toNumericValue(item.price_per_dollar_lbp),
+          cost_per_dollar_usd: toNumericValue(item.cost_per_dollar_usd),
+          price_per_dollar_usd: toNumericValue(item.price_per_dollar_usd),
+          message_cost: toNumericValue(item.message_cost),
+          maximum_per_message: toNumericValue(item.maximum_per_message),
+          minimum_amount: toNumericValue(item.minimum_amount),
+          maximum_amount: toNumericValue(item.maximum_amount),
+          step_amount: toNumericValue(item.step_amount),
+          is_active: toBoolean(item.is_active, true),
+          sort_order: Math.trunc(toNumericValue(item.sort_order)),
+        }))
+        .filter((item) => item.id !== undefined && item.id !== null);
+    }
+
     function attachPackageItemsToTree() {
       const itemsByChild = new Map();
       const countersByChild = new Map();
+      const balancesByChild = new Map();
 
       packageItems.forEach((item) => {
         const key = String(item.childcategory_id ?? "");
@@ -912,6 +955,12 @@
         const key = String(item.childcategory_id ?? "");
         if (!countersByChild.has(key)) countersByChild.set(key, []);
         countersByChild.get(key).push(item);
+      });
+
+      balanceItems.forEach((item) => {
+        const key = String(item.childcategory_id ?? "");
+        if (!balancesByChild.has(key)) balancesByChild.set(key, []);
+        balancesByChild.get(key).push(item);
       });
 
       categoriesTree.forEach((category) => {
@@ -932,6 +981,9 @@
                 a.sort_order - b.sort_order ||
                 a.name.localeCompare(b.name, undefined, { numeric: true })
               );
+            childcategory.balance_items = (balancesByChild.get(String(childcategory.id)) || [])
+              .slice()
+              .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name));
           });
         });
       });
@@ -996,6 +1048,19 @@
         attachPackageItemsToTree();
         updateTreeStatistics();
         renderCategoriesTree();
+        showStatus(error.message, "error");
+      }
+    }
+
+    async function loadBalanceItems() {
+      try {
+        const response = await sendRequest("GET_ITEMS_BALANCE");
+        balanceItems = normalizeBalanceItemsResponse(response);
+        attachPackageItemsToTree();
+        updateTreeStatistics();
+        renderCategoriesTree();
+      } catch (error) {
+        balanceItems = [];
         showStatus(error.message, "error");
       }
     }
@@ -1208,7 +1273,8 @@
       const counters = Array.isArray(childcategory.counter_items)
         ? childcategory.counter_items
         : [];
-      const totalItems = items.length + counters.length;
+      const balances = Array.isArray(childcategory.balance_items) ? childcategory.balance_items : [];
+      const totalItems = items.length + counters.length + balances.length;
 
       return `
         <div class="overflow-hidden rounded-xl border border-purple-900/60 bg-purple-950/20">
@@ -1236,6 +1302,7 @@
                 <div class="grid grid-cols-1 gap-3">
                   ${items.map((item) => renderPackageItemNode(item)).join("")}
                   ${counters.map((item) => renderCounterItemNode(item)).join("")}
+                  ${balances.map((item) => renderBalanceItemNode(item)).join("")}
                 </div>
               `
               : `<div class="rounded-xl border border-dashed border-gray-700 px-4 py-5 text-center text-xs text-gray-500">No items inside this child category.</div>`}
@@ -1321,6 +1388,31 @@
           </div>
         </article>
       `;
+    }
+
+    function renderBalanceItemNode(item) {
+      return `
+        <article class="rounded-xl border border-purple-800 bg-purple-950/30 p-3">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h6 class="font-black text-purple-200">${escapeHtml(item.name)}</h6>
+                ${renderActiveBadge(item.is_active)}
+                <span class="rounded-lg border border-purple-700 px-2 py-1 text-[10px] font-black text-purple-300">BALANCE</span>
+                <span class="rounded-lg border border-blue-700 px-2 py-1 text-[10px] text-blue-300">${escapeHtml(item.company)}</span>
+              </div>
+              <div class="mt-2 flex flex-wrap gap-2 text-[10px] font-bold">
+                <span>LBP price: ${formatNumber(item.price_per_dollar_lbp)}</span>
+                <span>USD price: ${formatNumber(item.price_per_dollar_usd)}</span>
+                <span>Message: ${formatNumber(item.message_cost)}</span>
+                <span>Range: ${formatNumber(item.minimum_amount)} → ${formatNumber(item.maximum_amount)}</span>
+                <span>Step: ${formatNumber(item.step_amount)}</span>
+                <span>ID ${escapeHtml(item.id)}</span>
+              </div>
+            </div>
+            ${isSuperAdmin ? `<button type="button" onclick="openBalanceModal('edit', '', '${escapeJsString(item.id)}')" class="rounded-lg border border-purple-700 px-3 py-2 text-xs font-bold text-purple-300">Edit</button>` : ""}
+          </div>
+        </article>`;
     }
 
     function renderEntityImage(entity, sizeClass) {
@@ -1830,7 +1922,7 @@
       }
     }
 
-    function openBalanceModal(mode, childcategoryId = "") {
+    function openBalanceModal(mode, childcategoryId = "", itemId = "") {
       if (!isSuperAdmin) return;
 
       const form = document.getElementById("balance-form");
@@ -1838,17 +1930,37 @@
       document.getElementById("balance-mode").value = mode;
 
       const isCreate = mode === "create";
+      const item = isCreate ? null : balanceItems.find((entry) => String(entry.id) === String(itemId));
+      if (!isCreate && !item) {
+        showStatus("The selected balance item was not found.", "error");
+        return;
+      }
       document.getElementById("balance-id-field").classList.toggle("hidden", isCreate);
       document.getElementById("balance-edit-note").classList.toggle("hidden", isCreate);
       document.getElementById("balance-id").required = !isCreate;
-      document.getElementById("balance-is-active").value = isCreate ? "true" : "";
-      document.getElementById("balance-sort-order").value = isCreate ? "0" : "";
+      document.getElementById("balance-id").value = item?.id ?? "";
+      document.getElementById("balance-name").value = item?.name ?? "";
+      document.getElementById("balance-company").value = item?.company ?? "";
+      document.getElementById("balance-cost-per-dollar-lbp").value = item?.cost_per_dollar_lbp ?? 0;
+      document.getElementById("balance-price-per-dollar-lbp").value = item?.price_per_dollar_lbp ?? 0;
+      document.getElementById("balance-cost-per-dollar-usd").value = item?.cost_per_dollar_usd ?? 0;
+      document.getElementById("balance-price-per-dollar-usd").value = item?.price_per_dollar_usd ?? 0;
+      document.getElementById("balance-message-cost").value = item?.message_cost ?? 0;
+      document.getElementById("balance-maximum-per-message").value = item?.maximum_per_message ?? 3;
+      document.getElementById("balance-minimum-amount").value = item?.minimum_amount ?? 0.5;
+      document.getElementById("balance-maximum-amount").value = item?.maximum_amount ?? 30;
+      document.getElementById("balance-step-amount").value = item?.step_amount ?? 0.5;
+      document.getElementById("balance-is-active").value = String(item?.is_active ?? true);
+      document.getElementById("balance-sort-order").value = item?.sort_order ?? 0;
 
       const requiredIds = [
         "balance-childcategory-id",
         "balance-name",
-        "balance-cost-per-dollar",
-        "balance-price-per-dollar",
+        "balance-company",
+        "balance-cost-per-dollar-lbp",
+        "balance-price-per-dollar-lbp",
+        "balance-cost-per-dollar-usd",
+        "balance-price-per-dollar-usd",
         "balance-message-cost",
         "balance-maximum-per-message",
         "balance-minimum-amount",
@@ -1863,8 +1975,8 @@
 
       fillChildcategorySelect(
         "balance-childcategory-id",
-        childcategoryId,
-        !isCreate
+        item?.childcategory_id ?? childcategoryId,
+        false
       );
 
       document.getElementById("balance-modal-title").textContent =
@@ -1910,11 +2022,14 @@
       const textFields = {
         childcategory_id: "balance-childcategory-id",
         name: "balance-name",
+        company: "balance-company",
       };
 
       const numericFields = {
-        cost_per_dollar: "balance-cost-per-dollar",
-        price_per_dollar: "balance-price-per-dollar",
+        cost_per_dollar_lbp: "balance-cost-per-dollar-lbp",
+        price_per_dollar_lbp: "balance-price-per-dollar-lbp",
+        cost_per_dollar_usd: "balance-cost-per-dollar-usd",
+        price_per_dollar_usd: "balance-price-per-dollar-usd",
         message_cost: "balance-message-cost",
         maximum_per_message: "balance-maximum-per-message",
         minimum_amount: "balance-minimum-amount",
@@ -1972,6 +2087,7 @@
             : "Balance item updated successfully.",
           "success"
         );
+        await loadBalanceItems();
       } catch (error) {
         showStatus(error.message, "error");
       } finally {
@@ -2269,6 +2385,7 @@
     async function initializePage() {
       await loadCategoriesTree();
       await loadCounterItems();
+      await loadBalanceItems();
     }
 
     initializePage();
