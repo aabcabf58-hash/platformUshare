@@ -59,6 +59,112 @@
         html.light-mode #total-balance-modal [class*="text-gray-"] {
             color: #6b7280 !important;
         }
+
+        /* Complete light theme */
+        html.light-mode body {
+            background: #f3f6fa !important;
+            color: #1f2937 !important;
+        }
+
+        html.light-mode :is(
+            [class~="bg-gray-900"],
+            [class~="bg-gray-900/35"],
+            [class~="bg-gray-900/40"],
+            [class~="bg-gray-900/50"]
+        ) {
+            background-color: #ffffff !important;
+        }
+
+        html.light-mode :is(
+            [class~="bg-gray-800"],
+            [class~="bg-gray-700"],
+            [class~="bg-gray-700/30"],
+            [class~="bg-gray-700/40"]
+        ) {
+            background-color: #f8fafc !important;
+        }
+
+        html.light-mode :is(
+            [class~="border-gray-700"],
+            [class~="border-gray-600"]
+        ) {
+            border-color: #d6dce5 !important;
+        }
+
+        html.light-mode :is(
+            [class~="text-gray-100"],
+            [class~="text-gray-200"],
+            [class~="text-gray-300"]
+        ) {
+            color: #1f2937 !important;
+        }
+
+        html.light-mode :is(
+            [class~="text-gray-400"],
+            [class~="text-gray-500"],
+            [class~="text-gray-600"]
+        ) {
+            color: #64748b !important;
+        }
+
+        html.light-mode [class~="text-white"] {
+            color: #1f2937 !important;
+        }
+
+        html.light-mode :is(
+            [class*="bg-orange-"],
+            [class*="bg-green-"],
+            [class*="bg-emerald-"],
+            [class*="bg-purple-"],
+            [class*="bg-indigo-"],
+            [class*="bg-red-"],
+            [class*="bg-teal-"],
+            [class*="bg-cyan-"],
+            [class*="bg-blue-"]
+        )[class~="text-white"] {
+            color: #ffffff !important;
+        }
+
+        html.light-mode input,
+        html.light-mode select,
+        html.light-mode textarea {
+            background-color: #ffffff !important;
+            border-color: #cbd5e1 !important;
+            color: #111827 !important;
+        }
+
+        html.light-mode input::placeholder,
+        html.light-mode textarea::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        html.light-mode #page-header h1 span {
+            color: #334155 !important;
+        }
+
+        html.light-mode #floating-table-header,
+        html.light-mode #floating-table-header table,
+        html.light-mode #floating-table-header th {
+            background: #f8fafc !important;
+            border-color: #d6dce5 !important;
+            color: #334155 !important;
+        }
+
+        .header-button-row > * {
+            flex: 1 1 0;
+            min-width: 0;
+            justify-content: center;
+            overflow: hidden;
+            white-space: nowrap;
+            gap: clamp(2px, 0.45vw, 8px) !important;
+            padding: clamp(5px, 0.65vw, 10px) clamp(3px, 0.9vw, 16px) !important;
+            font-size: clamp(6px, 0.75vw, 14px) !important;
+        }
+
+        .header-button-row > * i {
+            flex-shrink: 0;
+            font-size: clamp(7px, 0.8vw, 14px);
+        }
     </style>
 
     <link rel="stylesheet" href="./theme.css">
@@ -82,7 +188,71 @@
                 </h1>
             </div>
 
-            <div class="flex flex-wrap gap-2">
+            <div class="flex w-full min-w-0 flex-col gap-2 sm:flex-1 sm:items-end">
+                <!-- Page navigation buttons -->
+                <nav
+                    aria-label="Page navigation"
+                    class="header-button-row flex w-full flex-nowrap gap-2 overflow-hidden rounded-2xl border border-gray-700 bg-gray-900/35 p-2"
+                >
+                    <a
+                        id="table-view-button"
+                        href="./index.html"
+                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-orange-600"
+                    >
+                        <i class="fa-solid fa-table"></i>
+                        Table View
+                    </a>
+
+                    <a
+                        id="groups-view-button"
+                        href="./groups.html"
+                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-200 shadow transition-all hover:bg-gray-600"
+                    >
+                        <i class="fa-solid fa-object-group"></i>
+                        Groups View
+                    </a>
+
+                    <a
+                        id="group-builder-view-button"
+                        href="./group-builder.html"
+                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-teal-700"
+                    >
+                        <i class="fa-solid fa-layer-group"></i>
+                        Auto Group Builder
+                    </a>
+
+                    <a
+                        id="admin-center-view-button"
+                        href="./admin-center.html"
+                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-cyan-700"
+                    >
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                        Admin Center
+                    </a>
+
+                    <button
+                        id="refresh-all-button"
+                        type="button"
+                        onclick="window.location.href='./refresh-all.html'"
+                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                        title="Open the filtered Refresh All page"
+                    >
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        Refresh All Page
+                    </button>
+
+                    <button
+                        type="button"
+                        onclick="logout()"
+                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-red-700"
+                    >
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Logout
+                    </button>
+                </nav>
+
+                <!-- Current-page action buttons -->
+                <div class="header-button-row flex w-full flex-nowrap gap-2 overflow-hidden rounded-2xl border border-gray-700 bg-gray-900/35 p-2">
                 <button
                     data-theme-toggle
                     type="button"
@@ -159,53 +329,6 @@
                     Remove from Group
                 </button>
 
-                <a
-                    id="table-view-button"
-                    href="./index.html"
-                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-orange-600"
-                >
-                    <i class="fa-solid fa-table"></i>
-                    Table View
-                </a>
-
-                <a
-                    id="groups-view-button"
-                    href="./groups.html"
-                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-200 shadow transition-all hover:bg-gray-600"
-                >
-                    <i class="fa-solid fa-object-group"></i>
-                    Groups View
-                </a>
-
-                <a
-                    id="group-builder-view-button"
-                    href="./group-builder.html"
-                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-teal-700"
-                >
-                    <i class="fa-solid fa-layer-group"></i>
-                    Auto Group Builder
-                </a>
-
-                <a
-                    id="admin-center-view-button"
-                    href="./admin-center.html"
-                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-cyan-700"
-                >
-                    <i class="fa-solid fa-screwdriver-wrench"></i>
-                    Admin Center
-                </a>
-
-                <button
-                    id="refresh-all-button"
-                    type="button"
-                    onclick="window.location.href='./refresh-all.html'"
-                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    title="Open the filtered Refresh All page"
-                >
-                    <i class="fa-solid fa-arrows-rotate"></i>
-                    Refresh All Page
-                </button>
-
                 <button
                     id="refresh-selected-button"
                     type="button"
@@ -217,15 +340,7 @@
                     Refresh Selected Numbers
                     (<span id="selected-count">0</span>)
                 </button>
-                <button
-                    type="button"
-                    onclick="logout()"
-                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-red-700"
-                >
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    Logout
-                </button>
-
+                </div>
             </div>
         </div>
     </header>

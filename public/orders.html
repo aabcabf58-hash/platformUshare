@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zouzou App - Orders Management</title>
+  <title>Zouzou App - Pending Orders</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
@@ -12,13 +12,14 @@
     <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
       <div class="flex items-center gap-3">
         <div class="rounded-lg bg-amber-600 p-2"><i class="fa-solid fa-cart-shopping"></i></div>
-        <h1 class="text-xl font-bold text-amber-300">Zouzou App <span class="font-normal text-white">| Orders</span></h1>
+        <h1 class="text-xl font-bold text-amber-300">Zouzou App <span class="font-normal text-white">| Pending Orders</span></h1>
       </div>
       <nav class="flex flex-wrap items-center justify-center gap-2">
         <button data-theme-toggle type="button" onclick="toggleTheme()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2"><i data-theme-icon class="fa-solid fa-sun"></i> <span data-theme-label>Light Mode</span></button>
         <a href="./index.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2">Main Table</a>
         <a href="./groups.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2">Groups</a>
         <a href="./years.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2">Years</a>
+        <a href="./all-orders.html" class="rounded-xl bg-indigo-600 px-3 py-2">All Orders</a>
         <a href="./admin-center.html" class="rounded-xl bg-cyan-600 px-3 py-2">Admin Center</a>
         <button type="button" onclick="logout()" class="rounded-xl bg-red-600 px-3 py-2">Logout</button>
       </nav>
@@ -30,11 +31,6 @@
       <div class="flex flex-col gap-4 lg:flex-row lg:items-end">
         <label class="flex-1 text-xs font-bold uppercase text-gray-400">Search
           <input id="search" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white" placeholder="Phone, target or item">
-        </label>
-        <label class="text-xs font-bold uppercase text-gray-400">Status
-          <select id="status" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3">
-            <option value="">All</option><option value="pending">Pending</option><option value="COMPLETED">Completed</option><option value="RETURNED">Returned</option>
-          </select>
         </label>
         <label class="text-xs font-bold uppercase text-gray-400">Type
           <select id="type" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3">
@@ -53,7 +49,7 @@
 
     <section class="overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-xl">
       <div class="flex items-center justify-between border-b border-gray-700 p-4">
-        <h2 class="text-xl font-black">Orders</h2><span id="count" class="rounded-full bg-gray-700 px-3 py-1 text-sm">0</span>
+        <h2 class="text-xl font-black">Pending Orders</h2><span id="count" class="rounded-full bg-gray-700 px-3 py-1 text-sm">0</span>
       </div>
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
@@ -97,7 +93,7 @@
 
     function queryString() {
       const params = new URLSearchParams({ limit: "500" });
-      const values = { search: "search", order_status: "status", item_type: "type", currency: "currency" };
+      const values = { search: "search", item_type: "type", currency: "currency" };
       Object.entries(values).forEach(([key, id]) => {
         const value = document.getElementById(id).value.trim();
         if (value) params.set(key, value);
@@ -136,7 +132,7 @@
       document.getElementById("reload").disabled = true;
       body.innerHTML = '<tr><td colspan="8" class="p-10 text-center">Loading...</td></tr>';
       try {
-        const result = await api(`/orders/getAllOrders?${queryString()}`);
+        const result = await api(`/orders/getAllPendingOrders?${queryString()}`);
         render(Array.isArray(result.data) ? result.data : []);
       } catch (error) {
         showMessage(error.message, "error");
@@ -163,7 +159,7 @@
     }
 
     document.getElementById("reload").addEventListener("click", loadOrders);
-    ["status", "type", "currency"].forEach((id) => document.getElementById(id).addEventListener("change", loadOrders));
+    ["type", "currency"].forEach((id) => document.getElementById(id).addEventListener("change", loadOrders));
     document.getElementById("search").addEventListener("keydown", (event) => { if (event.key === "Enter") loadOrders(); });
     loadOrders();
   </script>

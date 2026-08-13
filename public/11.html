@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zouzou App - Orders Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body class="min-h-screen bg-gray-900 text-gray-100">
+  <header class="sticky top-0 z-40 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+    <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
+      <div class="flex items-center gap-3">
+        <div class="rounded-lg bg-amber-600 p-2"><i class="fa-solid fa-cart-shopping"></i></div>
+        <h1 class="text-xl font-bold text-amber-300">Zouzou App <span class="font-normal text-white">| Orders</span></h1>
+      </div>
+      <nav class="flex flex-wrap items-center justify-center gap-2">
+        <button data-theme-toggle type="button" onclick="toggleTheme()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2"><i data-theme-icon class="fa-solid fa-sun"></i> <span data-theme-label>Light Mode</span></button>
+        <a href="./index.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2">Main Table</a>
+        <a href="./groups.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2">Groups</a>
+        <a href="./years.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2">Years</a>
+        <a href="./admin-center.html" class="rounded-xl bg-cyan-600 px-3 py-2">Admin Center</a>
+        <button type="button" onclick="logout()" class="rounded-xl bg-red-600 px-3 py-2">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[1700px] p-4 sm:p-6">
+    <section class="mb-5 rounded-3xl border border-amber-800 bg-gray-800 p-5 shadow-xl">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-end">
+        <label class="flex-1 text-xs font-bold uppercase text-gray-400">Search
+          <input id="search" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white" placeholder="Phone, target or item">
+        </label>
+        <label class="text-xs font-bold uppercase text-gray-400">Status
+          <select id="status" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3">
+            <option value="">All</option><option value="pending">Pending</option><option value="completed">Completed</option><option value="returned">Returned</option>
+          </select>
+        </label>
+        <label class="text-xs font-bold uppercase text-gray-400">Type
+          <select id="type" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3">
+            <option value="">All</option><option value="PACKAGE">Package</option><option value="COUNTER">Counter</option><option value="BALANCE">Balance</option>
+          </select>
+        </label>
+        <label class="text-xs font-bold uppercase text-gray-400">Currency
+          <select id="currency" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3">
+            <option value="">All</option><option value="LBP">LBP</option><option value="USD">USD</option>
+          </select>
+        </label>
+        <button id="reload" class="rounded-xl bg-amber-600 px-5 py-3 font-black text-white">Reload</button>
+      </div>
+      <div id="message" class="mt-4 hidden rounded-xl border p-3 text-sm"></div>
+    </section>
+
+    <section class="overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-xl">
+      <div class="flex items-center justify-between border-b border-gray-700 p-4">
+        <h2 class="text-xl font-black">Orders</h2><span id="count" class="rounded-full bg-gray-700 px-3 py-1 text-sm">0</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-gray-950 text-left text-xs uppercase text-gray-400"><tr>
+            <th class="p-3">Order</th><th class="p-3">Client / Target</th><th class="p-3">Item</th><th class="p-3">Value</th><th class="p-3">Price</th><th class="p-3">Status</th><th class="p-3">Date</th><th class="p-3">Actions</th>
+          </tr></thead>
+          <tbody id="ordersBody" class="divide-y divide-gray-700"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="./config.js"></script>
+  <script src="./auth.js"></script>
+  <script>
+    requireRole(["admin", "super_admin"]);
+
+    const body = document.getElementById("ordersBody");
+    const message = document.getElementById("message");
+
+    function escapeHtml(value) {
+      return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+    }
+
+    function showMessage(text, type = "info") {
+      message.textContent = text;
+      message.className = `mt-4 rounded-xl border p-3 text-sm ${type === "error" ? "border-red-700 bg-red-950 text-red-200" : "border-green-700 bg-green-950 text-green-200"}`;
+    }
+
+    async function api(path, options = {}) {
+      const response = await fetch(`${getApiBaseUrl()}${path}`, {
+        method: options.method || "GET",
+        headers: authHeaders(options.body === undefined ? {} : { "Content-Type": "application/json" }),
+        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (response.status === 401) { logout(); throw new Error("Session expired"); }
+      if (!response.ok || data.success === false) throw new Error(data.message || `Server returned ${response.status}`);
+      return data;
+    }
+
+    function queryString() {
+      const params = new URLSearchParams({ limit: "500" });
+      const values = { search: "search", order_status: "status", item_type: "type", currency: "currency" };
+      Object.entries(values).forEach(([key, id]) => {
+        const value = document.getElementById(id).value.trim();
+        if (value) params.set(key, value);
+      });
+      return params.toString();
+    }
+
+    function badge(status) {
+      const value = String(status || "").toLowerCase();
+      const color = value === "completed" ? "green" : value === "returned" ? "red" : "amber";
+      return `<span class="rounded-full border border-${color}-700 bg-${color}-950 px-2 py-1 text-xs font-bold text-${color}-300">${escapeHtml(value)}</span>`;
+    }
+
+    function render(orders) {
+      document.getElementById("count").textContent = orders.length;
+      if (!orders.length) {
+        body.innerHTML = '<tr><td colspan="8" class="p-10 text-center text-gray-400">No orders found</td></tr>';
+        return;
+      }
+      body.innerHTML = orders.map((order) => {
+        const pending = String(order.order_status).toLowerCase() === "pending";
+        return `<tr>
+          <td class="p-3 font-mono font-black">#${escapeHtml(order.id)}</td>
+          <td class="p-3"><div>${escapeHtml(order.client_numberphone)}</div><div class="text-xs text-gray-400">→ ${escapeHtml(order.target_identifier)}</div></td>
+          <td class="p-3"><div class="font-bold">${escapeHtml(order.item_name)}</div><div class="text-xs text-gray-400">${escapeHtml(order.item_type)} · ${escapeHtml(order.company)}</div></td>
+          <td class="p-3">${escapeHtml(order.package_value ?? "—")} ${escapeHtml(order.unit ?? "")}</td>
+          <td class="p-3 font-black">${Number(order.item_price || 0).toLocaleString()} ${escapeHtml(order.currency)}</td>
+          <td class="p-3">${badge(order.order_status)}</td>
+          <td class="p-3 text-xs">${order.created_at ? new Date(order.created_at).toLocaleString() : "—"}</td>
+          <td class="p-3">${pending ? `<div class="flex gap-2"><button onclick="editStatus(${Number(order.id)}, 'completed')" class="rounded-lg bg-green-600 px-3 py-2 text-xs font-bold">Complete</button><button onclick="editStatus(${Number(order.id)}, 'returned')" class="rounded-lg bg-red-600 px-3 py-2 text-xs font-bold">Return</button></div>` : "—"}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    async function loadOrders() {
+      document.getElementById("reload").disabled = true;
+      body.innerHTML = '<tr><td colspan="8" class="p-10 text-center">Loading...</td></tr>';
+      try {
+        const result = await api(`/orders/getAllOrders?${queryString()}`);
+        render(Array.isArray(result.data) ? result.data : []);
+      } catch (error) {
+        showMessage(error.message, "error");
+        render([]);
+      } finally {
+        document.getElementById("reload").disabled = false;
+      }
+    }
+
+    async function editStatus(orderId, orderStatus) {
+      let note = null;
+      if (orderStatus === "returned") {
+        note = window.prompt("Reason for returning this order:") ?? "";
+        if (!note.trim()) return;
+      }
+      if (!window.confirm(orderStatus === "returned" ? "Return this order and refund the wallet?" : "Mark this order as completed?")) return;
+      try {
+        const result = await api("/orders/editOrderStatus", { method: "PUT", body: { order_id: orderId, order_status: orderStatus, note } });
+        showMessage(result.message || "Order updated successfully");
+        await loadOrders();
+      } catch (error) {
+        showMessage(error.message, "error");
+      }
+    }
+
+    document.getElementById("reload").addEventListener("click", loadOrders);
+    ["status", "type", "currency"].forEach((id) => document.getElementById(id).addEventListener("change", loadOrders));
+    document.getElementById("search").addEventListener("keydown", (event) => { if (event.key === "Enter") loadOrders(); });
+    loadOrders();
+  </script>
+</body>
+</html>
