@@ -444,20 +444,6 @@
               <option value="false">Inactive</option>
             </select>
           </label>
-
-          <label class="block">
-            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Auto API</span>
-            <select id="item-auto-api" onchange="toggleItemApiFunctionField()" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500">
-              <option value="false">Disabled</option>
-              <option value="true">Enabled</option>
-            </select>
-          </label>
-
-          <label id="item-api-function-wrapper" class="hidden md:col-span-2">
-            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">API Function Name</span>
-            <input id="item-api-function" type="text" autocomplete="off" placeholder="topUpRechargeCard" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
-            <span class="mt-2 block text-xs text-gray-500">Write the server function name without parentheses.</span>
-          </label>
         </div>
 
         <div class="mt-6 flex gap-3">
@@ -886,8 +872,6 @@
           unit: String(item.unit ?? ""),
           validity_days: Math.max(0, Math.trunc(toNumericValue(item.validity_days ?? 0))),
           is_active: toBoolean(item.is_active, true),
-          auto_api: toBoolean(item.auto_api, false),
-          api_function: String(item.api_function ?? "").trim(),
           sort_order: Math.trunc(toNumericValue(item.sort_order)),
           raw: item,
         }))
@@ -1343,9 +1327,6 @@
                   ${renderActiveBadge(item.is_active)}
                   <span class="rounded-lg border border-cyan-800 bg-cyan-950/40 px-2 py-1 text-[10px] font-black uppercase text-cyan-300">Package</span>
                   <span class="rounded-lg border border-blue-800 bg-blue-950/30 px-2 py-1 text-[10px] font-black uppercase text-blue-300">${escapeHtml(item.company || "No company")}</span>
-                  ${item.auto_api
-                    ? `<span class="rounded-lg border border-emerald-700 bg-emerald-950/40 px-2 py-1 text-[10px] font-black uppercase text-emerald-300">Auto API · ${escapeHtml(item.api_function || "No function")}</span>`
-                    : `<span class="rounded-lg border border-gray-700 bg-gray-900 px-2 py-1 text-[10px] font-black uppercase text-gray-400">Manual</span>`}
                 </div>
                 ${item.description ? `<p class="mt-1 text-xs leading-5 text-gray-400">${escapeHtml(item.description)}</p>` : ""}
                 <div class="mt-2 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-wide">
@@ -1624,9 +1605,6 @@
       document.getElementById("item-validity-days").value = item?.validity_days ?? 0;
       document.getElementById("item-sort-order").value = item?.sort_order ?? 0;
       document.getElementById("item-is-active").value = String(item?.is_active ?? true);
-      document.getElementById("item-auto-api").value = String(item?.auto_api ?? false);
-      document.getElementById("item-api-function").value = item?.api_function ?? "";
-      toggleItemApiFunctionField();
 
       fillItemChildcategorySelect(childcategoryId);
       updateItemImagePreview();
@@ -1680,17 +1658,6 @@
       wrapper.classList.remove("hidden");
     }
 
-    function toggleItemApiFunctionField() {
-      const autoApi = getInputValue("item-auto-api") === "true";
-      const wrapper = document.getElementById("item-api-function-wrapper");
-      const input = document.getElementById("item-api-function");
-
-      wrapper.classList.toggle("hidden", !autoApi);
-      input.required = autoApi;
-
-      if (!autoApi) input.value = "";
-    }
-
     async function submitItemForm(event) {
       event.preventDefault();
       if (!isSuperAdmin) return;
@@ -1711,8 +1678,6 @@
       const validity_days = Number(getInputValue("item-validity-days"));
       const sort_order = Number(getInputValue("item-sort-order"));
       const is_active = toBoolean(getInputValue("item-is-active"), true);
-      const auto_api = getInputValue("item-auto-api") === "true";
-      const api_function = getInputValue("item-api-function");
       const submitButton = document.getElementById("item-submit-button");
 
       if (!childcategory_id || !name || !company) {
@@ -1740,16 +1705,6 @@
         return;
       }
 
-      if (auto_api && !api_function) {
-        showStatus("API function name is required when Auto API is enabled.", "error");
-        return;
-      }
-
-      if (auto_api && !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(api_function)) {
-        showStatus("API function name is not valid. Write the function name without parentheses.", "error");
-        return;
-      }
-
       const body = {
         childcategory_id,
         name,
@@ -1764,8 +1719,6 @@
         unit: unit || null,
         validity_days,
         is_active,
-        auto_api,
-        api_function: auto_api ? api_function : null,
         sort_order,
       };
 
