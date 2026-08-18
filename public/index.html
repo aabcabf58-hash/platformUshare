@@ -340,6 +340,19 @@
                     Refresh Selected Numbers
                     (<span id="selected-count">0</span>)
                 </button>
+
+                <button
+                    id="check-selected-groups-button"
+                    type="button"
+                    onclick="checkSelectedGroupLines()"
+                    disabled
+                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    title="Check the selected numbers and update their groups"
+                >
+                    <i class="fa-solid fa-check-double"></i>
+                    Check Selected
+                    (<span id="check-selected-count">0</span>)
+                </button>
                 </div>
             </div>
         </div>
@@ -1002,6 +1015,9 @@
 
         const EDIT_GROUP_API =
             `${API_BASE_URL}/api/ushare/editGroup`;
+
+        const CHECK_REMOVE_GROUP_API =
+            `${API_BASE_URL}/api/ushare/checkAndRemoveUshareGroups`;
 
         // The current server endpoint checks the Alfa account and inserts or
         // updates the number in the database.
@@ -4618,12 +4634,20 @@
             const groupCount =
                 document.getElementById('group-selected-count');
 
+            const checkSelectedCount =
+                document.getElementById('check-selected-count');
+
             const copyButton =
                 document.getElementById('copy-selected-button');
 
             const refreshSelectedButton =
                 document.getElementById(
                     'refresh-selected-button'
+                );
+
+            const checkSelectedButton =
+                document.getElementById(
+                    'check-selected-groups-button'
                 );
 
             const addToGroupButton =
@@ -4643,6 +4667,11 @@
                 groupCount.textContent = String(checkedCount);
             }
 
+            if (checkSelectedCount) {
+                checkSelectedCount.textContent =
+                    String(checkedCount);
+            }
+
             if (copyButton) {
                 copyButton.disabled =
                     checkedCount === 0 ||
@@ -4651,6 +4680,13 @@
 
             if (refreshSelectedButton) {
                 refreshSelectedButton.disabled =
+                    checkedCount === 0 ||
+                    isBulkRefreshing ||
+                    isGroupUpdating;
+            }
+
+            if (checkSelectedButton) {
+                checkSelectedButton.disabled =
                     checkedCount === 0 ||
                     isBulkRefreshing ||
                     isGroupUpdating;
@@ -4680,6 +4716,105 @@
                     '.line-checkbox:checked'
                 )
             ).map((checkbox) => String(checkbox.value));
+        }
+
+        async function checkSelectedGroupLines() {
+            const selectedPhones =
+                getSelectedPhoneNumbers()
+                    .map((numberphone) =>
+                        String(numberphone ?? '').trim()
+                    )
+                    .filter(Boolean);
+
+            if (!selectedPhones.length) {
+                showGlobalStatus(
+                    'Select at least one line first.',
+                    'error'
+                );
+                return;
+            }
+
+            if (!confirm(
+                `Check ${selectedPhones.length} selected number(s)?`
+            )) {
+                return;
+            }
+
+            const button = document.getElementById(
+                'check-selected-groups-button'
+            );
+
+            const originalHtml =
+                button?.innerHTML || '';
+
+            try {
+                if (button) {
+                    button.disabled = true;
+                    button.innerHTML = `
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        Checking...
+                    `;
+                }
+
+                showGlobalStatus(
+                    `Checking ${selectedPhones.length} selected number(s)...`,
+                    'info'
+                );
+
+                const response = await fetch(
+                    CHECK_REMOVE_GROUP_API,
+                    {
+                        method: 'PUT',
+                        headers: authHeaders(),
+                        body: JSON.stringify({
+                            numberphones: selectedPhones
+                        })
+                    }
+                );
+
+                const result =
+                    await readJsonResponse(response);
+
+                if (
+                    !response.ok ||
+                    result.success !== true
+                ) {
+                    throw new Error(
+                        result.message ||
+                        `Server returned ${response.status}`
+                    );
+                }
+
+                await loadTableData();
+
+                if (button) {
+                    button.innerHTML = originalHtml;
+                }
+
+                updateSelectedCount();
+
+                showGlobalStatus(
+                    `${selectedPhones.length} selected number(s) checked: ${result.updated_count ?? 0} updated, ${result.skipped_count ?? 0} skipped, ${result.line_error_count ?? 0} line error.`,
+                    'success'
+                );
+            } catch (error) {
+                console.error(
+                    'Check selected group lines error:',
+                    error
+                );
+
+                showGlobalStatus(
+                    `Unable to check the selected numbers: ${error.message}`,
+                    'error'
+                );
+
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalHtml;
+                }
+
+                updateSelectedCount();
+            }
         }
 
         function openAddToGroupModal() {
@@ -6121,6 +6256,19 @@
                 document.querySelectorAll(
                     '.line-checkbox:checked'
                 ).length === 0;
+
+            const checkSelectedButton =
+                document.getElementById(
+                    'check-selected-groups-button'
+                );
+
+            if (checkSelectedButton) {
+                checkSelectedButton.disabled =
+                    disabled ||
+                    document.querySelectorAll(
+                        '.line-checkbox:checked'
+                    ).length === 0;
+            }
 
             document.getElementById(
                 'select-all-checkbox'
