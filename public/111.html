@@ -187,9 +187,6 @@
         const EDIT_GROUP_API =
             `${API_BASE_URL}/api/ushare/editGroup`;
 
-        const CHECK_REMOVE_GROUP_API =
-            `${API_BASE_URL}/api/ushare/checkAndRemoveUshareGroups`;
-
         const CREATE_YEAR_API =
             `${API_BASE_URL}/api/ushare/createYears`;
 
@@ -622,16 +619,6 @@
 
                                         <button
                                             type="button"
-                                            onclick="checkGroupLines('${escapeJsString(groupId)}', this)"
-                                            class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg bg-emerald-600 px-2 text-[11px] font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-                                            title="Check all numbers in this group and remove valid lines"
-                                        >
-                                            <i class="fa-solid fa-list-check"></i>
-                                            Check Group
-                                        </button>
-
-                                        <button
-                                            type="button"
                                             onclick="renameGroup(${groupIndex}, this)"
                                             class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg bg-amber-600 px-2 text-[11px] font-semibold text-white transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
                                             title="Change group name or ID"
@@ -774,18 +761,6 @@
                         </div>
 
                         <div class="flex shrink-0 items-center gap-1">
-                            <button
-                                type="button"
-                                onclick="checkSingleGroupLine(
-                                    '${escapeJsString(line.numberphone || '')}',
-                                    this
-                                )"
-                                class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded border border-emerald-700 bg-emerald-500/10 text-emerald-300 transition hover:bg-emerald-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                                title="Check this number and remove it from the group when valid"
-                            >
-                                <i class="fa-solid fa-check text-[10px]"></i>
-                            </button>
-
                             <button
                                 type="button"
                                 onclick="refreshSingleLine(
@@ -1780,187 +1755,6 @@
 
                     buttonElement.innerHTML =
                         originalHtml;
-                }
-            }
-        }
-
-        async function sendGroupCheckRequest(numberphones) {
-            const response = await fetch(
-                CHECK_REMOVE_GROUP_API,
-                {
-                    method: 'PUT',
-                    headers: getJsonHeaders(),
-                    body: JSON.stringify({
-                        numberphones
-                    })
-                }
-            );
-
-            const result =
-                await readJsonResponse(response);
-
-            if (!response.ok || result.success !== true) {
-                throw new Error(
-                    result.message ||
-                    `Server returned ${response.status}`
-                );
-            }
-
-            return result;
-        }
-
-        async function checkGroupLines(
-            groupId,
-            buttonElement
-        ) {
-            const group = findGroupById(groupId);
-
-            if (!group) {
-                showStatus(
-                    `Group ${groupId} was not found.`,
-                    'error'
-                );
-                return;
-            }
-
-            const numberphones = group[1]
-                .map((line) =>
-                    String(line?.numberphone ?? '').trim()
-                )
-                .filter(Boolean);
-
-            if (!numberphones.length) {
-                showStatus(
-                    `Group ${groupId} has no valid numbers.`,
-                    'error'
-                );
-                return;
-            }
-
-            if (!confirm(
-                `Check all ${numberphones.length} number(s) in group "${groupId}"?`
-            )) {
-                return;
-            }
-
-            const originalHtml =
-                buttonElement?.innerHTML || '';
-
-            try {
-                if (buttonElement) {
-                    buttonElement.disabled = true;
-                    buttonElement.innerHTML = `
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        Checking...
-                    `;
-                }
-
-                showStatus(
-                    `Checking ${numberphones.length} number(s) in group ${groupId}...`,
-                    'info'
-                );
-
-                const result =
-                    await sendGroupCheckRequest(numberphones);
-
-                await loadGroupsData();
-
-                showStatus(
-                    `Group ${groupId} checked: ${result.updated_count ?? 0} updated, ${result.skipped_count ?? 0} skipped, ${result.line_error_count ?? 0} line error.`,
-                    'success'
-                );
-            } catch (error) {
-                console.error(
-                    'Check group lines error:',
-                    error
-                );
-
-                showStatus(
-                    `Unable to check group ${groupId}: ${error.message}`,
-                    'error'
-                );
-
-                if (
-                    buttonElement &&
-                    buttonElement.isConnected
-                ) {
-                    buttonElement.disabled = false;
-                    buttonElement.innerHTML = originalHtml;
-                }
-            }
-        }
-
-        async function checkSingleGroupLine(
-            numberphone,
-            buttonElement
-        ) {
-            const cleanPhone =
-                String(numberphone ?? '').trim();
-
-            if (!cleanPhone) {
-                showStatus(
-                    'Phone number is required.',
-                    'error'
-                );
-                return;
-            }
-
-            if (!confirm(
-                `Check number ${cleanPhone}?`
-            )) {
-                return;
-            }
-
-            const originalHtml =
-                buttonElement?.innerHTML || '';
-
-            try {
-                if (buttonElement) {
-                    buttonElement.disabled = true;
-                    buttonElement.innerHTML =
-                        '<i class="fa-solid fa-spinner fa-spin text-[10px]"></i>';
-                }
-
-                showStatus(
-                    `Checking ${cleanPhone}...`,
-                    'info'
-                );
-
-                const result =
-                    await sendGroupCheckRequest([
-                        cleanPhone
-                    ]);
-
-                await loadGroupsData();
-
-                const lineResult =
-                    Array.isArray(result.results)
-                        ? result.results[0]
-                        : null;
-
-                showStatus(
-                    `${cleanPhone}: ${lineResult?.result || lineResult?.reason || 'checked successfully'}.`,
-                    lineResult?.result === 'LINE_ERROR'
-                        ? 'error'
-                        : 'success'
-                );
-            } catch (error) {
-                console.error(
-                    'Check single group line error:',
-                    error
-                );
-
-                showStatus(
-                    `Unable to check ${cleanPhone}: ${error.message}`,
-                    'error'
-                );
-
-                if (
-                    buttonElement &&
-                    buttonElement.isConnected
-                ) {
-                    buttonElement.disabled = false;
-                    buttonElement.innerHTML = originalHtml;
                 }
             }
         }
