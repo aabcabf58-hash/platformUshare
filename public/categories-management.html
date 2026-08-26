@@ -747,6 +747,11 @@
           </label>
 
           <label class="block">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Split Text On</span>
+            <input id="days-split-text-on" type="number" step="1" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-amber-500">
+          </label>
+
+          <label class="block">
             <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-500">Sort Order</span>
             <input id="days-sort-order" type="number" step="1" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono outline-none focus:border-amber-500">
           </label>
@@ -1072,6 +1077,7 @@
           base_sene: toNumericValue(item.base_sene),
           balance_plus_price_per_dollar: toNumericValue(item.balance_plus_price_per_dollar),
           balance_minus_price_per_dollar: toNumericValue(item.balance_minus_price_per_dollar),
+          split_text_on: Math.trunc(toNumericValue(item.split_text_on)),
           active: toBoolean(item.active, true),
           is_active: toBoolean(item.active, true),
           auto_api: toBoolean(item.auto_api, false),
@@ -1628,6 +1634,7 @@
                 <span>Base Sene: ${formatNumber(item.base_sene)}</span>
                 <span>Plus/$: ${formatNumber(item.balance_plus_price_per_dollar)}</span>
                 <span>Minus/$: ${formatNumber(item.balance_minus_price_per_dollar)}</span>
+                <span>Split On: ${formatNumber(item.split_text_on)}</span>
                 ${item.api_function ? `<span>API: ${escapeHtml(item.api_function)}</span>` : ""}
                 <span>ID ${escapeHtml(item.id)}</span>
               </div>
@@ -2381,6 +2388,7 @@
       document.getElementById("days-base-sene").value = item?.base_sene ?? 0;
       document.getElementById("days-balance-plus-price-per-dollar").value = item?.balance_plus_price_per_dollar ?? 0;
       document.getElementById("days-balance-minus-price-per-dollar").value = item?.balance_minus_price_per_dollar ?? 0;
+      document.getElementById("days-split-text-on").value = item?.split_text_on ?? 0;
       document.getElementById("days-active").value = String(item?.active ?? true);
       document.getElementById("days-auto-api").value = String(item?.auto_api ?? false);
       document.getElementById("days-api-function").value = item?.api_function ?? "";
@@ -2435,6 +2443,7 @@
         base_sene: Number(getInputValue("days-base-sene")),
         balance_plus_price_per_dollar: Number(getInputValue("days-balance-plus-price-per-dollar")),
         balance_minus_price_per_dollar: Number(getInputValue("days-balance-minus-price-per-dollar")),
+        split_text_on: Number(getInputValue("days-split-text-on")),
         active: toBoolean(getInputValue("days-active"), true),
         auto_api,
         api_function: auto_api ? api_function : null,
@@ -2454,6 +2463,7 @@
         body.base_sene,
         body.balance_plus_price_per_dollar,
         body.balance_minus_price_per_dollar,
+        body.split_text_on,
         body.sort_order,
       ];
 
@@ -2470,6 +2480,11 @@
         body.balance_minus_price_per_dollar,
       ].some((value) => value < 0)) {
         showStatus("Days price and base fields cannot be negative.", "error");
+        return;
+      }
+
+      if (!Number.isInteger(body.split_text_on)) {
+        showStatus("Split Text On must be an integer.", "error");
         return;
       }
 

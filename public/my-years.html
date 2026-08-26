@@ -478,7 +478,7 @@
                     year.year_name,
                     year.status,
                     year.split_text,
-                    year.number_client,
+                    year.client_numberphone ,
                     year.buyer_numberphone,
                     year.number1,
                     year.number2,
@@ -543,7 +543,7 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 p-4 md:grid-cols-3 xl:grid-cols-6">
-                        ${detail('Client', year.number_client)}
+                        ${detail('Client', year.client_numberphone )}
                         ${detail('Buyer', year.buyer_numberphone)}
                         ${detail('Final price', year.final_year_price)}
                         ${detail('Refund', year.refund_amount)}
