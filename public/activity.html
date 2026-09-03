@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zouzou App - All Activity</title>
+  <script src="./theme.js?v=admin-colors-20260727-2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="./theme.css?v=admin-colors-20260727-2">
+  <style>
+    html.light-mode body {
+      background: #eef1f4 !important;
+      color: #1f2937 !important;
+    }
+
+    html.light-mode header {
+      background: #f8fafc !important;
+      border-color: #d1d5db !important;
+    }
+
+    html.light-mode header h1 span {
+      color: #1f2937 !important;
+    }
+
+    html.light-mode header nav [class*="bg-gray-"] {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #374151 !important;
+    }
+
+    html.light-mode header nav [class*="bg-gray-"]:hover {
+      background: #e5e7eb !important;
+    }
+
+    html.light-mode main > section {
+      background: #ffffff !important;
+      border-color: #d1d5db !important;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08) !important;
+    }
+
+    html.light-mode main h2,
+    html.light-mode main td {
+      color: #1f2937 !important;
+    }
+
+    html.light-mode main label,
+    html.light-mode main [class*="text-gray-400"] {
+      color: #6b7280 !important;
+    }
+
+    html.light-mode main input,
+    html.light-mode main select {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #111827 !important;
+    }
+
+    html.light-mode main input::placeholder {
+      color: #9ca3af !important;
+    }
+
+    html.light-mode table thead {
+      background: #f1f5f9 !important;
+      color: #475569 !important;
+    }
+
+    html.light-mode table tbody {
+      background: #ffffff !important;
+    }
+
+    html.light-mode table tbody tr {
+      border-color: #e5e7eb !important;
+    }
+
+    html.light-mode table tbody tr:hover {
+      background: #f8fafc !important;
+    }
+
+    html.light-mode main [class*="bg-gray-700"] {
+      background: #e5e7eb !important;
+      border-color: #cbd5e1 !important;
+      color: #374151 !important;
+    }
+
+    html.light-mode main [class*="bg-green-950"] {
+      background: #dcfce7 !important;
+      border-color: #86efac !important;
+      color: #166534 !important;
+    }
+
+    html.light-mode main [class*="bg-red-950"] {
+      background: #fee2e2 !important;
+      border-color: #fca5a5 !important;
+      color: #991b1b !important;
+    }
+
+    html.light-mode main [class*="bg-amber-950"] {
+      background: #fef3c7 !important;
+      border-color: #fcd34d !important;
+      color: #92400e !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-900 text-gray-100">
+  <header class="sticky top-0 z-40 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+    <div class="flex flex-col items-center justify-between gap-4 xl:flex-row">
+      <div class="flex items-center gap-3">
+        <div class="rounded-lg bg-violet-600 p-2"><i class="fa-solid fa-clock-rotate-left"></i></div>
+        <h1 class="text-xl font-bold text-violet-300">Zouzou App <span class="font-normal text-white">| All Activity</span></h1>
+      </div>
+      <nav class="flex flex-wrap items-center justify-center gap-2">
+        <button data-theme-toggle type="button" onclick="toggleTheme()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2"><i data-theme-icon class="fa-solid fa-sun"></i> <span data-theme-label>Light Mode</span></button>
+        <a href="./index.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2">Main Table</a>
+        <a href="./groups.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2">Groups</a>
+        <a href="./years.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2">Years</a>
+        <a href="./all-orders.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2">All Orders</a>
+        <a href="./activity.html" class="rounded-xl bg-violet-600 px-3 py-2">Activity</a>
+        <a href="./admin-center.html" class="rounded-xl bg-cyan-600 px-3 py-2">Admin Center</a>
+        <button type="button" onclick="logout()" class="rounded-xl bg-red-600 px-3 py-2">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[1700px] p-4 sm:p-6">
+    <section class="mb-5 rounded-3xl border border-violet-800 bg-gray-800 p-5 shadow-xl">
+      <div class="mb-4 flex flex-wrap gap-2" id="periodButtons">
+        <button type="button" data-period="all" class="period-button rounded-xl border border-gray-600 bg-gray-700 px-4 py-2 font-bold">All</button>
+        <button type="button" data-period="1d" class="period-button rounded-xl bg-violet-600 px-4 py-2 font-bold text-white">1 Day</button>
+        <button type="button" data-period="1w" class="period-button rounded-xl border border-gray-600 bg-gray-700 px-4 py-2 font-bold">1 Week</button>
+        <button type="button" data-period="1m" class="period-button rounded-xl border border-gray-600 bg-gray-700 px-4 py-2 font-bold">1 Month</button>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-6 xl:items-end">
+        <label class="text-xs font-bold uppercase text-gray-400 xl:col-span-2">Search anything
+          <input id="search" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white" placeholder="Client, target, type, amount, status...">
+        </label>
+
+        <label class="text-xs font-bold uppercase text-gray-400">From
+          <input id="fromDate" type="date" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white">
+        </label>
+
+        <label class="text-xs font-bold uppercase text-gray-400">To
+          <input id="toDate" type="date" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white">
+        </label>
+
+        <label class="text-xs font-bold uppercase text-gray-400">Currency
+          <select id="currency" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white">
+            <option value="">All</option>
+            <option value="LBP">LBP</option>
+            <option value="USD">USD</option>
+          </select>
+        </label>
+
+        <label class="text-xs font-bold uppercase text-gray-400">Direction
+          <select id="direction" class="mt-2 w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white">
+            <option value="">All</option>
+            <option value="CREDIT">Credit</option>
+            <option value="DEBIT">Debit</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="mt-4 flex flex-wrap gap-2">
+        <button id="applyDates" type="button" class="rounded-xl bg-violet-600 px-5 py-3 font-black text-white"><i class="fa-solid fa-filter mr-2"></i>Apply dates</button>
+        <button id="reload" type="button" class="rounded-xl bg-amber-600 px-5 py-3 font-black text-white"><i class="fa-solid fa-rotate mr-2"></i>Reload</button>
+        <button id="clearFilters" type="button" class="rounded-xl border border-gray-600 bg-gray-700 px-5 py-3 font-bold">Clear filters</button>
+      </div>
+
+      <div id="message" class="mt-4 hidden rounded-xl border p-3 text-sm"></div>
+    </section>
+
+    <section class="overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-xl">
+      <div class="flex items-center justify-between border-b border-gray-700 p-4">
+        <h2 class="text-xl font-black">Activity</h2>
+        <span id="count" class="rounded-full bg-gray-700 px-3 py-1 text-sm">0</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead class="bg-gray-950 text-left text-xs uppercase text-gray-400">
+            <tr>
+              <th class="p-3">ID</th>
+              <th class="p-3">Client</th>
+              <th class="p-3">Target</th>
+              <th class="p-3">Type</th>
+              <th class="p-3">Amount</th>
+              <th class="p-3">Balance</th>
+              <th class="p-3">Currency</th>
+              <th class="p-3">Status</th>
+              <th class="p-3">Date</th>
+            </tr>
+          </thead>
+          <tbody id="activityBody" class="divide-y divide-gray-700"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="./config.js"></script>
+  <script src="./auth.js"></script>
+  <script>
+    requireRole(["admin", "super_admin"]);
+
+    const GET_ALL_ACTIVITY_PATH = "/auth/getAllActivity";
+
+    const body = document.getElementById("activityBody");
+    const message = document.getElementById("message");
+    const reloadButton = document.getElementById("reload");
+
+    let selectedPeriod = "1d";
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function showMessage(text, type = "info") {
+      message.textContent = text;
+      message.className = `mt-4 rounded-xl border p-3 text-sm ${type === "error" ? "border-red-700 bg-red-950 text-red-200" : "border-green-700 bg-green-950 text-green-200"}`;
+    }
+
+    function hideMessage() {
+      message.classList.add("hidden");
+      message.textContent = "";
+    }
+
+    async function api(path, options = {}) {
+      const response = await fetch(`${getApiBaseUrl()}${path}`, {
+        method: options.method || "GET",
+        headers: authHeaders(options.body === undefined ? {} : { "Content-Type": "application/json" }),
+        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 401) {
+        logout();
+        throw new Error("Session expired");
+      }
+
+      if (!response.ok || data.success === false) {
+        throw new Error(data.message || `Server returned ${response.status}`);
+      }
+
+      return data;
+    }
+
+    function setPeriod(period, load = true) {
+      selectedPeriod = period;
+
+      if (["all", "1d", "1w", "1m"].includes(period)) {
+        document.getElementById("fromDate").value = "";
+        document.getElementById("toDate").value = "";
+      }
+
+      document.querySelectorAll(".period-button").forEach((button) => {
+        const active = button.dataset.period === period;
+        button.className = active
+          ? "period-button rounded-xl bg-violet-600 px-4 py-2 font-bold text-white"
+          : "period-button rounded-xl border border-gray-600 bg-gray-700 px-4 py-2 font-bold";
+      });
+
+      if (load) loadActivity();
+    }
+
+    function activateCustomDates() {
+      selectedPeriod = "custom";
+
+      document.querySelectorAll(".period-button").forEach((button) => {
+        button.className = "period-button rounded-xl border border-gray-600 bg-gray-700 px-4 py-2 font-bold";
+      });
+    }
+
+    function queryString() {
+      const params = new URLSearchParams({ limit: "500" });
+
+      const search = document.getElementById("search").value.trim();
+      const currency = document.getElementById("currency").value.trim();
+      const direction = document.getElementById("direction").value.trim();
+      const fromDate = document.getElementById("fromDate").value;
+      const toDate = document.getElementById("toDate").value;
+
+      if (["1d", "1w", "1m"].includes(selectedPeriod)) params.set("period", selectedPeriod);
+
+      if (selectedPeriod === "custom") {
+        if (fromDate) params.set("from", fromDate);
+        if (toDate) params.set("to", toDate);
+      }
+
+      if (search) params.set("search", search);
+      if (currency) params.set("currency", currency);
+      if (direction) params.set("direction", direction);
+
+      return params.toString();
+    }
+
+    function statusBadge(status) {
+      const value = String(status || "—");
+      const normalized = value.toUpperCase();
+      let classes = "border-amber-700 bg-amber-950 text-amber-300";
+
+      if (normalized === "COMPLETE" || normalized === "COMPLETED") {
+        classes = "border-green-700 bg-green-950 text-green-300";
+      } else if (normalized === "RETURNED" || normalized === "FAILED") {
+        classes = "border-red-700 bg-red-950 text-red-300";
+      }
+
+      return `<span class="rounded-full border px-2 py-1 text-xs font-bold ${classes}">${escapeHtml(value)}</span>`;
+    }
+
+    function directionBadge(direction) {
+      const value = String(direction || "—").toUpperCase();
+      const classes = value === "CREDIT"
+        ? "border-green-700 bg-green-950 text-green-300"
+        : "border-red-700 bg-red-950 text-red-300";
+
+      return `<span class="rounded-full border px-2 py-1 text-xs font-bold ${classes}">${escapeHtml(value)}</span>`;
+    }
+
+    function formatAmount(value) {
+      if (value === null || value === undefined || value === "") return "—";
+      const numericValue = Number(value);
+
+      return Number.isFinite(numericValue)
+        ? numericValue.toLocaleString(undefined, { maximumFractionDigits: 2 })
+        : escapeHtml(value);
+    }
+
+    function render(activities) {
+      document.getElementById("count").textContent = activities.length;
+
+      if (!activities.length) {
+        body.innerHTML = '<tr><td colspan="9" class="p-10 text-center text-gray-400">No activity found</td></tr>';
+        return;
+      }
+
+      body.innerHTML = activities.map((activity) => `<tr class="hover:bg-gray-700/40">
+        <td class="p-3 font-mono font-black">#${escapeHtml(activity.id)}</td>
+        <td class="p-3 font-semibold">${escapeHtml(activity.client_numberphone || "—")}</td>
+        <td class="p-3">${escapeHtml(activity.target_identifier || "—")}</td>
+        <td class="p-3"><div class="font-bold">${escapeHtml(activity.activity_type || "—")}</div><div class="mt-1 text-xs text-gray-400">${escapeHtml(activity.description || "")}</div><div class="mt-1">${directionBadge(activity.direction)}</div></td>
+        <td class="p-3 font-black">${formatAmount(activity.amount)}</td>
+        <td class="p-3 text-xs"><div><span class="text-gray-400">Before:</span> ${formatAmount(activity.balance_before)}</div><div class="mt-1"><span class="text-gray-400">After:</span> ${formatAmount(activity.balance_after)}</div></td>
+        <td class="p-3 font-bold">${escapeHtml(activity.currency || "—")}</td>
+        <td class="p-3">${statusBadge(activity.status)}</td>
+        <td class="p-3 text-xs">${activity.created_at ? new Date(activity.created_at).toLocaleString() : "—"}</td>
+      </tr>`).join("");
+    }
+
+    async function loadActivity() {
+      hideMessage();
+      reloadButton.disabled = true;
+      body.innerHTML = '<tr><td colspan="9" class="p-10 text-center">Loading...</td></tr>';
+
+      try {
+        const result = await api(`${GET_ALL_ACTIVITY_PATH}?${queryString()}`);
+        render(Array.isArray(result.data) ? result.data : []);
+      } catch (error) {
+        showMessage(error.message, "error");
+        render([]);
+      } finally {
+        reloadButton.disabled = false;
+      }
+    }
+
+    document.querySelectorAll(".period-button").forEach((button) => {
+      button.addEventListener("click", () => setPeriod(button.dataset.period));
+    });
+
+    document.getElementById("fromDate").addEventListener("change", activateCustomDates);
+    document.getElementById("toDate").addEventListener("change", activateCustomDates);
+    document.getElementById("applyDates").addEventListener("click", () => {
+      activateCustomDates();
+      loadActivity();
+    });
+    reloadButton.addEventListener("click", loadActivity);
+    document.getElementById("currency").addEventListener("change", loadActivity);
+    document.getElementById("direction").addEventListener("change", loadActivity);
+    document.getElementById("search").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") loadActivity();
+    });
+
+    document.getElementById("clearFilters").addEventListener("click", () => {
+      document.getElementById("search").value = "";
+      document.getElementById("currency").value = "";
+      document.getElementById("direction").value = "";
+      setPeriod("1d");
+    });
+
+    loadActivity();
+  </script>
+</body>
+</html>

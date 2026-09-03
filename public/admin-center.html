@@ -91,6 +91,18 @@
       border-color: #fcd34d !important;
     }
 
+    html.light-mode main > section.grid > a[href="./all-orders.html"] {
+      background-color: #eef2ff !important;
+      background-image: linear-gradient(135deg, #eef2ff, #ffffff) !important;
+      border-color: #a5b4fc !important;
+    }
+
+    html.light-mode main > section.grid > a[href="./activity.html"] {
+      background-color: #f5f3ff !important;
+      background-image: linear-gradient(135deg, #f5f3ff, #ffffff) !important;
+      border-color: #c4b5fd !important;
+    }
+
     html.light-mode .admin-card h3,
     html.light-mode main > section.grid > article h3 {
       color: #1f2937 !important;
@@ -124,6 +136,14 @@
 
     html.light-mode .admin-card [class*="text-amber-300"] {
       color: #a16207 !important;
+    }
+
+    html.light-mode .admin-card [class*="text-indigo-300"] {
+      color: #4338ca !important;
+    }
+
+    html.light-mode .admin-card [class*="text-violet-300"] {
+      color: #6d28d9 !important;
     }
   </style>
 </head>
@@ -186,11 +206,11 @@
             <span id="current-role-badge" class="rounded-full border border-gray-600 bg-gray-800 px-3 py-1 text-xs font-bold text-gray-300">Role: -</span>
           </div>
           <h2 class="text-3xl font-black text-white">Choose an administration section</h2>
-          <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-300">Each responsibility now has its own page, so users, categories, and recharge cards are no longer mixed together.</p>
+          <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-300">Each responsibility has its own page for users, categories, all orders, pending orders, and activity.</p>
         </div>
         <div class="rounded-2xl border border-cyan-800 bg-cyan-950/40 px-5 py-4 text-center">
           <div class="text-xs font-bold uppercase tracking-wide text-cyan-400">Available Sections</div>
-          <div class="mt-1 text-3xl font-black text-cyan-300">3</div>
+          <div class="mt-1 text-3xl font-black text-cyan-300">5</div>
         </div>
       </div>
     </section>
@@ -214,24 +234,32 @@
         <div class="mt-6 font-black text-purple-300">Open Categories <i class="fa-solid fa-arrow-right ml-2 transition group-hover:translate-x-1"></i></div>
       </a>
 
-      <a href="./orders.html" class="admin-card group flex min-h-64 flex-col justify-between rounded-3xl border border-amber-800 bg-gradient-to-br from-amber-950/60 to-gray-800 p-6 shadow-xl hover:border-amber-500 hover:shadow-amber-950/40">
+      <a href="./all-orders.html" class="admin-card group flex min-h-64 flex-col justify-between rounded-3xl border border-indigo-800 bg-gradient-to-br from-indigo-950/60 to-gray-800 p-6 shadow-xl hover:border-indigo-500 hover:shadow-indigo-950/40">
         <div>
-          <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-600 text-2xl text-white shadow"><i class="fa-solid fa-cart-shopping"></i></div>
-          <h3 class="text-2xl font-black text-white">Orders</h3>
-          <p class="mt-3 leading-6 text-gray-300">Review package, counter and balance orders, then complete or return them.</p>
+          <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-600 text-2xl text-white shadow"><i class="fa-solid fa-list-check"></i></div>
+          <h3 class="text-2xl font-black text-white">All Orders</h3>
+          <p class="mt-3 leading-6 text-gray-300">Review all package, counter and balance orders in every status.</p>
         </div>
-        <div class="mt-6 font-black text-amber-300">Open Orders <i class="fa-solid fa-arrow-right ml-2 transition group-hover:translate-x-1"></i></div>
+        <div class="mt-6 font-black text-indigo-300">Open All Orders <i class="fa-solid fa-arrow-right ml-2 transition group-hover:translate-x-1"></i></div>
       </a>
 
-      <article class="flex min-h-64 flex-col justify-between rounded-3xl border border-gray-700 bg-gray-800/70 p-6 opacity-75 shadow-xl">
+      <a href="./orders.html" class="admin-card group flex min-h-64 flex-col justify-between rounded-3xl border border-amber-800 bg-gradient-to-br from-amber-950/60 to-gray-800 p-6 shadow-xl hover:border-amber-500 hover:shadow-amber-950/40">
         <div>
-          <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-700 text-2xl text-gray-300"><i class="fa-solid fa-chart-line"></i></div>
-          <div class="mb-2 inline-flex rounded-full border border-gray-600 bg-gray-900 px-3 py-1 text-[10px] font-black uppercase tracking-wide text-gray-400">Coming Soon</div>
-          <h3 class="text-2xl font-black text-white">Reports &amp; Activity</h3>
-          <p class="mt-3 leading-6 text-gray-400">A future page for system-wide transactions, sales reports, and administrative audit history.</p>
+          <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-600 text-2xl text-white shadow"><i class="fa-solid fa-hourglass-half"></i></div>
+          <h3 class="text-2xl font-black text-white">Pending Orders</h3>
+          <p class="mt-3 leading-6 text-gray-300">Open only pending orders to complete them or return them to the client.</p>
         </div>
-        <div class="mt-6 font-bold text-gray-500">Not active yet</div>
-      </article>
+        <div class="mt-6 font-black text-amber-300">Open Pending Orders <i class="fa-solid fa-arrow-right ml-2 transition group-hover:translate-x-1"></i></div>
+      </a>
+
+      <a href="./activity.html" class="admin-card group flex min-h-64 flex-col justify-between rounded-3xl border border-violet-800 bg-gradient-to-br from-violet-950/60 to-gray-800 p-6 shadow-xl hover:border-violet-500 hover:shadow-violet-950/40">
+        <div>
+          <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-600 text-2xl text-white shadow"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          <h3 class="text-2xl font-black text-white">Activity</h3>
+          <p class="mt-3 leading-6 text-gray-300">Search wallet activity and filter transactions by day, week, month, or a custom date range.</p>
+        </div>
+        <div class="mt-6 font-black text-violet-300">Open Activity <i class="fa-solid fa-arrow-right ml-2 transition group-hover:translate-x-1"></i></div>
+      </a>
     </section>
   </main>
 
