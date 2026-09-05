@@ -1077,7 +1077,7 @@
           base_sene: toNumericValue(item.base_sene),
           balance_plus_price_per_dollar: toNumericValue(item.balance_plus_price_per_dollar),
           balance_minus_price_per_dollar: toNumericValue(item.balance_minus_price_per_dollar),
-          split_text_on: Math.trunc(toNumericValue(item.split_text_on)),
+          split_text_on:  toNumericValue(toNumericValue(item.split_text_on)),
           active: toBoolean(item.active, true),
           is_active: toBoolean(item.active, true),
           auto_api: toBoolean(item.auto_api, false),
@@ -2483,8 +2483,8 @@
         return;
       }
 
-      if (!Number.isInteger(body.split_text_on)) {
-        showStatus("Split Text On must be an integer.", "error");
+      if (!Number.isFinite(body.split_text_on) ||  body.split_text_on < 0 ||  !Number.isInteger(body.split_text_on * 2)) {
+        showStatus("Split Text On must be in steps of 0.5.", "error");
         return;
       }
 
