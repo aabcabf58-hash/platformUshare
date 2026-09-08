@@ -397,6 +397,11 @@
             <textarea id="item-description" rows="3" class="w-full resize-y rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500"></textarea>
           </label>
 
+          <label id="item-sms-wrapper" class="hidden">
+            <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">SMS</span>
+            <input id="item-sms" type="text" autocomplete="off" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500" placeholder="SMS text">
+          </label>
+
           <label class="block md:col-span-2">
             <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Image URL</span>
             <input id="item-image-url" type="url" placeholder="https://..." class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500">
@@ -985,6 +990,7 @@
           name: String(item.name ?? "Unnamed Item"),
           company: String(item.company ?? "").trim().toUpperCase(),
           description: String(item.description ?? ""),
+          SMS: String(item.SMS ?? item.sms ?? ""),
           image_url: String(item.image_url ?? item.image ?? ""),
           cost_lbp: toNumericValue(item.cost_lbp ?? item.cost ?? 0),
           price_lbp: toNumericValue(item.price_lbp ?? item.price ?? 0),
@@ -1826,6 +1832,11 @@
       document.getElementById("item-name").value = item?.name ?? "";
       document.getElementById("item-company").value = item?.company ?? "";
       document.getElementById("item-description").value = item?.description ?? "";
+      document.getElementById("item-sms").value = item?.SMS ?? "";
+      document.getElementById("item-sms-wrapper").classList.toggle(
+        "hidden",
+        mode !== "edit"
+      );
       document.getElementById("item-image-url").value = item?.image_url ?? "";
       document.getElementById("item-cost-lbp").value = item?.cost_lbp ?? 0;
       document.getElementById("item-price-lbp").value = item?.price_lbp ?? 0;
@@ -1913,6 +1924,7 @@
       const name = getInputValue("item-name");
       const company = getInputValue("item-company").toUpperCase();
       const description = getInputValue("item-description");
+      const SMS = getInputValue("item-sms");
       const image_url = getInputValue("item-image-url");
       const cost_lbp = Number(getInputValue("item-cost-lbp"));
       const price_lbp = Number(getInputValue("item-price-lbp"));
@@ -1981,7 +1993,10 @@
         sort_order,
       };
 
-      if (mode === "edit") body.id = id;
+      if (mode === "edit") {
+        body.id = id;
+        body.SMS = SMS || null;
+      }
 
       submitButton.disabled = true;
 

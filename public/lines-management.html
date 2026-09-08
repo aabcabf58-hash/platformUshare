@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zouzou App - Balance Lines</title>
+  <script src="./theme.js?v=lines-20260906-1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./theme.css?v=lines-20260906-1">
+  <style>
+    .tab.active { background:#059669; border-color:#10b981; color:#fff; }
+    .modal-open { display:flex !important; }
+    html.light-mode body { background:#eef2f3 !important; color:#111827 !important; }
+    html.light-mode .surface, html.light-mode header, html.light-mode .modal-card { background:#fff !important; border-color:#d1d5db !important; }
+    html.light-mode .main-text { color:#111827 !important; }
+    html.light-mode .muted-text { color:#4b5563 !important; }
+    html.light-mode input, html.light-mode select { background:#fff !important; color:#111827 !important; border-color:#9ca3af !important; }
+    html.light-mode thead { background:#e5e7eb !important; color:#374151 !important; }
+    html.light-mode tbody tr { border-color:#e5e7eb !important; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-900 font-sans text-gray-100">
+  <header class="sticky top-0 z-40 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+    <div class="mx-auto flex max-w-[1500px] flex-col items-center justify-between gap-4 xl:flex-row">
+      <div class="flex items-center gap-3">
+        <div class="rounded-xl bg-emerald-600 p-3 text-white"><i class="fa-solid fa-sim-card"></i></div>
+        <div><h1 class="main-text text-xl font-black text-white">Balance Lines</h1><p class="muted-text text-xs text-gray-400">Lines and activity management</p></div>
+      </div>
+      <nav class="flex flex-wrap items-center justify-center gap-2">
+        <button data-theme-toggle type="button" onclick="toggleTheme()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-bold text-gray-200"><i data-theme-icon class="fa-solid fa-sun"></i> <span data-theme-label>Light Mode</span></button>
+        <a href="./admin-center.html" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-bold text-gray-200"><i class="fa-solid fa-arrow-left mr-2"></i>Admin Center</a>
+        <button type="button" onclick="logout()" class="rounded-xl bg-red-600 px-3 py-2 text-sm font-bold text-white"><i class="fa-solid fa-right-from-bracket mr-2"></i>Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-[1500px] px-4 py-7">
+    <div id="statusBox" class="mb-4 hidden rounded-xl border p-3 text-sm font-bold"></div>
+
+    <section class="mb-5 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <div class="surface rounded-2xl border border-gray-700 bg-gray-800 p-4"><p class="muted-text text-xs text-gray-400">Total lines</p><strong id="statTotalLines" class="main-text mt-1 block text-2xl text-white">0</strong></div>
+      <div class="surface rounded-2xl border border-emerald-800 bg-emerald-950/30 p-4"><p class="text-xs text-emerald-400">Available</p><strong id="statAvailable" class="mt-1 block text-2xl text-emerald-300">0</strong></div>
+      <div class="surface rounded-2xl border border-red-800 bg-red-950/30 p-4"><p class="text-xs text-red-400">Unavailable</p><strong id="statUnavailable" class="mt-1 block text-2xl text-red-300">0</strong></div>
+      <div class="surface rounded-2xl border border-amber-800 bg-amber-950/30 p-4"><p class="text-xs text-amber-400">Created</p><strong id="statCreated" class="mt-1 block text-2xl text-amber-300">0</strong></div>
+      <div class="surface rounded-2xl border border-cyan-800 bg-cyan-950/30 p-4"><p class="text-xs text-cyan-400">Pending</p><strong id="statPending" class="mt-1 block text-2xl text-cyan-300">0</strong></div>
+      <div class="surface rounded-2xl border border-green-800 bg-green-950/30 p-4"><p class="text-xs text-green-400">Completed</p><strong id="statCompleted" class="mt-1 block text-2xl text-green-300">0</strong></div>
+    </section>
+
+    <section class="surface overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
+      <div class="flex flex-col gap-3 border-b border-gray-700 p-4 md:flex-row md:items-center md:justify-between">
+        <div class="flex gap-2">
+          <button id="linesTab" type="button" onclick="openTab('lines')" class="tab active rounded-xl border border-gray-600 px-4 py-2 text-sm font-black">Lines</button>
+          <button id="activityTab" type="button" onclick="openTab('activity')" class="tab rounded-xl border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-black">Line Activity</button>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" onclick="refreshCurrentTab()" class="rounded-xl border border-gray-600 bg-gray-700 px-4 py-2 text-sm font-bold"><i class="fa-solid fa-rotate mr-2"></i>Refresh</button>
+          <button id="addLineButton" type="button" onclick="openLineModal()" class="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-black text-white"><i class="fa-solid fa-plus mr-2"></i>Add line</button>
+        </div>
+      </div>
+
+      <div id="linesPanel" class="p-4">
+        <div class="mb-4 grid gap-3 md:grid-cols-3">
+          <input id="lineSearch" oninput="renderLines()" type="search" placeholder="Search number or company" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 outline-none focus:border-emerald-500">
+          <select id="lineAvailability" onchange="renderLines()" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3"><option value="ALL">All availability</option><option value="true">Available</option><option value="false">Unavailable</option></select>
+          <select id="lineCompany" onchange="renderLines()" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3"><option value="ALL">All companies</option></select>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border border-gray-700">
+          <table class="w-full min-w-[1050px] text-left text-sm">
+            <thead class="bg-gray-900 text-xs uppercase text-gray-400"><tr><th class="p-3">Number</th><th class="p-3">Company</th><th class="p-3">Balance</th><th class="p-3">Available</th><th class="p-3">Balance service</th><th class="p-3">Gift</th><th class="p-3">Validity</th><th class="p-3">Actions</th></tr></thead>
+            <tbody id="linesBody" class="divide-y divide-gray-700"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="activityPanel" class="hidden p-4">
+        <div class="mb-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <input id="activitySearch" oninput="renderActivity()" type="search" placeholder="Sender, target or order ID" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 outline-none focus:border-emerald-500">
+          <select id="activityStatus" onchange="renderActivity()" class="rounded-xl border border-gray-600 bg-gray-900 px-4 py-3"><option value="ALL">All statuses</option><option>CREATED</option><option>PENDING</option><option>COMPLETED</option></select>
+          <button type="button" onclick="loadActivity(false)" class="rounded-xl border border-gray-600 bg-gray-700 px-4 py-3 font-bold">Load all</button>
+          <button type="button" onclick="loadActivity(true)" class="rounded-xl border border-amber-700 bg-amber-950/40 px-4 py-3 font-bold text-amber-300">Load CREATED only</button>
+        </div>
+        <div class="overflow-x-auto rounded-2xl border border-gray-700">
+          <table class="w-full min-w-[1450px] text-left text-sm">
+            <thead class="bg-gray-900 text-xs uppercase text-gray-400"><tr><th class="p-3">Sender</th><th class="p-3">Target</th><th class="p-3">Before</th><th class="p-3">After</th><th class="p-3">Pure</th><th class="p-3">Total</th><th class="p-3">Order</th><th class="p-3">Status</th><th class="p-3">SMS</th><th class="p-3">Created</th><th class="p-3">Change status</th></tr></thead>
+            <tbody id="activityBody" class="divide-y divide-gray-700"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="lineModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4">
+    <div class="modal-card max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-gray-700 bg-gray-800 p-6 shadow-2xl">
+      <div class="mb-5 flex items-center justify-between"><h2 id="lineModalTitle" class="main-text text-xl font-black text-white">Add line</h2><button type="button" onclick="closeLineModal()" class="text-2xl text-gray-400">&times;</button></div>
+      <form id="lineForm" class="grid gap-4 md:grid-cols-2">
+        <input id="lineMode" type="hidden" value="create">
+        <label><span class="muted-text mb-2 block text-xs font-bold text-gray-400">Numberphone</span><input id="formNumberphone" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3"></label>
+        <label><span class="muted-text mb-2 block text-xs font-bold text-gray-400">Company</span><input id="formCompany" required placeholder="ALFA" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3"></label>
+        <label><span class="muted-text mb-2 block text-xs font-bold text-gray-400">Balance</span><input id="formBalance" required type="number" step="0.01" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3"></label>
+        <label><span class="muted-text mb-2 block text-xs font-bold text-gray-400">Available</span><select id="formAvailable" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3"><option value="true">True</option><option value="false">False</option></select></label>
+        <label><span class="muted-text mb-2 block text-xs font-bold text-gray-400">Balance service</span><select id="formIsBalance" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3"><option value="true">True</option><option value="false">False</option></select></label>
+        <label><span class="muted-text mb-2 block text-xs font-bold text-gray-400">Gift service</span><select id="formGift" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3"><option value="true">True</option><option value="false">False</option></select></label>
+        <label><span class="muted-text mb-2 block text-xs font-bold text-gray-400">Validity service</span><select id="formValidity" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3"><option value="true">True</option><option value="false">False</option></select></label>
+        <div class="flex items-end gap-3"><button type="button" onclick="closeLineModal()" class="flex-1 rounded-xl border border-gray-600 bg-gray-700 px-4 py-3 font-bold">Cancel</button><button id="saveLineButton" type="submit" class="flex-1 rounded-xl bg-emerald-600 px-4 py-3 font-black text-white">Save</button></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="./config.js"></script>
+  <script src="./auth.js"></script>
+  <script>
+    requireRole(["admin", "super_admin"]);
+
+    const API = {
+      lines: "/tableLines/getAllLinesBalance",
+      createLine: "/tableLines/createLineBalance",
+      editLine: "/tableLines/editLineBalance",
+      activity: "/tableLines/getAllActivityLines",
+      createdActivity: "/tableLines/getAllActivityLinesCreated",
+      editStatus: "/tableLines/editActivityLineStatus",
+    };
+
+    const currentUser = getUser() || parseJwtPayload(getToken()) || {};
+    const role = String(currentUser.role || "").trim().toLowerCase().replaceAll("-", "_").replaceAll(" ", "_");
+    const isSuperAdmin = role === "super_admin";
+    let lines = [];
+    let activities = [];
+    let currentTab = "lines";
+
+    if (!isSuperAdmin) document.getElementById("addLineButton").classList.add("hidden");
+
+    function escapeHtml(value) {
+      return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+    }
+    function escapeJs(value) { return String(value ?? "").replaceAll("\\", "\\\\").replaceAll("'", "\\'").replaceAll("\n", "\\n").replaceAll("\r", "\\r"); }
+    function boolValue(value) { return value === true || value === "true" || value === 1 || value === "1"; }
+    function badge(value) { return boolValue(value) ? '<span class="rounded-lg border border-emerald-700 bg-emerald-950/40 px-2 py-1 text-xs font-bold text-emerald-300">YES</span>' : '<span class="rounded-lg border border-red-800 bg-red-950/40 px-2 py-1 text-xs font-bold text-red-300">NO</span>'; }
+    function formatNumber(value) { const n = Number(value); return Number.isFinite(n) ? new Intl.NumberFormat("en-US", { maximumFractionDigits:2 }).format(n) : "-"; }
+    function formatDate(value) { if (!value) return "-"; const date = new Date(value); return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString(); }
+
+    function showStatus(message, type = "info") {
+      const box = document.getElementById("statusBox");
+      const styles = { info:"border-blue-700 bg-blue-950/40 text-blue-300", success:"border-emerald-700 bg-emerald-950/40 text-emerald-300", error:"border-red-700 bg-red-950/40 text-red-300" };
+      box.className = `mb-4 rounded-xl border p-3 text-sm font-bold ${styles[type] || styles.info}`;
+      box.textContent = message;
+      box.classList.remove("hidden");
+    }
+
+    async function apiRequest(path, options = {}) {
+      const token = getToken();
+      if (!token) { logout(); throw new Error("Token not found"); }
+      const response = await fetch(`${getApiBaseUrl()}${path}`, {
+        method: options.method || "GET",
+        headers: { Authorization:`Bearer ${token}`, ...(options.body !== undefined ? { "Content-Type":"application/json" } : {}), ...(options.headers || {}) },
+        body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+      });
+      const text = await response.text();
+      let data = {};
+      try { data = text ? JSON.parse(text) : {}; } catch (_) { data = { raw:text }; }
+      if (response.status === 401) { logout(); throw new Error(data.message || "Session expired"); }
+      if (!response.ok || data.success === false) throw new Error(data.message || data.error || `Request failed (${response.status})`);
+      return data;
+    }
+
+    function responseArray(data) {
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data.data)) return data.data;
+      if (Array.isArray(data.items)) return data.items;
+      return [];
+    }
+
+    async function loadLines() {
+      try { lines = responseArray(await apiRequest(API.lines)); fillCompanyFilter(); renderLines(); updateStats(); }
+      catch (error) { showStatus(error.message, "error"); }
+    }
+
+    async function loadActivity(createdOnly = false) {
+      try { activities = responseArray(await apiRequest(createdOnly ? API.createdActivity : API.activity)); renderActivity(); updateStats(); }
+      catch (error) { showStatus(error.message, "error"); }
+    }
+
+    function fillCompanyFilter() {
+      const select = document.getElementById("lineCompany");
+      const oldValue = select.value;
+      const companies = [...new Set(lines.map(item => String(item.company || "").trim().toUpperCase()).filter(Boolean))].sort();
+      select.innerHTML = '<option value="ALL">All companies</option>' + companies.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("");
+      if (companies.includes(oldValue)) select.value = oldValue;
+    }
+
+    function renderLines() {
+      const query = document.getElementById("lineSearch").value.trim().toLowerCase();
+      const availability = document.getElementById("lineAvailability").value;
+      const company = document.getElementById("lineCompany").value;
+      const filtered = lines.filter(item => {
+        const matchText = !query || String(item.numberphone || "").toLowerCase().includes(query) || String(item.company || "").toLowerCase().includes(query);
+        const matchAvailability = availability === "ALL" || String(boolValue(item.is_available)) === availability;
+        const matchCompany = company === "ALL" || String(item.company || "").trim().toUpperCase() === company;
+        return matchText && matchAvailability && matchCompany;
+      });
+      document.getElementById("linesBody").innerHTML = filtered.length ? filtered.map(item => `
+        <tr class="border-gray-700 hover:bg-gray-700/30">
+          <td class="p-3 font-mono font-bold">${escapeHtml(item.numberphone)}</td><td class="p-3 font-black">${escapeHtml(item.company)}</td><td class="p-3 font-mono">${formatNumber(item.balance)}</td>
+          <td class="p-3">${badge(item.is_available)}</td><td class="p-3">${badge(item.is_balance)}</td><td class="p-3">${badge(item.gift)}</td><td class="p-3">${badge(item.validity)}</td>
+          <td class="p-3"><div class="flex gap-2">${isSuperAdmin ? `<button type="button" onclick="openEditLine('${escapeJs(item.numberphone)}')" class="rounded-lg bg-cyan-700 px-3 py-2 text-xs font-bold text-white">Edit</button>` : ""}<button type="button" onclick="showLineActivity('${escapeJs(item.numberphone)}')" class="rounded-lg bg-violet-700 px-3 py-2 text-xs font-bold text-white">Activity</button></div></td>
+        </tr>`).join("") : '<tr><td colspan="8" class="p-10 text-center text-gray-400">No lines found.</td></tr>';
+    }
+
+    function renderActivity() {
+      const query = document.getElementById("activitySearch").value.trim().toLowerCase();
+      const wantedStatus = document.getElementById("activityStatus").value;
+      const filtered = activities.filter(item => {
+        const haystack = `${item.numberphone_sender || ""} ${item.target_identifier || ""} ${item.order_id || ""}`.toLowerCase();
+        return (!query || haystack.includes(query)) && (wantedStatus === "ALL" || String(item.status || "").toUpperCase() === wantedStatus);
+      });
+      document.getElementById("activityBody").innerHTML = filtered.length ? filtered.map(item => {
+        const status = String(item.status || "").trim().toUpperCase();
+        const sms = String(item.sms ?? item.SMS ?? "");
+        const statusControl = isSuperAdmin
+          ? `<select onchange="changeActivityStatus('${escapeJs(item.order_id)}', this.value, this)" class="rounded-lg border border-gray-600 bg-gray-900 px-2 py-2 text-xs"><option value="">Choose</option><option>CREATED</option><option>PENDING</option><option>COMPLETED</option></select>`
+          : "-";
+        return `<tr class="border-gray-700 hover:bg-gray-700/30"><td class="p-3 font-mono">${escapeHtml(item.numberphone_sender)}</td><td class="p-3 font-mono">${escapeHtml(item.target_identifier)}</td><td class="p-3">${formatNumber(item.balance_before)}</td><td class="p-3">${formatNumber(item.balance_after)}</td><td class="p-3">${formatNumber(item.amount_sent_pure)}</td><td class="p-3">${formatNumber(item.amount_sent_total)}</td><td class="p-3 font-mono">${escapeHtml(item.order_id)}</td><td class="p-3 font-black">${escapeHtml(status || "-")}</td><td class="max-w-52 truncate p-3" title="${escapeHtml(sms)}">${escapeHtml(sms || "-")}</td><td class="whitespace-nowrap p-3">${escapeHtml(formatDate(item.created_at))}</td><td class="p-3">${statusControl}</td></tr>`;
+      }).join("") : '<tr><td colspan="11" class="p-10 text-center text-gray-400">No activity found.</td></tr>';
+    }
+
+    function updateStats() {
+      document.getElementById("statTotalLines").textContent = lines.length;
+      document.getElementById("statAvailable").textContent = lines.filter(item => boolValue(item.is_available)).length;
+      document.getElementById("statUnavailable").textContent = lines.filter(item => !boolValue(item.is_available)).length;
+      document.getElementById("statCreated").textContent = activities.filter(item => String(item.status || "").toUpperCase() === "CREATED").length;
+      document.getElementById("statPending").textContent = activities.filter(item => String(item.status || "").toUpperCase() === "PENDING").length;
+      document.getElementById("statCompleted").textContent = activities.filter(item => String(item.status || "").toUpperCase() === "COMPLETED").length;
+    }
+
+    function openTab(tab) {
+      currentTab = tab;
+      document.getElementById("linesPanel").classList.toggle("hidden", tab !== "lines");
+      document.getElementById("activityPanel").classList.toggle("hidden", tab !== "activity");
+      document.getElementById("linesTab").classList.toggle("active", tab === "lines");
+      document.getElementById("activityTab").classList.toggle("active", tab === "activity");
+      document.getElementById("addLineButton").classList.toggle("hidden", tab !== "lines" || !isSuperAdmin);
+    }
+
+    function refreshCurrentTab() { currentTab === "lines" ? loadLines() : loadActivity(false); }
+    function showLineActivity(numberphone) { openTab("activity"); document.getElementById("activitySearch").value = numberphone; loadActivity(false); }
+    function openEditLine(numberphone) { const item = lines.find(value => String(value.numberphone) === String(numberphone)); if (item) openLineModal(item); }
+
+    function openLineModal(item = null) {
+      document.getElementById("lineMode").value = item ? "edit" : "create";
+      document.getElementById("lineModalTitle").textContent = item ? "Edit line" : "Add line";
+      document.getElementById("formNumberphone").value = item?.numberphone ?? "";
+      document.getElementById("formNumberphone").readOnly = Boolean(item);
+      document.getElementById("formCompany").value = item?.company ?? "";
+      document.getElementById("formBalance").value = item?.balance ?? "0";
+      document.getElementById("formAvailable").value = String(boolValue(item?.is_available ?? true));
+      document.getElementById("formIsBalance").value = String(boolValue(item?.is_balance ?? true));
+      document.getElementById("formGift").value = String(boolValue(item?.gift ?? false));
+      document.getElementById("formValidity").value = String(boolValue(item?.validity ?? false));
+      document.getElementById("lineModal").classList.add("modal-open");
+    }
+    function closeLineModal() { document.getElementById("lineModal").classList.remove("modal-open"); }
+
+    document.getElementById("lineForm").addEventListener("submit", async event => {
+      event.preventDefault();
+      const mode = document.getElementById("lineMode").value;
+      const body = {
+        numberphone:document.getElementById("formNumberphone").value.trim(),
+        balance:Number(document.getElementById("formBalance").value),
+        is_available:boolValue(document.getElementById("formAvailable").value),
+        company:document.getElementById("formCompany").value.trim(),
+        gift:boolValue(document.getElementById("formGift").value),
+        validity:boolValue(document.getElementById("formValidity").value),
+        is_balance:boolValue(document.getElementById("formIsBalance").value),
+      };
+      if (!body.numberphone || !body.company || !Number.isFinite(body.balance)) { showStatus("Number, company and valid balance are required.", "error"); return; }
+      const button = document.getElementById("saveLineButton"); button.disabled = true;
+      try {
+        await apiRequest(mode === "create" ? API.createLine : API.editLine, { method:mode === "create" ? "POST" : "PUT", body });
+        closeLineModal(); showStatus(mode === "create" ? "Line created successfully." : "Line updated successfully.", "success"); await loadLines();
+      } catch (error) { showStatus(error.message, "error"); }
+      finally { button.disabled = false; }
+    });
+
+    async function changeActivityStatus(orderId, status, select) {
+      if (!status) return;
+      if (!confirm(`Change order ${orderId} status to ${status}?`)) { select.value = ""; return; }
+      select.disabled = true;
+      try { await apiRequest(API.editStatus, { method:"PUT", body:{ order_id:Number(orderId), status } }); showStatus("Activity status updated successfully.", "success"); await loadActivity(false); }
+      catch (error) { showStatus(error.message, "error"); select.value = ""; }
+      finally { select.disabled = false; }
+    }
+
+    Promise.all([loadLines(), loadActivity(false)]);
+  </script>
+</body>
+</html>
