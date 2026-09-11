@@ -81,8 +81,8 @@
           <button type="button" onclick="loadActivity(true)" class="rounded-xl border border-amber-700 bg-amber-950/40 px-4 py-3 font-bold text-amber-300">Load CREATED only</button>
         </div>
         <div class="overflow-x-auto rounded-2xl border border-gray-700">
-          <table class="w-full min-w-[1450px] text-left text-sm">
-            <thead class="bg-gray-900 text-xs uppercase text-gray-400"><tr><th class="p-3">Sender</th><th class="p-3">Target</th><th class="p-3">Before</th><th class="p-3">After</th><th class="p-3">Pure</th><th class="p-3">Total</th><th class="p-3">Order</th><th class="p-3">Status</th><th class="p-3">SMS</th><th class="p-3">Created</th><th class="p-3">Change status</th></tr></thead>
+          <table class="w-full min-w-[1650px] text-left text-sm">
+            <thead class="bg-gray-900 text-xs uppercase text-gray-400"><tr><th class="p-3">Sender</th><th class="p-3">Target</th><th class="p-3">Company</th><th class="p-3">Item type</th><th class="p-3">Before</th><th class="p-3">After</th><th class="p-3">Pure</th><th class="p-3">Total</th><th class="p-3">Order</th><th class="p-3">Status</th><th class="p-3">SMS</th><th class="p-3">Created</th><th class="p-3">Change status</th></tr></thead>
             <tbody id="activityBody" class="divide-y divide-gray-700"></tbody>
           </table>
         </div>
@@ -219,8 +219,8 @@
         const statusControl = isSuperAdmin
           ? `<select onchange="changeActivityStatus('${escapeJs(item.order_id)}', this.value, this)" class="rounded-lg border border-gray-600 bg-gray-900 px-2 py-2 text-xs"><option value="">Choose</option><option>CREATED</option><option>PENDING</option><option>COMPLETED</option></select>`
           : "-";
-        return `<tr class="border-gray-700 hover:bg-gray-700/30"><td class="p-3 font-mono">${escapeHtml(item.numberphone_sender)}</td><td class="p-3 font-mono">${escapeHtml(item.target_identifier)}</td><td class="p-3">${formatNumber(item.balance_before)}</td><td class="p-3">${formatNumber(item.balance_after)}</td><td class="p-3">${formatNumber(item.amount_sent_pure)}</td><td class="p-3">${formatNumber(item.amount_sent_total)}</td><td class="p-3 font-mono">${escapeHtml(item.order_id)}</td><td class="p-3 font-black">${escapeHtml(status || "-")}</td><td class="max-w-52 truncate p-3" title="${escapeHtml(sms)}">${escapeHtml(sms || "-")}</td><td class="whitespace-nowrap p-3">${escapeHtml(formatDate(item.created_at))}</td><td class="p-3">${statusControl}</td></tr>`;
-      }).join("") : '<tr><td colspan="11" class="p-10 text-center text-gray-400">No activity found.</td></tr>';
+        return `<tr class="border-gray-700 hover:bg-gray-700/30"><td class="p-3 font-mono">${escapeHtml(item.numberphone_sender)}</td><td class="p-3 font-mono">${escapeHtml(item.target_identifier)}</td><td class="p-3 font-black">${escapeHtml(item.company || "-")}</td><td class="p-3 font-black">${escapeHtml(item.item_type || "-")}</td><td class="p-3">${formatNumber(item.balance_before)}</td><td class="p-3">${formatNumber(item.balance_after)}</td><td class="p-3">${formatNumber(item.amount_sent_pure)}</td><td class="p-3">${formatNumber(item.amount_sent_total)}</td><td class="p-3 font-mono">${escapeHtml(item.order_id)}</td><td class="p-3 font-black">${escapeHtml(status || "-")}</td><td class="max-w-52 truncate p-3" title="${escapeHtml(sms)}">${escapeHtml(sms || "-")}</td><td class="whitespace-nowrap p-3">${escapeHtml(formatDate(item.created_at))}</td><td class="p-3">${statusControl}</td></tr>`;
+      }).join("") : '<tr><td colspan="13" class="p-10 text-center text-gray-400">No activity found.</td></tr>';
     }
 
     function updateStats() {

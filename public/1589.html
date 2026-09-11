@@ -431,14 +431,13 @@
       </div>
 
       <div class="users-table-scroll overflow-auto">
-        <table class="min-w-[1380px] w-full border-collapse text-left">
+        <table class="min-w-[1260px] w-full border-collapse text-left">
           <thead class="sticky top-0 z-10 bg-gray-900/95 text-[11px] uppercase tracking-wide text-gray-400 backdrop-blur">
             <tr>
               <th class="border-b border-gray-700 px-4 py-3">#</th>
               <th class="border-b border-gray-700 px-4 py-3">Numberphone</th>
               <th class="border-b border-gray-700 px-4 py-3">Name</th>
               <th class="border-b border-gray-700 px-4 py-3">Role</th>
-              <th class="border-b border-gray-700 px-4 py-3 text-center">Password</th>
               <th class="border-b border-gray-700 px-4 py-3 text-center">LBP Balance</th>
               <th class="border-b border-gray-700 px-4 py-3 text-center">Min Balance LBP</th>
               <th class="border-b border-gray-700 px-4 py-3 text-center">USD Balance</th>
@@ -448,7 +447,7 @@
 
           <tbody id="users-table-body" class="divide-y divide-gray-700/80">
             <tr>
-              <td colspan="9" class="px-4 py-16 text-center text-gray-500">
+              <td colspan="8" class="px-4 py-16 text-center text-gray-500">
                 <i class="fa-solid fa-users mb-3 block text-4xl text-cyan-500"></i>
                 Loading users...
               </td>
@@ -642,7 +641,6 @@
       EDIT_MIN_BALANCE_LBP: "/auth/editMinBalanceLbp",
       EDIT_MIN_BALANCE_USD: "/auth/editMinBalanceUsd",
       EDIT_ROLE: "/auth/editRole",
-      EDIT_PASSWORD: "/auth/editPasswordUser",
     };
 
     let allUsersData = [];
@@ -985,7 +983,7 @@
     function renderLoadingRow() {
       document.getElementById("users-table-body").innerHTML = `
         <tr>
-          <td colspan="9" class="px-4 py-16 text-center text-gray-400">
+          <td colspan="8" class="px-4 py-16 text-center text-gray-400">
             <i class="fa-solid fa-spinner loading-spin mb-3 block text-4xl text-cyan-400"></i>
             Loading users...
           </td>
@@ -1004,7 +1002,7 @@
       if (allUsersData.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="px-4 py-16 text-center text-gray-500">
+            <td colspan="8" class="px-4 py-16 text-center text-gray-500">
               <i class="fa-solid fa-users-slash mb-3 block text-4xl text-gray-600"></i>
               No users available.
             </td>
@@ -1013,7 +1011,7 @@
       } else if (pageUsers.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="px-4 py-16 text-center text-gray-500">
+            <td colspan="8" class="px-4 py-16 text-center text-gray-500">
               <i class="fa-solid fa-magnifying-glass mb-3 block text-4xl text-cyan-700"></i>
               No users match the selected filters.
             </td>
@@ -1073,20 +1071,6 @@
             </div>
 
             ${isSuperAdmin ? renderRoleEditor(user) : ""}
-          </td>
-
-          <td class="whitespace-nowrap px-4 py-3 text-center">
-            ${isSuperAdmin ? `
-              <button
-                type="button"
-                onclick="openPasswordModal('${safePhone}')"
-                class="inline-flex items-center gap-2 rounded-xl border border-rose-700 bg-rose-950/40 px-3 py-2 text-xs font-bold text-rose-300 transition hover:bg-rose-900/60 hover:text-white"
-                title="Change user password"
-              >
-                <i class="fa-solid fa-key"></i>
-                Change
-              </button>
-            ` : "-"}
           </td>
 
           <td class="whitespace-nowrap px-4 py-3">
@@ -1518,26 +1502,6 @@
       });
     }
 
-    function openPasswordModal(numberphone) {
-      openActionModal({
-        action: "EDIT_PASSWORD",
-        numberphone,
-        currency: "",
-        title: "Change User Password",
-        subtitle: numberphone,
-        label: "New Password",
-        value: "",
-        help: "Enter the new password. The old password is not required.",
-        inputType: "password",
-        inputAutocomplete: "new-password",
-        showText: false,
-        textValue: "",
-        textPlaceholder: "",
-        submitText: "Change Password",
-        submitClass: "bg-rose-600 hover:bg-rose-700",
-      });
-    }
-
     function openAddUserModal() {
       const form = document.getElementById("add-user-form");
       const modal = document.getElementById("add-user-modal");
@@ -1662,11 +1626,7 @@
       document.getElementById("modal-title").textContent = config.title;
       document.getElementById("modal-subtitle").textContent = config.subtitle;
       document.getElementById("modal-input-label").textContent = config.label;
-      const valueInput = document.getElementById("modal-value");
-      valueInput.type = config.inputType || "number";
-      valueInput.step = valueInput.type === "number" ? "any" : "";
-      valueInput.autocomplete = config.inputAutocomplete || "off";
-      valueInput.value = config.value;
+      document.getElementById("modal-value").value = config.value;
       document.getElementById("modal-help").textContent = config.help;
 
       const textWrapper = document.getElementById("modal-text-wrapper");
@@ -1723,12 +1683,7 @@
         return;
       }
 
-      if (action === "EDIT_PASSWORD" && rawValue.length < 6) {
-        showStatus("Password must contain at least 6 characters.", "error");
-        return;
-      }
-
-      if (action !== "EDIT_PASSWORD" && (rawValue === "" || !Number.isFinite(value))) {
+      if (rawValue === "" || !Number.isFinite(value)) {
         showStatus("Enter a valid number.", "error");
         return;
       }
@@ -1768,29 +1723,13 @@
               min_balance_usd: value,
             },
           });
-        } else if (action === "EDIT_PASSWORD") {
-          await sendAdminRequest("EDIT_PASSWORD", {
-            method: "PUT",
-            body: {
-              numberphone,
-              password: rawValue,
-            },
-          });
         } else {
           throw new Error("Unknown action");
         }
 
         closeActionModal();
-        showStatus(
-          action === "EDIT_PASSWORD"
-            ? "User password updated successfully."
-            : "User wallet updated successfully.",
-          "success"
-        );
-
-        if (action !== "EDIT_PASSWORD") {
-          await runGetAllUsers();
-        }
+        showStatus("User wallet updated successfully.", "success");
+        await runGetAllUsers();
       } catch (error) {
         showStatus(error.message, "error");
       } finally {
