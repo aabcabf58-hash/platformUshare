@@ -245,7 +245,7 @@
       }
       if (!window.confirm(orderStatus === "returned" ? "Return this order and refund the wallet?" : "Mark this order as completed?")) return;
       try {
-        const result = await api("/orders/editOrderStatus", { method: "PUT", body: { order_id: orderId, new_status: orderStatus, note } });
+        const result = await api("/orders/editOrderStatus", { method: "PUT", body: { order_id: orderId, status: orderStatus, note } });
         showMessage(result.message || "Order updated successfully");
         await loadOrders();
       } catch (error) {
