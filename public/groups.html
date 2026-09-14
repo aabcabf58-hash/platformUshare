@@ -1159,6 +1159,23 @@
                 return;
             }
 
+            const group = findGroupById(cleanGroupId);
+
+            if (!group || !Array.isArray(group[1])) {
+                showStatus('Group not found. Refresh the page and try again.', 'error');
+                return;
+            }
+
+            // Preserve the current displayed line order, including leading zeros.
+            const numberphones = group[1].map(
+                (line) => String(line.numberphone ?? '').trim()
+            );
+
+            if (!numberphones.length || numberphones.some((phone) => !phone)) {
+                showStatus('The group must contain valid phone numbers.', 'error');
+                return;
+            }
+
             const giveBalance = prompt(
                 `Enter give_balance / split text for year from group "${cleanGroupId}":`,
                 ''
@@ -1192,6 +1209,7 @@
                         body: JSON.stringify({
                             group_id: cleanGroupId,
                             source_group_id: cleanGroupId,
+                            numberphones,
                             give_balance: String(giveBalance).trim()
                         })
                     }
