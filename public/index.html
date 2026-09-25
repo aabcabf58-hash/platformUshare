@@ -1016,6 +1016,14 @@
         const EDIT_GROUP_API =
             `${API_BASE_URL}/api/ushare/editGroup`;
 
+        /*
+         * This endpoint is the only source used to refresh a changed line
+         * in the page.  It accepts an array, but this page always sends one
+         * number per request: { numberphones: [numberphone] }.
+         */
+        const EDIT_NUMBERS_INFO_API =
+            `${API_BASE_URL}/api/ushare/getUshareNumbersEdit`;
+
         const CHECK_REMOVE_GROUP_API =
             `${API_BASE_URL}/api/ushare/checkAndRemoveUshareGroups`;
 
@@ -1859,6 +1867,123 @@
             ];
 
             return possibleArrays.find(Array.isArray) || null;
+        }
+
+        function getSelectedPhoneSet() {
+            return new Set(
+                getSelectedPhoneNumbers()
+                    .map(normalizeRefreshPhone)
+                    .filter(Boolean)
+            );
+        }
+
+        function restoreSelectedPhoneSet(selectedPhones) {
+            document
+                .querySelectorAll('.line-checkbox')
+                .forEach((checkbox) => {
+                    checkbox.checked = selectedPhones.has(
+                        normalizeRefreshPhone(checkbox.value)
+                    );
+                });
+
+            updateSelectedCount();
+        }
+
+        function deselectOneNumberphone(numberphone) {
+            const cleanNumberphone =
+                normalizeRefreshPhone(numberphone);
+
+            document
+                .querySelectorAll('.line-checkbox')
+                .forEach((checkbox) => {
+                    if (
+                        normalizeRefreshPhone(checkbox.value) ===
+                        cleanNumberphone
+                    ) {
+                        checkbox.checked = false;
+                    }
+                });
+
+            updateSelectedCount();
+        }
+
+        async function refreshOneLineFromDatabase(numberphone) {
+            const cleanNumberphone =
+                normalizeRefreshPhone(numberphone);
+
+            if (!cleanNumberphone) {
+                throw new Error('A valid numberphone is required.');
+            }
+
+            const selectedPhones = getSelectedPhoneSet();
+
+            const response = await fetch(
+                EDIT_NUMBERS_INFO_API,
+                {
+                    method: 'POST',
+                    headers: authHeaders(),
+                    body: JSON.stringify({
+                        numberphones: [cleanNumberphone]
+                    }),
+                    cache: 'no-store'
+                }
+            );
+
+            const json = await readJsonResponse(response);
+
+            if (!response.ok || json?.success === false) {
+                throw new Error(
+                    json?.message ||
+                    `Server returned ${response.status}`
+                );
+            }
+
+            const responseLines =
+                getLinesArrayFromResponse(json);
+
+            const freshLine = responseLines?.find((item) => {
+                return (
+                    normalizeRefreshPhone(item?.numberphone) ===
+                    cleanNumberphone
+                );
+            });
+
+            if (!freshLine) {
+                throw new Error(
+                    `The server did not return ${cleanNumberphone}.`
+                );
+            }
+
+            let wasReplaced = false;
+
+            linesData = linesData.map((oldLine) => {
+                if (
+                    normalizeRefreshPhone(oldLine?.numberphone) !==
+                    cleanNumberphone
+                ) {
+                    return oldLine;
+                }
+
+                wasReplaced = true;
+
+                return freshLine;
+            });
+
+            if (!wasReplaced) {
+                linesData.push(freshLine);
+            }
+
+            /*
+             * The successful per-line flow has now finished:
+             * update/check -> getUshareNumbersEdit -> table update.
+             */
+            selectedPhones.delete(cleanNumberphone);
+
+            applyCurrentSort();
+            renderTable(linesData);
+            restoreSelectedPhoneSet(selectedPhones);
+
+            return freshLine;
         }
 
         async function loadTableData() {
@@ -4761,41 +4886,81 @@
                     'info'
                 );
 
-                const response = await fetch(
-                    CHECK_REMOVE_GROUP_API,
-                    {
-                        method: 'PUT',
-                        headers: authHeaders(),
-                        body: JSON.stringify({
-                            numberphones: selectedPhones
-                        })
-                    }
+                const results = await Promise.all(
+                    selectedPhones.map(async (numberphone) => {
+                        let checkSucceeded = false;
+                        let checkMessage = '';
+
+                        try {
+                            const response = await fetch(
+                                CHECK_REMOVE_GROUP_API,
+                                {
+                                    method: 'PUT',
+                                    headers: authHeaders(),
+                                    body: JSON.stringify({
+                                        numberphones: [numberphone]
+                                    })
+                                }
+                            );
+
+                            const result =
+                                await readJsonResponse(response);
+
+                            if (
+                                !response.ok ||
+                                result.success !== true
+                            ) {
+                                throw new Error(
+                                    result.message ||
+                                    `Server returned ${response.status}`
+                                );
+                            }
+
+                            checkSucceeded = true;
+                        } catch (error) {
+                            checkMessage = error.message;
+                        }
+
+                        try {
+                            /*
+                             * This is always a separate request for this
+                             * one number.  The check API response is never
+                             * used as displayed line information.
+                             */
+                            await refreshOneLineFromDatabase(
+                                numberphone
+                            );
+                        } catch (refreshError) {
+                            checkMessage = checkMessage ||
+                                refreshError.message;
+                            checkSucceeded = false;
+                        }
+
+                        deselectOneNumberphone(numberphone);
+
+                        return {
+                            numberphone,
+                            success: checkSucceeded,
+                            message: checkMessage
+                        };
+                    })
                 );
 
-                const result =
-                    await readJsonResponse(response);
+                const successfulCount = results.filter(
+                    (item) => item.success
+                ).length;
 
-                if (
-                    !response.ok ||
-                    result.success !== true
-                ) {
-                    throw new Error(
-                        result.message ||
-                        `Server returned ${response.status}`
-                    );
-                }
+                const failedItems = results.filter(
+                    (item) => !item.success
+                );
 
-                await loadTableData();
-
-                if (button) {
-                    button.innerHTML = originalHtml;
-                }
-
-                updateSelectedCount();
+                const failedText = failedItems.length
+                    ? ` Failed: ${failedItems.map((item) => item.numberphone).join(', ')}.`
+                    : '';
 
                 showGlobalStatus(
-                    `${selectedPhones.length} selected number(s) checked: ${result.updated_count ?? 0} updated, ${result.skipped_count ?? 0} skipped, ${result.line_error_count ?? 0} line error.`,
-                    'success'
+                    `Checked ${successfulCount} of ${selectedPhones.length} selected number(s).${failedText}`,
+                    failedItems.length ? 'error' : 'success'
                 );
             } catch (error) {
                 console.error(
@@ -5015,6 +5180,19 @@
                                     '0'
                                 );
 
+                            try {
+                                await refreshOneLineFromDatabase(
+                                    phone
+                                );
+                            } catch (refreshError) {
+                                result.success = false;
+                                result.message =
+                                    result.message ||
+                                    refreshError.message;
+                            }
+
+                            deselectOneNumberphone(phone);
+
                             return {
                                 phone,
                                 result
@@ -5064,11 +5242,9 @@
                     );
                 }
 
-                await loadTableData();
-
                 /*
-                 * After reloading, keep failed numbers selected when they
-                 * are visible on the current page so they can be retried.
+                 * Keep failed numbers selected when they are visible on the
+                 * current page so they can be retried.
                  */
                 const failedPhoneSet = new Set(
                     failedItems.map(
@@ -5181,7 +5357,7 @@
             }
 
             const progressMessage =
-                `Updating group for ${selectedPhones.length} selected line(s) in one request...`;
+                `Updating ${selectedPhones.length} selected line(s). Each line is sent in its own request...`;
 
             showGlobalStatus(
                 progressMessage,
@@ -5202,47 +5378,70 @@
             }
 
             try {
-                const result =
-                    await sendEditGroupRequest(
-                        selectedPhones,
-                        groupId
-                    );
+                const results = await Promise.all(
+                    selectedPhones.map(async (numberphone) => {
+                        const result =
+                            await sendEditGroupRequest(
+                                [numberphone],
+                                groupId
+                            );
 
-                if (!result.success) {
-                    throw new Error(
-                        result.message ||
-                        'Failed to update group.'
-                    );
-                }
+                        try {
+                            /*
+                             * Do not use update API data in the table.
+                             * Reload this exact line from the database.
+                             */
+                            await refreshOneLineFromDatabase(
+                                numberphone
+                            );
+                        } catch (refreshError) {
+                            result.success = false;
+                            result.message =
+                                result.message ||
+                                refreshError.message;
+                        }
 
-                await loadTableData();
+                        deselectOneNumberphone(numberphone);
+
+                        return {
+                            numberphone,
+                            result
+                        };
+                    })
+                );
 
                 const actionText =
-                    groupId === 0
+                    String(groupId) === '0'
                         ? 'removed from the group'
                         : `added to group ${groupId}`;
 
-                const updatedCount =
-                    result.updated_count ??
-                    result.data?.length ??
-                    selectedPhones.length;
+                const successfulItems = results.filter(
+                    (item) => item.result.success === true
+                );
 
-                const notFoundCount =
-                    result.not_found_count ?? 0;
+                const failedItems = results.filter(
+                    (item) => item.result.success !== true
+                );
+
+                const updatedCount = successfulItems.length;
+
+                const failedText = failedItems.length
+                    ? ` Failed: ${failedItems.map((item) => item.numberphone).join(', ')}.`
+                    : '';
 
                 const finalMessage =
-                    `${updatedCount} line(s) ${actionText}. Not found: ${notFoundCount}.`;
+                    `${updatedCount} line(s) ${actionText}.${failedText}`;
 
                 showGlobalStatus(
                     finalMessage,
-                    notFoundCount === 0
+                    failedItems.length === 0
                         ? 'success'
                         : 'error'
                 );
 
                 if (
                     options.closeModalAfterSuccess &&
-                    notFoundCount === 0
+                    failedItems.length === 0
                 ) {
                     closeAddToGroupModal();
                 } else if (
@@ -5254,7 +5453,7 @@
                 ) {
                     showGroupEditMessage(
                         finalMessage,
-                        notFoundCount === 0
+                        failedItems.length === 0
                             ? 'success'
                             : 'error'
                     );
@@ -5833,9 +6032,10 @@
                     buttonElement.closest('tr')
                 );
 
-            if (refreshResult.success) {
-                await loadTableData();
-            }
+            /*
+             * triggerSingleUpdate already reloads this exact number through
+             * getUshareNumbersEdit. Do not reload the whole table here.
+             */
         }
 
         async function triggerSingleUpdate(line, rowElement, silentStatus = false) {
@@ -5982,6 +6182,25 @@
                     false
                 );
                 setRowRefreshing(rowElement, false);
+
+                /*
+                 * Never use the check endpoint response as line data.
+                 * Whether the check succeeded or failed, ask the database
+                 * for this one exact number and replace only that line.
+                 */
+                try {
+                    await refreshOneLineFromDatabase(
+                        line.numberphone
+                    );
+                } catch (refreshError) {
+                    console.error(
+                        `Unable to reload ${line.numberphone}:`,
+                        refreshError
+                    );
+                }
+
+                deselectOneNumberphone(line.numberphone);
+
                 applyGlobalSearch();
             }
         }
@@ -6046,10 +6265,8 @@
             isBulkRefreshing = true;
             updateSelectedCount();
 
-            const CONCURRENT_REQUESTS = 10;
             let successCount = 0;
             let failedCount = 0;
-            let completedCount = 0;
             const failedPhones = [];
 
             const refreshJobs = rows.map((row) => {
@@ -6076,118 +6293,62 @@
             });
 
             try {
-                for (
-                    let batchStart = 0;
-                    batchStart < refreshJobs.length;
-                    batchStart += CONCURRENT_REQUESTS
-                ) {
-                    const batchJobs =
-                        refreshJobs.slice(
-                            batchStart,
-                            batchStart +
-                                CONCURRENT_REQUESTS
+                showGlobalStatus(
+                    `Sending ${refreshJobs.length} check request(s) at the same time...`,
+                    'info'
+                );
+
+                const refreshResults = await Promise.allSettled(
+                    refreshJobs.map(async (job) => {
+                        if (!job.phone || !job.line) {
+                            return {
+                                success: false,
+                                phone: job.phone,
+                                message:
+                                    'The line could not be matched to its table row.'
+                            };
+                        }
+
+                        return triggerSingleUpdate(
+                            job.line,
+                            job.row,
+                            true
                         );
+                    })
+                );
 
-                    const batchNumber =
-                        Math.floor(
-                            batchStart /
-                            CONCURRENT_REQUESTS
-                        ) + 1;
+                refreshResults.forEach(
+                    (settledResult, index) => {
+                        const job = refreshJobs[index];
 
-                    const totalBatches =
-                        Math.ceil(
-                            refreshJobs.length /
-                            CONCURRENT_REQUESTS
-                        );
+                        const refreshResult =
+                            settledResult.status === 'fulfilled'
+                                ? settledResult.value
+                                : {
+                                    success: false,
+                                    phone: job.phone,
+                                    message:
+                                        settledResult.reason?.message ||
+                                        'Unexpected refresh error.'
+                                };
 
-                    showGlobalStatus(
-                        `Running batch ${batchNumber} of ${totalBatches}. Sending ${batchJobs.length} requests at the same time...`,
-                        'info'
-                    );
+                        const resultPhone =
+                            normalizeRefreshPhone(
+                                refreshResult.phone || job.phone
+                            );
 
-                    const batchResults =
-                        await Promise.allSettled(
-                            batchJobs.map(
-                                async (job) => {
-                                    if (
-                                        !job.phone ||
-                                        !job.line
-                                    ) {
-                                        return {
-                                            success: false,
-                                            phone: job.phone,
-                                            message:
-                                                'The line could not be matched to its table row.'
-                                        };
-                                    }
+                        if (refreshResult.success === true) {
+                            successCount++;
+                        } else {
+                            failedCount++;
 
-                                    return triggerSingleUpdate(
-                                        job.line,
-                                        job.row,
-                                        true
-                                    );
-                                }
-                            )
-                        );
-
-                    batchResults.forEach(
-                        (settledResult, index) => {
-                            completedCount++;
-
-                            const job =
-                                batchJobs[index];
-
-                            const refreshResult =
-                                settledResult.status ===
-                                'fulfilled'
-                                    ? settledResult.value
-                                    : {
-                                        success: false,
-                                        phone:
-                                            job.phone,
-                                        message:
-                                            settledResult
-                                                .reason
-                                                ?.message ||
-                                            'Unexpected refresh error.'
-                                    };
-
-                            const resultPhone =
-                                normalizeRefreshPhone(
-                                    refreshResult.phone ||
-                                    job.phone
-                                );
-
-                            if (
-                                refreshResult.success ===
-                                true
-                            ) {
-                                successCount++;
-                            } else {
-                                failedCount++;
-
-                                if (resultPhone) {
-                                    failedPhones.push(
-                                        resultPhone
-                                    );
-
-                                }
+                            if (resultPhone) {
+                                failedPhones.push(resultPhone);
                             }
                         }
-                    );
+                    }
+                );
 
-                    showGlobalStatus(
-                        `Completed ${completedCount} of ${refreshJobs.length}. Successful: ${successCount}, Failed: ${failedCount}.`,
-                        failedCount === 0
-                            ? 'info'
-                            : 'error'
-                    );
-                }
-
-                await loadTableData();
-
-                // The table was rebuilt. Reapply only the
-                // balance-related status saved for each number.
                 reapplyAllRefreshWarnings();
 
                 const uniqueFailedPhones =
@@ -6785,10 +6946,11 @@
             30000
         );
 
-        window.setInterval(
-            pollPendingRefreshes,
-            8000
-        );
+        /*
+         * No automatic getAll/getExpired polling during checks.
+         * Each completed check reloads only its own number through
+         * getUshareNumbersEdit.
+         */
 
         window.addEventListener(
             'scroll',
