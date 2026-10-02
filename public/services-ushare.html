@@ -33,7 +33,26 @@
     async function call(path,opt={}){const headers={...authHeaders()};if(opt.body)headers["Content-Type"]="application/json";const r=await fetch(BASE+path,{method:opt.method||"GET",headers,body:opt.body?JSON.stringify(opt.body):undefined}),raw=await r.text();let x={};try{x=raw?JSON.parse(raw):{}}catch{x={message:raw}}if(r.status===401)logout();if(!r.ok||x.success===false)throw Error(x.message||`Server returned ${r.status}`);return x}
     async function load(){tbody.innerHTML='<tr><td colspan="13" class="py-8 text-center text-gray-400">Loading...</td></tr>';try{const x=await call(API.all);list=Array.isArray(x)?x:(Array.isArray(x.data)?x.data:(x.services||[]));draw()}catch(e){tbody.innerHTML=`<tr><td colspan="13" class="py-8 text-center text-red-300">${esc(e.message)}</td></tr>`}}
     function draw(){const q=document.getElementById("search").value.toLowerCase(),rows=list.filter(s=>`${s.numberphone||""} ${s.line_type||""}`.toLowerCase().includes(q));document.getElementById("count").textContent=`(${rows.length})`;if(!rows.length){tbody.innerHTML='<tr><td colspan="13" class="py-8 text-center text-gray-400">No services found.</td></tr>';return}tbody.innerHTML=rows.map(s=>{const i=list.indexOf(s),p=String(s.numberphone??"").replaceAll("'","\\'");return `<tr class="bg-gray-800 hover:bg-gray-700/40"><td class="font-bold text-orange-300">${esc(s.numberphone)}</td><td>${esc(s.primary_bundle)}</td><td>${esc(s.n1)} / ${esc(s.b1)}</td><td class="text-gray-400">${esc(date(s.updated_at1))}</td><td>${esc(s.n2)} / ${esc(s.b2)}</td><td class="text-gray-400">${esc(date(s.updated_at2))}</td><td>${esc(s.n3)} / ${esc(s.b3)}</td><td class="text-gray-400">${esc(date(s.updated_at3))}</td><td>${esc(s.total_secondary_bundles)}</td><td>${esc(s.remaining_quota)}</td><td class="text-gray-400">${esc(date(s.service_started_at))}</td><td><span class="rounded-lg bg-purple-900/50 px-2 py-1 text-xs text-purple-200">${esc(s.line_type||"—")}</span></td><td><div class="flex gap-2"><button onclick="edit(${i})" class="btn bg-blue-600"><i class="fa-solid fa-pen"></i></button><button onclick="removeRow('${p}')" class="btn bg-red-600"><i class="fa-solid fa-trash"></i></button></div></td></tr>`}).join("")}
-    function newRow(){form.reset();document.getElementById("editorTitle").textContent="Add U-Share service";document.getElementById("editor").classList.remove("hidden");form.elements.numberphone.focus()}function closeEditor(){document.getElementById("editor").classList.add("hidden")}function edit(i){const s=list[i];Object.keys(s).forEach(k=>{if(form.elements[k])form.elements[k].value=(k.startsWith("updated_at")||k==="service_started_at")?dateIn(s[k]):(s[k]??"")});document.getElementById("editorTitle").textContent=`Edit service: ${s.numberphone}`;document.getElementById("editor").classList.remove("hidden");scrollTo({top:0,behavior:"smooth"})}
+    function newRow()
+    {form.reset();document.getElementById("editorTitle").textContent="Add U-Share service";
+    document.getElementById("editor").classList.remove("hidden");form.elements.numberphone.focus()}
+    
+    function closeEditor()
+    {document.getElementById("editor").classList.add("hidden")}
+    function edit(i)
+    {const s=list[i];
+      Object.keys(s).forEach(k=>{if(form.elements[k])form.elements[k].value=(k.startsWith("updated_at")||k==="service_started_at")?dateIn(s[k]):(s[k]??"")});
+      document.getElementById("editorTitle").textContent=`Edit service: ${s.numberphone}`;document.getElementById("editor").classList.remove("hidden");
+      scrollTo({top:0,behavior:"smooth"})}
+
+
+
+
+
+
+
+
+
     form.onsubmit=async e=>{e.preventDefault();const f=form.elements,p={numberphone:f.numberphone.value.trim(),primary_bundle:num(f.primary_bundle.value),line_type:nul(f.line_type.value.trim()),total_secondary_bundles:num(f.total_secondary_bundles.value),remaining_quota:num(f.remaining_quota.value),n1:nul(f.n1.value.trim()),b1:num(f.b1.value),updated_at1:nul(f.updated_at1.value),n2:nul(f.n2.value.trim()),b2:num(f.b2.value),updated_at2:nul(f.updated_at2.value),n3:nul(f.n3.value.trim()),b3:num(f.b3.value),updated_at3:nul(f.updated_at3.value),service_started_at:nul(f.service_started_at.value)};try{await call(API.save,{method:"POST",body:p});note("Service saved successfully.");closeEditor();load()}catch(e){note(e.message,true)}};async function removeRow(numberphone){if(!confirm(`Delete service for ${numberphone}?`))return;try{await call(API.del,{method:"DELETE",body:{numberphone}});note("Service deleted successfully.");load()}catch(e){note(e.message,true)}}if(requireRole(["admin","super_admin"]))load();
   </script>
 </body>
