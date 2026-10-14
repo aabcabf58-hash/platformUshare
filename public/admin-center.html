@@ -109,6 +109,12 @@
       border-color: #6ee7b7 !important;
     }
 
+    html.light-mode main > section.grid > a[href="./reseller-client-rates.html"] {
+      background-color: #fdf4ff !important;
+      background-image: linear-gradient(135deg, #fdf4ff, #ffffff) !important;
+      border-color: #e879f9 !important;
+    }
+
     html.light-mode .admin-card h3,
     html.light-mode main > section.grid > article h3 {
       color: #1f2937 !important;
@@ -212,11 +218,11 @@
             <span id="current-role-badge" class="rounded-full border border-gray-600 bg-gray-800 px-3 py-1 text-xs font-bold text-gray-300">Role: -</span>
           </div>
           <h2 class="text-3xl font-black text-white">Choose an administration section</h2>
-          <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-300">Each responsibility has its own page for users, categories, all orders, pending orders, and activity.</p>
+          <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-300">Each responsibility has its own page for users, categories, reseller rates, all orders, pending orders, and activity.</p>
         </div>
         <div class="rounded-2xl border border-cyan-800 bg-cyan-950/40 px-5 py-4 text-center">
           <div class="text-xs font-bold uppercase tracking-wide text-cyan-400">Available Sections</div>
-          <div class="mt-1 text-3xl font-black text-cyan-300">6</div>
+          <div id="available-sections-count" class="mt-1 text-3xl font-black text-cyan-300">6</div>
         </div>
       </div>
     </section>
@@ -275,6 +281,15 @@
         </div>
         <div class="mt-6 font-black text-emerald-300">Open Lines Management <i class="fa-solid fa-arrow-right ml-2 transition group-hover:translate-x-1"></i></div>
       </a>
+
+      <a id="reseller-rates-admin-card" href="./reseller-client-rates.html" class="admin-card group hidden min-h-64 flex-col justify-between rounded-3xl border border-fuchsia-800 bg-gradient-to-br from-fuchsia-950/60 to-gray-800 p-6 shadow-xl hover:border-fuchsia-500 hover:shadow-fuchsia-950/40">
+        <div>
+          <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-fuchsia-600 text-2xl text-white shadow"><i class="fa-solid fa-percent"></i></div>
+          <h3 class="text-2xl font-black text-white">Reseller Client Rates</h3>
+          <p class="mt-3 leading-6 text-gray-300">View every client reseller rate record and edit category percentages.</p>
+        </div>
+        <div class="mt-6 font-black text-fuchsia-300">Open Reseller Rates <i class="fa-solid fa-arrow-right ml-2 transition group-hover:translate-x-1"></i></div>
+      </a>
     </section>
   </main>
 
@@ -285,6 +300,12 @@
     const currentUser = getUser() || parseJwtPayload(getToken()) || {};
     const role = String(currentUser.role || "-").trim().toLowerCase().replaceAll("-", "_").replaceAll(" ", "_");
     document.getElementById("current-role-badge").textContent = `Role: ${role}`;
+
+    if (role === "super_admin") {
+      document.getElementById("reseller-rates-admin-card")?.classList.remove("hidden");
+      document.getElementById("reseller-rates-admin-card")?.classList.add("flex");
+      document.getElementById("available-sections-count").textContent = "7";
+    }
   </script>
 </body>
 </html>

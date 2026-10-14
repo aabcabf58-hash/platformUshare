@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zouzou App - Reseller Client Rates</title>
+  <script src="./theme.js?v=admin-colors-20260727-2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./theme.css?v=admin-colors-20260727-2">
+  <style>
+    .table-scroll::-webkit-scrollbar { height: 10px; width: 10px; }
+    .table-scroll::-webkit-scrollbar-track { background: rgba(17, 24, 39, .7); }
+    .table-scroll::-webkit-scrollbar-thumb { background: rgba(75, 85, 99, .9); border-radius: 999px; }
+    .number-cell { font-variant-numeric: tabular-nums; }
+    html.light-mode body { background: #eef1f4 !important; color: #1f2937 !important; }
+    html.light-mode header, html.light-mode .panel { background-color: #f8fafc !important; border-color: #d1d5db !important; }
+    html.light-mode header h1, html.light-mode .panel h2 { color: #1f2937 !important; }
+    html.light-mode .panel p { color: #4b5563 !important; }
+    html.light-mode .data-table th { background: #e2e8f0 !important; color: #475569 !important; }
+    html.light-mode .data-table td { background: #fff !important; border-color: #e2e8f0 !important; color: #334155 !important; }
+    html.light-mode .data-table tr:hover td { background: #f8fafc !important; }
+    html.light-mode .modal-panel { background: #fff !important; border-color: #d1d5db !important; }
+    html.light-mode .modal-panel label, html.light-mode .modal-panel h2 { color: #1f2937 !important; }
+    html.light-mode .rate-input { background: #f8fafc !important; color: #1f2937 !important; border-color: #cbd5e1 !important; }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-900 font-sans text-gray-100">
+  <header class="sticky top-0 z-40 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
+    <div class="mx-auto flex w-full max-w-[1600px] flex-col items-center justify-between gap-4 xl:flex-row">
+      <div class="flex items-center gap-3">
+        <div class="rounded-lg bg-fuchsia-600 p-2 text-white"><i class="fa-solid fa-percent text-xl"></i></div>
+        <h1 class="text-xl font-bold text-fuchsia-300">Zouzou App <span class="text-base font-normal text-white">| Reseller Client Rates</span></h1>
+      </div>
+      <nav class="flex flex-wrap items-center justify-center gap-2">
+        <button data-theme-toggle type="button" onclick="toggleTheme()" class="theme-toggle-button flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600">
+          <i data-theme-icon class="fa-solid fa-sun"></i><span data-theme-label>Light Mode</span>
+        </button>
+        <a href="./admin-center.html" class="flex items-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600">
+          <i class="fa-solid fa-arrow-left"></i> Admin Center
+        </a>
+        <button type="button" onclick="logout()" class="flex items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-[1600px] px-4 py-7">
+    <section class="panel mb-6 rounded-3xl border border-fuchsia-800 bg-gradient-to-br from-fuchsia-950/70 via-gray-900 to-gray-900 p-6 shadow-xl">
+      <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <span class="inline-flex rounded-full border border-fuchsia-700 bg-fuchsia-950/60 px-3 py-1 text-xs font-black uppercase tracking-wide text-fuchsia-300">Super Admin</span>
+          <h2 class="mt-3 text-3xl font-black text-white">Reseller Client Rates</h2>
+          <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-300">View all client rate records and edit the percentage fields and active status.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+          <div class="rounded-2xl border border-fuchsia-800 bg-fuchsia-950/40 px-5 py-3 text-center">
+            <div class="text-xs font-bold uppercase tracking-wide text-fuchsia-300">Records</div>
+            <div id="record-count" class="mt-1 text-2xl font-black text-white">0</div>
+          </div>
+          <button id="reload-button" type="button" onclick="loadRates()" class="inline-flex items-center gap-2 rounded-xl bg-fuchsia-600 px-4 py-3 text-sm font-bold text-white shadow transition hover:bg-fuchsia-700 disabled:cursor-not-allowed disabled:opacity-60">
+            <i id="reload-icon" class="fa-solid fa-rotate"></i> Reload
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div id="status-message" class="mb-5 hidden rounded-2xl border px-4 py-3 text-sm font-semibold" role="status" aria-live="polite"></div>
+
+    <section class="overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-xl">
+      <div class="flex flex-col gap-3 border-b border-gray-700 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 class="text-lg font-black text-white">All reseller rate records</h3>
+          <p class="mt-1 text-xs text-gray-400">Search by client number or reseller number.</p>
+        </div>
+        <label class="relative block w-full sm:max-w-sm">
+          <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+          <input id="search-input" type="search" oninput="renderRows()" placeholder="Search phone number..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-11 pr-4 text-sm text-white outline-none transition focus:border-fuchsia-500">
+        </label>
+      </div>
+
+      <div class="table-scroll overflow-auto">
+        <table class="data-table min-w-[1850px] w-full border-collapse text-left">
+          <thead class="sticky top-0 z-10 bg-gray-900 text-[11px] uppercase tracking-wide text-gray-400">
+            <tr>
+              <th class="border-b border-gray-700 px-4 py-3">#</th>
+              <th class="border-b border-gray-700 px-4 py-3">Client Numberphone</th>
+              <th class="border-b border-gray-700 px-4 py-3">Reseller Numberphone</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Balance %</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Validity %</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Counter %</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Days %</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Card %</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Booster %</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Gift %</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">UShare %</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Active</th>
+              <th class="border-b border-gray-700 px-4 py-3">Created At</th>
+              <th class="border-b border-gray-700 px-4 py-3">Updated At</th>
+              <th class="border-b border-gray-700 px-4 py-3 text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="rates-table-body" class="divide-y divide-gray-700/80">
+            <tr><td colspan="15" class="px-4 py-14 text-center text-gray-400"><i class="fa-solid fa-spinner loading-spin mb-3 block text-3xl text-fuchsia-400"></i>Loading rate records...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="edit-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+    <div class="modal-panel w-full max-w-3xl overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
+        <div>
+          <h2 class="text-xl font-black text-white">Edit Client Rates</h2>
+          <p id="edit-client-label" class="mt-1 text-xs text-gray-400"></p>
+        </div>
+        <button type="button" onclick="closeEditModal()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-gray-300 transition hover:bg-gray-600 hover:text-white" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="edit-form" onsubmit="saveRates(event)" class="p-5">
+        <input id="edit-client-numberphone" type="hidden">
+        <div id="rate-fields" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"></div>
+        <label class="mt-5 flex cursor-pointer items-center gap-3 rounded-xl border border-gray-700 bg-gray-900 px-4 py-3 text-sm font-bold text-gray-200">
+          <input id="edit-active" type="checkbox" class="h-5 w-5 accent-fuchsia-600"> Active
+        </label>
+        <div class="mt-5 flex gap-3">
+          <button type="button" onclick="closeEditModal()" class="flex-1 rounded-xl border border-gray-600 bg-gray-700 px-4 py-3 font-bold text-white transition hover:bg-gray-600">Cancel</button>
+          <button id="save-button" type="submit" class="flex-1 rounded-xl bg-fuchsia-600 px-4 py-3 font-bold text-white transition hover:bg-fuchsia-700 disabled:cursor-not-allowed disabled:opacity-60"><i class="fa-solid fa-check mr-1"></i> Save rates</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="./config.js"></script>
+  <script src="./auth.js"></script>
+  <script>
+    requireRole(["super_admin"]);
+
+    const RATE_FIELDS = [
+      ["balance_percent", "Balance %"],
+      ["validity_percent", "Validity %"],
+      ["counter_percent", "Counter %"],
+      ["days_percent", "Days %"],
+      ["card_percent", "Card %"],
+      ["booster_percent", "Booster %"],
+      ["gift_percent", "Gift %"],
+      ["ushare_percent", "UShare %"],
+    ];
+
+    const API_PATHS = {
+      GET_ALL: "/resellerRole/getAllResellerClientRates",
+      EDIT: "/resellerRole/adminEditResellerClientRate",
+    };
+
+    let allRates = [];
+    let requestInProgress = false;
+
+    document.getElementById("rate-fields").innerHTML = RATE_FIELDS.map(([field, label]) => `
+      <label class="block text-xs font-bold text-gray-400">
+        <span class="mb-2 block">${label}</span>
+        <input id="rate-${field}" data-rate-field="${field}" type="number" min="0" step="any" placeholder="Leave blank for null" class="rate-input w-full rounded-xl border border-gray-600 bg-gray-900 px-3 py-3 font-mono text-sm font-bold text-white outline-none transition focus:border-fuchsia-500">
+      </label>
+    `).join("");
+
+    async function apiRequest(path, options = {}) {
+      const response = await fetch(`${getApiBaseUrl()}${path}`, {
+        method: options.method || "GET",
+        headers: authHeaders({ "Content-Type": "application/json" }),
+        body: options.body ? JSON.stringify(options.body) : undefined,
+      });
+
+      const responseText = await response.text();
+      let data = {};
+      try { data = responseText ? JSON.parse(responseText) : {}; }
+      catch { data = { message: responseText }; }
+
+      if (!response.ok) {
+        throw new Error(data.message || data.error || `Server returned ${response.status}`);
+      }
+      return data;
+    }
+
+    async function loadRates() {
+      if (requestInProgress) return;
+      requestInProgress = true;
+      setReloading(true);
+      setStatus("Loading all reseller client rates...", "info");
+
+      try {
+        const response = await apiRequest(API_PATHS.GET_ALL);
+        allRates = Array.isArray(response.data) ? response.data : [];
+        document.getElementById("record-count").textContent = allRates.length;
+        renderRows();
+        setStatus(`${allRates.length} rate record(s) loaded.`, "success");
+      } catch (error) {
+        allRates = [];
+        document.getElementById("record-count").textContent = "0";
+        renderRows();
+        setStatus(error.message, "error");
+      } finally {
+        requestInProgress = false;
+        setReloading(false);
+      }
+    }
+
+    function renderRows() {
+      const query = String(document.getElementById("search-input").value || "").trim().toLowerCase();
+      const rows = allRates.filter((row) =>
+        String(row.client_numberphone ?? "").toLowerCase().includes(query) ||
+        String(row.reseller_numberphone ?? "").toLowerCase().includes(query)
+      );
+      const tbody = document.getElementById("rates-table-body");
+
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="15" class="px-4 py-14 text-center text-gray-500">No rate records found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.map((row, index) => {
+        const clientPhone = String(row.client_numberphone ?? "");
+        const rateCells = RATE_FIELDS.map(([field]) => `<td class="number-cell whitespace-nowrap border-b border-gray-700 px-4 py-3 text-center font-mono text-sm">${formatRate(row[field])}</td>`).join("");
+        return `
+          <tr class="transition hover:bg-gray-700/40">
+            <td class="border-b border-gray-700 px-4 py-3 text-xs font-bold text-gray-500">${index + 1}</td>
+            <td class="number-cell whitespace-nowrap border-b border-gray-700 px-4 py-3 font-mono font-bold text-white">${escapeHtml(clientPhone)}</td>
+            <td class="number-cell whitespace-nowrap border-b border-gray-700 px-4 py-3 font-mono text-gray-300">${escapeHtml(row.reseller_numberphone ?? "-")}</td>
+            ${rateCells}
+            <td class="border-b border-gray-700 px-4 py-3 text-center">${row.active ? '<span class="rounded-full border border-emerald-700 bg-emerald-950/50 px-2.5 py-1 text-xs font-bold text-emerald-300">Active</span>' : '<span class="rounded-full border border-gray-600 bg-gray-900 px-2.5 py-1 text-xs font-bold text-gray-400">Inactive</span>'}</td>
+            <td class="whitespace-nowrap border-b border-gray-700 px-4 py-3 text-xs text-gray-400">${formatDate(row.created_at)}</td>
+            <td class="whitespace-nowrap border-b border-gray-700 px-4 py-3 text-xs text-gray-400">${formatDate(row.updated_at)}</td>
+            <td class="border-b border-gray-700 px-4 py-3 text-center">
+              <button type="button" onclick="openEditModal('${escapeJsString(clientPhone)}')" class="inline-flex items-center gap-2 rounded-lg border border-fuchsia-700 bg-fuchsia-950/40 px-3 py-2 text-xs font-bold text-fuchsia-300 transition hover:bg-fuchsia-900/60 hover:text-white"><i class="fa-solid fa-pen"></i> Edit</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function openEditModal(clientPhone) {
+      const row = allRates.find((item) => String(item.client_numberphone ?? "") === clientPhone);
+      if (!row) return;
+
+      document.getElementById("edit-client-numberphone").value = clientPhone;
+      document.getElementById("edit-client-label").textContent = `Client: ${clientPhone} · Reseller: ${row.reseller_numberphone ?? "-"}`;
+      RATE_FIELDS.forEach(([field]) => {
+        const value = row[field];
+        document.getElementById(`rate-${field}`).value = value === null || value === undefined ? "" : String(value);
+      });
+      document.getElementById("edit-active").checked = Boolean(row.active);
+      const modal = document.getElementById("edit-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeEditModal() {
+      const modal = document.getElementById("edit-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.getElementById("edit-form").reset();
+    }
+
+    async function saveRates(event) {
+      event.preventDefault();
+      const clientNumberphone = String(document.getElementById("edit-client-numberphone").value || "").trim();
+      const body = { client_numberphone: clientNumberphone, active: document.getElementById("edit-active").checked };
+
+      for (const [field] of RATE_FIELDS) {
+        const raw = String(document.getElementById(`rate-${field}`).value ?? "").trim();
+        if (raw === "") {
+          body[field] = null;
+          continue;
+        }
+        const value = Number(raw);
+        if (!Number.isFinite(value) || value < 0) {
+          setStatus(`${field} must be a valid non-negative number or blank.`, "error");
+          return;
+        }
+        body[field] = value;
+      }
+
+      const button = document.getElementById("save-button");
+      button.disabled = true;
+      try {
+        await apiRequest(API_PATHS.EDIT, { method: "PUT", body });
+        const row = allRates.find((item) => String(item.client_numberphone ?? "") === clientNumberphone);
+        if (row) Object.assign(row, body);
+        renderRows();
+        closeEditModal();
+        setStatus(`Rates updated for client ${clientNumberphone}.`, "success");
+      } catch (error) {
+        setStatus(error.message, "error");
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function setReloading(isLoading) {
+      document.getElementById("reload-button").disabled = isLoading;
+      document.getElementById("reload-icon").classList.toggle("loading-spin", isLoading);
+    }
+
+    function setStatus(message, type) {
+      const box = document.getElementById("status-message");
+      const styles = {
+        info: "border-cyan-800 bg-cyan-950/50 text-cyan-200",
+        success: "border-emerald-800 bg-emerald-950/50 text-emerald-200",
+        error: "border-red-800 bg-red-950/50 text-red-200",
+      };
+      box.className = `mb-5 rounded-2xl border px-4 py-3 text-sm font-semibold ${styles[type] || styles.info}`;
+      box.textContent = message;
+      box.classList.remove("hidden");
+    }
+
+    function formatRate(value) {
+      return value === null || value === undefined || value === ""
+        ? '<span class="text-gray-600">—</span>'
+        : escapeHtml(String(value));
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? escapeHtml(value) : escapeHtml(date.toLocaleString());
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeJsString(value) {
+      return String(value ?? "")
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'")
+        .replaceAll("\n", "\\n")
+        .replaceAll("\r", "\\r");
+    }
+
+    document.getElementById("edit-modal").addEventListener("click", (event) => {
+      if (event.target.id === "edit-modal") closeEditModal();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeEditModal();
+    });
+
+    loadRates();
+  </script>
+</body>
+</html>

@@ -438,6 +438,7 @@
               <th class="border-b border-gray-700 px-4 py-3">Numberphone</th>
               <th class="border-b border-gray-700 px-4 py-3">Name</th>
               <th class="border-b border-gray-700 px-4 py-3">Role</th>
+              <th class="border-b border-gray-700 px-4 py-3">Reseller</th>
               <th class="border-b border-gray-700 px-4 py-3 text-center">Password</th>
               <th class="border-b border-gray-700 px-4 py-3 text-center">LBP Balance</th>
               <th class="border-b border-gray-700 px-4 py-3 text-center">Min Balance LBP</th>
@@ -448,7 +449,7 @@
 
           <tbody id="users-table-body" class="divide-y divide-gray-700/80">
             <tr>
-              <td colspan="9" class="px-4 py-16 text-center text-gray-500">
+              <td colspan="10" class="px-4 py-16 text-center text-gray-500">
                 <i class="fa-solid fa-users mb-3 block text-4xl text-cyan-500"></i>
                 Loading users...
               </td>
@@ -522,6 +523,32 @@
           <button id="modal-submit-button" type="submit" class="flex-1 rounded-xl bg-cyan-600 px-4 py-3 font-bold text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-60">
             Save
           </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="reseller-modal" class="fixed inset-0 z-[105] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-md overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
+        <div>
+          <h3 class="text-lg font-black text-white">Assign Reseller</h3>
+          <p id="reseller-modal-client" class="mt-1 text-xs text-gray-400"></p>
+        </div>
+        <button type="button" onclick="closeResellerModal()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-gray-300 transition hover:bg-gray-600 hover:text-white" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="reseller-form" onsubmit="submitResellerAssignment(event)" class="p-5">
+        <input id="reseller-client-numberphone" type="hidden">
+        <label class="block">
+          <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Reseller numberphone</span>
+          <input id="reseller-numberphone" type="tel" required autocomplete="off" placeholder="Enter a user's phone number with reseller role" class="w-full rounded-2xl border border-gray-600 bg-gray-900 px-4 py-4 font-mono text-lg font-bold text-white outline-none transition focus:border-emerald-500">
+        </label>
+        <p class="mt-2 text-xs leading-5 text-gray-500">The number must belong to a user whose role is reseller. Changing reseller resets the client's existing rates.</p>
+        <div class="mt-5 flex gap-3">
+          <button type="button" onclick="closeResellerModal()" class="flex-1 rounded-xl border border-gray-600 bg-gray-700 px-4 py-3 font-bold text-white transition hover:bg-gray-600">Cancel</button>
+          <button id="reseller-submit-button" type="submit" class="flex-1 rounded-xl bg-emerald-600 px-4 py-3 font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">Save reseller</button>
         </div>
       </form>
     </div>
@@ -642,6 +669,7 @@
       EDIT_MIN_BALANCE_LBP: "/auth/editMinBalanceLbp",
       EDIT_MIN_BALANCE_USD: "/auth/editMinBalanceUsd",
       EDIT_ROLE: "/auth/editRole",
+      ASSIGN_RESELLER_TO_CLIENT: "/auth/assignResellerToClient",
       EDIT_PASSWORD: "/auth/editPasswordUser",
     };
 
@@ -825,6 +853,7 @@
           "-"
         ).trim(),
         role: normalizeRole(user.role || "client"),
+        resellerNumberphone: String(user.reseller_numberphone ?? "").trim(),
         balanceLbp: toNumericValue(
           user.balance_lbp ??
           user.balance ??
@@ -985,7 +1014,7 @@
     function renderLoadingRow() {
       document.getElementById("users-table-body").innerHTML = `
         <tr>
-          <td colspan="9" class="px-4 py-16 text-center text-gray-400">
+          <td colspan="10" class="px-4 py-16 text-center text-gray-400">
             <i class="fa-solid fa-spinner loading-spin mb-3 block text-4xl text-cyan-400"></i>
             Loading users...
           </td>
@@ -1004,7 +1033,7 @@
       if (allUsersData.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="px-4 py-16 text-center text-gray-500">
+            <td colspan="10" class="px-4 py-16 text-center text-gray-500">
               <i class="fa-solid fa-users-slash mb-3 block text-4xl text-gray-600"></i>
               No users available.
             </td>
@@ -1013,7 +1042,7 @@
       } else if (pageUsers.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="9" class="px-4 py-16 text-center text-gray-500">
+            <td colspan="10" class="px-4 py-16 text-center text-gray-500">
               <i class="fa-solid fa-magnifying-glass mb-3 block text-4xl text-cyan-700"></i>
               No users match the selected filters.
             </td>
@@ -1073,6 +1102,27 @@
             </div>
 
             ${isSuperAdmin ? renderRoleEditor(user) : ""}
+          </td>
+
+          <td class="whitespace-nowrap px-4 py-3">
+            ${user.role === "client" ? `
+              <div class="flex min-w-[190px] items-center gap-2">
+                <span class="number-cell font-mono text-xs ${user.resellerNumberphone ? "text-emerald-300" : "text-gray-500"}">
+                  ${escapeHtml(user.resellerNumberphone || "Not assigned")}
+                </span>
+                ${isSuperAdmin ? `
+                  <button
+                    type="button"
+                    onclick="openResellerAssignment('${safePhone}')"
+                    class="inline-flex items-center gap-1 rounded-lg border border-emerald-700 bg-emerald-950/40 px-2.5 py-2 text-[11px] font-bold text-emerald-300 transition hover:bg-emerald-900/60 hover:text-white"
+                    title="Assign or change reseller"
+                  >
+                    <i class="fa-solid fa-user-tag"></i>
+                    ${user.resellerNumberphone ? "Edit" : "Assign"}
+                  </button>
+                ` : ""}
+              </div>
+            ` : "-"}
           </td>
 
           <td class="whitespace-nowrap px-4 py-3 text-center">
@@ -1200,6 +1250,71 @@
           </td>
         </tr>
       `;
+    }
+
+    function openResellerAssignment(clientNumberphone) {
+      if (!isSuperAdmin) {
+        showStatus("Only super_admin can assign a reseller.", "error");
+        return;
+      }
+
+      const user = allUsersData.find((item) => item.numberphone === clientNumberphone);
+      if (!user || user.role !== "client") {
+        showStatus("The selected user must have the client role.", "error");
+        return;
+      }
+
+      document.getElementById("reseller-client-numberphone").value = user.numberphone;
+      document.getElementById("reseller-modal-client").textContent = `Client: ${user.numberphone} · ${user.name}`;
+      document.getElementById("reseller-numberphone").value = user.resellerNumberphone || "";
+      const modal = document.getElementById("reseller-modal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+      window.setTimeout(() => document.getElementById("reseller-numberphone")?.focus(), 50);
+    }
+
+    function closeResellerModal() {
+      const modal = document.getElementById("reseller-modal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      document.getElementById("reseller-form")?.reset();
+    }
+
+    async function submitResellerAssignment(event) {
+      event.preventDefault();
+      if (!isSuperAdmin) {
+        showStatus("Only super_admin can assign a reseller.", "error");
+        return;
+      }
+
+      const numberphone = getInputValue("reseller-client-numberphone");
+      const resellerNumberphone = getInputValue("reseller-numberphone");
+      if (!numberphone || !resellerNumberphone) {
+        showStatus("Client and reseller numberphones are required.", "error");
+        return;
+      }
+
+      const submitButton = document.getElementById("reseller-submit-button");
+      submitButton.disabled = true;
+      try {
+        await sendAdminRequest("ASSIGN_RESELLER_TO_CLIENT", {
+          method: "PUT",
+          body: {
+            numberphone,
+            reseller_numberphone: resellerNumberphone,
+          },
+        });
+
+        const user = allUsersData.find((item) => item.numberphone === numberphone);
+        if (user) user.resellerNumberphone = resellerNumberphone;
+        closeResellerModal();
+        applyFilters(false);
+        showStatus(`Reseller ${resellerNumberphone} assigned to client ${numberphone}.`, "success");
+      } catch (error) {
+        showStatus(error.message, "error");
+      } finally {
+        submitButton.disabled = false;
+      }
     }
 
     function renderRoleBadge(role) {
@@ -1825,6 +1940,12 @@
       }
     });
 
+    document.getElementById("reseller-modal")?.addEventListener("click", (event) => {
+      if (event.target.id === "reseller-modal") {
+        closeResellerModal();
+      }
+    });
+
     document.getElementById("add-user-modal")?.addEventListener("click", (event) => {
       if (event.target.id === "add-user-modal") {
         closeAddUserModal();
@@ -1834,6 +1955,7 @@
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
         closeActionModal();
+        closeResellerModal();
         closeAddUserModal();
       }
     });
