@@ -23,6 +23,94 @@
     html.light-mode .modal-panel { background: #fff !important; border-color: #d1d5db !important; }
     html.light-mode .modal-panel label, html.light-mode .modal-panel h2 { color: #1f2937 !important; }
     html.light-mode .rate-input { background: #f8fafc !important; color: #1f2937 !important; border-color: #cbd5e1 !important; }
+
+    /* Keep every surface readable and consistently light in light mode. */
+    html.light-mode header nav a:not([href*="logout"]),
+    html.light-mode header nav button:not([onclick="logout()"]) {
+      background-color: #ffffff !important;
+      border-color: #d1d5db !important;
+      color: #334155 !important;
+    }
+    html.light-mode header nav a:hover,
+    html.light-mode header nav button:hover { background-color: #f1f5f9 !important; }
+    html.light-mode header h1 span { color: #475569 !important; }
+
+    html.light-mode .panel {
+      background-color: #ffffff !important;
+      background-image: none !important;
+      border-color: #f0abfc !important;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, .08) !important;
+    }
+    html.light-mode .panel h2,
+    html.light-mode .panel .text-white { color: #1f2937 !important; }
+    html.light-mode .panel p { color: #475569 !important; }
+    html.light-mode .panel > div > div > span {
+      background: #fdf4ff !important;
+      border-color: #f0abfc !important;
+      color: #a21caf !important;
+    }
+    html.light-mode .panel .rounded-2xl {
+      background: #fdf4ff !important;
+      border-color: #f0abfc !important;
+    }
+    html.light-mode .panel .text-fuchsia-300 { color: #a21caf !important; }
+    html.light-mode #reload-button { color: #ffffff !important; }
+
+    html.light-mode main > section:not(.panel) {
+      background: #ffffff !important;
+      border-color: #dbe3ec !important;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, .06) !important;
+    }
+    html.light-mode main > section:not(.panel) > div:first-child {
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode main > section:not(.panel) h3 { color: #1f2937 !important; }
+    html.light-mode main > section:not(.panel) p { color: #64748b !important; }
+
+    html.light-mode #search-input {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #1f2937 !important;
+    }
+    html.light-mode #search-input::placeholder { color: #94a3b8 !important; }
+    html.light-mode .table-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+    html.light-mode .table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; }
+    html.light-mode .data-table thead { background: #f1f5f9 !important; color: #475569 !important; }
+    html.light-mode .data-table th { background: #f1f5f9 !important; border-color: #dbe3ec !important; color: #475569 !important; }
+    html.light-mode .data-table td { background: #ffffff !important; border-color: #e2e8f0 !important; color: #334155 !important; }
+    html.light-mode .data-table tr:hover td { background: #f8fafc !important; }
+    html.light-mode .data-table .text-white { color: #1f2937 !important; }
+    html.light-mode .data-table [class*="text-gray-"] { color: #64748b !important; }
+    html.light-mode .data-table [class*="bg-emerald-950"] { background: #dcfce7 !important; border-color: #86efac !important; }
+    html.light-mode .data-table [class*="text-emerald-300"] { color: #166534 !important; }
+    html.light-mode .data-table [class*="bg-gray-900"] { background: #f1f5f9 !important; border-color: #cbd5e1 !important; }
+    html.light-mode .data-table [class*="text-gray-400"] { color: #64748b !important; }
+    html.light-mode .data-table [class*="bg-fuchsia-950"] { background: #fdf4ff !important; border-color: #e879f9 !important; }
+    html.light-mode .data-table [class*="text-fuchsia-300"] { color: #a21caf !important; }
+    html.light-mode .data-table [class*="hover:bg-fuchsia-900"]:hover { background: #fae8ff !important; }
+
+    html.light-mode .modal-panel { background: #ffffff !important; border-color: #d1d5db !important; }
+    html.light-mode .modal-panel > div:first-child { border-color: #e2e8f0 !important; }
+    html.light-mode .modal-panel h2 { color: #1f2937 !important; }
+    html.light-mode .modal-panel p,
+    html.light-mode .modal-panel label { color: #475569 !important; }
+    html.light-mode .modal-panel #edit-active + span { color: #475569 !important; }
+    html.light-mode .modal-panel label.rounded-xl {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    html.light-mode .modal-panel button[aria-label="Close"],
+    html.light-mode .modal-panel button[onclick="closeEditModal()"] {
+      background: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #475569 !important;
+    }
+    html.light-mode .modal-panel button[aria-label="Close"]:hover,
+    html.light-mode .modal-panel button[onclick="closeEditModal()"]:hover { background: #e2e8f0 !important; }
+    html.light-mode .modal-panel .rate-input { background: #ffffff !important; }
+    html.light-mode #status-message[class*="bg-cyan-950"] { background: #ecfeff !important; border-color: #67e8f9 !important; color: #155e75 !important; }
+    html.light-mode #status-message[class*="bg-emerald-950"] { background: #f0fdf4 !important; border-color: #86efac !important; color: #166534 !important; }
+    html.light-mode #status-message[class*="bg-red-950"] { background: #fef2f2 !important; border-color: #fca5a5 !important; color: #991b1b !important; }
   </style>
 </head>
 <body class="min-h-screen bg-gray-900 font-sans text-gray-100">
