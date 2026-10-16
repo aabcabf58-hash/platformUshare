@@ -48,6 +48,185 @@
             max-height: none !important;
             overflow-y: visible !important;
         }
+
+        .group-lines-list {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden !important;
+        }
+
+        .group-lines-header,
+        .group-line-row {
+            display: grid;
+            grid-template-columns:
+                22px
+                minmax(0, 1.05fr)
+                minmax(0, .55fr)
+                minmax(0, .55fr)
+                minmax(0, .65fr)
+                minmax(0, .72fr)
+                minmax(0, .78fr)
+                minmax(0, .86fr)
+                repeat(3, minmax(0, .9fr))
+                minmax(0, 1.85fr);
+            align-items: center;
+            gap: 2px;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .group-lines-header {
+            padding: 2px 3px 5px;
+            box-sizing: border-box;
+            color: #9ca3af;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .group-lines-stacked-header,
+        .group-line-stacked-values {
+            display: grid;
+            gap: 2px;
+        }
+
+        .group-lines-stacked-header {
+            font-size: 8px;
+            line-height: 1.15;
+        }
+
+        .group-line-stacked-values {
+            white-space: normal;
+        }
+
+        .group-line-stacked-values span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .group-line-row {
+            min-height: 48px;
+            padding: 5px 3px;
+            border: 1px solid #374151;
+            border-radius: 12px;
+            background: rgba(17, 24, 39, .72);
+            box-sizing: border-box;
+        }
+
+        .group-line-cell {
+            min-width: 0;
+            overflow: hidden;
+            color: #e5e7eb;
+            font-size: 12px;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .group-line-phone {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .group-line-phone span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .group-line-secondary {
+            display: grid;
+            gap: 2px;
+            font-size: 11px;
+        }
+
+        .group-line-secondary .secondary-number {
+            overflow: hidden;
+            color: #a5b4fc;
+            text-overflow: ellipsis;
+        }
+
+        .group-line-secondary .secondary-meta {
+            color: #9ca3af;
+            font-size: 10px;
+        }
+
+        .group-line-actions {
+            display: flex;
+            min-width: 0;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 2px;
+            overflow: hidden;
+        }
+
+        .group-line-actions button {
+            width: clamp(12px, 1.55vw, 21px);
+            height: clamp(12px, 1.55vw, 21px);
+            min-width: 0;
+            flex: 0 1 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+            .group-lines-list {
+                padding-left: 4px !important;
+                padding-right: 4px !important;
+            }
+
+            .group-line-row {
+                gap: 1px;
+                padding-left: 2px;
+                padding-right: 2px;
+            }
+
+            .group-line-cell {
+                font-size: 9px;
+            }
+
+            .group-line-phone {
+                font-size: 9px;
+            }
+
+            .group-line-actions button {
+                width: clamp(10px, 2.8vw, 15px);
+                height: clamp(10px, 2.8vw, 15px);
+                border-radius: 4px;
+            }
+        }
+
+        html.light-mode .group-lines-header {
+            color: #64748b;
+        }
+
+        html.light-mode .group-lines-count {
+            border-color: #0891b2;
+            background-color: #cffafe;
+            color: #155e75;
+        }
+
+        html.light-mode .group-line-row {
+            border-color: #d1d5db;
+            background: #f8fafc;
+        }
+
+        html.light-mode .group-line-cell {
+            color: #1f2937;
+        }
+
+        html.light-mode .group-line-secondary .secondary-meta {
+            color: #64748b;
+        }
     </style>
 </head>
 
@@ -604,8 +783,13 @@
                                             Group ID
                                         </div>
 
-                                        <div class="mt-0.5 truncate font-mono text-xl font-bold text-indigo-300" title="${escapeHtml(groupId)}">
-                                            ${escapeHtml(groupId)}
+                                        <div class="mt-0.5 flex min-w-0 items-center gap-2">
+                                            <div class="truncate font-mono text-xl font-bold text-indigo-300" title="${escapeHtml(groupId)}">
+                                                ${escapeHtml(groupId)}
+                                            </div>
+                                            <span class="group-lines-count shrink-0 rounded-md border border-cyan-400/60 bg-cyan-500/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-cyan-100" title="Lines">
+                                                ${groupLines.length} lines
+                                            </span>
                                         </div>
                                     </div>
 
@@ -659,35 +843,34 @@
                                             <i class="fa-solid fa-trash"></i>
                                             Delete
                                         </button>
+
+                                        ${renderYearControls(groupId)}
                                     </div>
                                 </div>
 
-                                <div class="mt-2 grid grid-cols-2 gap-2">
-                                    <div class="flex items-center justify-between rounded-lg bg-gray-900/50 px-2.5 py-1.5">
-                                        <span class="text-[10px] uppercase text-gray-500">
-                                            Lines
-                                        </span>
-
-                                        <span class="font-mono text-sm font-bold text-white">
-                                            ${groupLines.length}
-                                        </span>
-                                    </div>
-
-                                    <div class="flex items-center justify-between rounded-lg bg-gray-900/50 px-2.5 py-1.5">
-                                        <span class="text-[10px] uppercase text-gray-500">
-                                            Type
-                                        </span>
-
-                                        <span class="font-mono text-xs font-bold text-green-300">
-                                            YEAR ACTION
-                                        </span>
-                                    </div>
-                                </div>
-
-                                ${renderYearControls(groupId, groupLines)}
                             </div>
 
                             <div class="group-lines-list space-y-1 p-2">
+                                <div class="group-lines-header" aria-hidden="true">
+                                    <div></div>
+                                    <div>Phone</div>
+                                    <div>Line Type</div>
+                                    <div>SIM Type</div>
+                                    <div>Balance</div>
+                                    <div>Validity</div>
+                                    <div class="group-lines-stacked-header">
+                                        <span>Primary</span>
+                                        <span>Shared Bundle</span>
+                                    </div>
+                                    <div class="group-lines-stacked-header">
+                                        <span>Subscription</span>
+                                        <span>Service Expiry</span>
+                                    </div>
+                                    <div>Secondary 1</div>
+                                    <div>Secondary 2</div>
+                                    <div>Secondary 3</div>
+                                    <div>Actions</div>
+                                </div>
                                 ${groupLines
                                     .map(
                                         (line) =>
@@ -716,134 +899,114 @@
                 line.sim_type ??
                 '-'
             );
+            const subscriptionDate = formatDate(line.subscription_date);
+            const expiryDate = formatDate(line.service_validity);
+            const primaryUser = formatEmptyValue(line.primary_user);
+            const totalSharedBundle = formatTotalSharedBundle(line);
+            const balanceClass = Number(line.balance) < 0
+                ? 'text-red-400'
+                : 'text-green-400';
+            const phone = String(line.numberphone || '');
+            const escapedPhone = escapeJsString(phone);
+            const escapedGroupId = escapeJsString(groupId);
 
-            const subscriptionDate =
-                formatDate(line.subscription_date);
+            return (
+                '<div class="group-line-row">' +
+                    '<div class="group-line-cell text-center">' +
+                        '<input type="checkbox" data-group-line-select value="' +
+                            escapeHtml(phone) +
+                            '" onchange="toggleGroupLineSelection(\'' +
+                            escapedPhone +
+                            '\', this.checked)" ' +
+                            (selectedGroupLinePhones.has(phone) ? 'checked' : '') +
+                            ' class="h-4 w-4 cursor-pointer accent-indigo-500">' +
+                    '</div>' +
 
-            const expiryDate =
-                formatDate(line.service_validity);
+                    '<div class="group-line-cell group-line-phone">' +
+                        '<span title="' + escapeHtml(phone || '-') + '">' +
+                            escapeHtml(phone || '-') +
+                        '</span>' +
+                    '</div>' +
 
-            const updatedAt =
-                formatDateTime(getUpdatedAtValue(line));
+                    '<div class="group-line-cell">' +
+                        '<span class="rounded border border-blue-700 bg-blue-500/10 px-1 py-0.5 text-[9px] text-blue-300">' +
+                            escapeHtml(line.line_type ?? '-') +
+                        '</span>' +
+                    '</div>' +
 
-            const primaryUser =
-                formatEmptyValue(line.primary_user);
+                    '<div class="group-line-cell">' +
+                        '<span class="rounded border border-cyan-700 bg-cyan-500/10 px-1 py-0.5 text-[9px] text-cyan-300" title="SIM Type: ' +
+                            escapeHtml(typeSim) + '">' +
+                            escapeHtml(typeSim) +
+                        '</span>' +
+                    '</div>' +
 
-            const totalSharedBundle =
-                formatTotalSharedBundle(line);
+                    '<div class="group-line-cell ' + balanceClass + '">' +
+                        '$' + escapeHtml(formatNumber(line.balance)) +
+                    '</div>' +
 
-            const ushareNote =
-                getUShareNote(line);
+                    '<div class="group-line-cell text-orange-300">' +
+                        escapeHtml(line.validity ?? 0) + ' days' +
+                        '<div class="text-[10px] text-gray-400" title="Service expiry">' +
+                            escapeHtml(expiryDate) +
+                        '</div>' +
+                    '</div>' +
 
-            return `
-                <div class="rounded-lg border border-gray-700 bg-gray-900/50 p-2 shadow">
-                    <div class="grid grid-cols-1 gap-2 xl:grid-cols-[28px_190px_1fr_auto] xl:items-start">
-                        <label class="flex h-7 items-center justify-center"><input type="checkbox" data-group-line-select value="${escapeHtml(line.numberphone || '')}" onchange="toggleGroupLineSelection('${escapeJsString(line.numberphone || '')}', this.checked)" ${selectedGroupLinePhones.has(String(line.numberphone || '')) ? 'checked' : ''} class="h-4 w-4 cursor-pointer accent-indigo-500"></label>
-                        <div class="min-w-0">
-                            <div
-                                class="whitespace-nowrap overflow-hidden text-ellipsis font-mono text-sm font-bold text-white"
-                                title="${escapeHtml(line.numberphone || '-')}"
-                            >
-                                ${escapeHtml(line.numberphone || '-')}
-                            </div>
+                    '<div class="group-line-cell group-line-stacked-values" title="Primary: ' +
+                        escapeHtml(primaryUser) + ' | Shared Bundle: ' +
+                        escapeHtml(totalSharedBundle) + '">' +
+                        '<span class="text-purple-300">' + escapeHtml(primaryUser) + '</span>' +
+                        '<span class="text-cyan-300">' + escapeHtml(totalSharedBundle) + '</span>' +
+                    '</div>' +
 
-                            <div class="mt-1 flex flex-nowrap gap-1 overflow-hidden">
-                                <span class="shrink-0 rounded border border-blue-700 bg-blue-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-blue-300">
-                                    ${escapeHtml(line.line_type ?? '-')}
-                                </span>
+                    '<div class="group-line-cell group-line-stacked-values" title="Subscription: ' +
+                        escapeHtml(subscriptionDate) + ' | Service Expiry: ' +
+                        escapeHtml(expiryDate) + '">' +
+                        '<span class="text-blue-300">' + escapeHtml(subscriptionDate) + '</span>' +
+                        '<span class="text-orange-300">' + escapeHtml(expiryDate) + '</span>' +
+                    '</div>' +
 
-                                <span class="min-w-0 truncate rounded border border-indigo-700 bg-indigo-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-indigo-300" title="${escapeHtml(groupId)}">
-                                    ${escapeHtml(groupId)}
-                                </span>
+                    renderSecondaryRowCell(line, 1) +
+                    renderSecondaryRowCell(line, 2) +
+                    renderSecondaryRowCell(line, 3) +
 
-                                <span class="shrink-0 rounded border border-cyan-700 bg-cyan-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-cyan-300" title="SIM Type: ${escapeHtml(typeSim)}">
-                                    ${escapeHtml(typeSim)}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-1 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-8">
-                            ${renderMiniInfo('Balance', `$${formatNumber(line.balance)}`, 'text-green-400')}
-                            ${renderMiniInfo('Validity', `${line.validity ?? 0} days`, 'text-orange-300')}
-                            ${renderMiniInfo('Primary', primaryUser, 'text-purple-300')}
-                            ${renderMiniInfo('Bundle', totalSharedBundle, 'text-cyan-300')}
-                            ${renderMiniInfo('Sub Date', subscriptionDate, 'text-blue-300')}
-                            ${renderMiniInfo('Service', expiryDate, 'text-orange-300')}
-                            ${renderMiniInfo('Update', updatedAt, 'text-gray-300')}
-                            ${renderMiniInfo('Note', ushareNote, 'text-amber-300')}
-                        </div>
-
-                        <div class="flex shrink-0 items-center gap-1">
-                            <button
-                                type="button"
-                                onclick="checkSingleGroupLine(
-                                    '${escapeJsString(line.numberphone || '')}',
-                                    this
-                                )"
-                                class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded border border-emerald-700 bg-emerald-500/10 text-emerald-300 transition hover:bg-emerald-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                                title="Check this number and remove it from the group when valid"
-                            >
-                                <i class="fa-solid fa-check text-[10px]"></i>
-                            </button>
-
-                            <button
-                                type="button"
-                                onclick="refreshSingleLine(
-                                    '${escapeJsString(line.numberphone || '')}',
-                                    this
-                                )"
-                                class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded border border-blue-700 bg-blue-500/10 text-blue-300 transition hover:bg-blue-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                                title="Refresh only this number"
-                            >
-                                <i class="fa-solid fa-rotate text-[10px]"></i>
-                            </button>
-
-                            <button
-                                type="button"
-                                onclick="changeLineGroup(
-                                    '${escapeJsString(line.numberphone || '')}',
-                                    '${escapeJsString(groupId)}',
-                                    this
-                                )"
-                                class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded border border-amber-700 bg-amber-500/10 text-amber-300 transition hover:bg-amber-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                                title="Change this number's group"
-                            >
-                                <i class="fa-solid fa-pen-to-square text-[10px]"></i>
-                            </button>
-
-                            <button
-                                type="button"
-                                onclick="copyLine('${escapeJsString(line.numberphone || '')}')"
-                                class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded border border-purple-700 bg-purple-500/10 text-purple-300 transition hover:bg-purple-600 hover:text-white"
-                                title="Copy phone number"
-                            >
-                                <i class="fa-solid fa-copy text-[10px]"></i>
-                            </button>
-
-                            <button
-                                type="button"
-                                onclick="removeLineFromGroup(
-                                    '${escapeJsString(line.numberphone || '')}',
-                                    '${escapeJsString(groupId)}',
-                                    this
-                                )"
-                                class="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded border border-red-700 bg-red-500/10 text-red-300 transition hover:bg-red-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-                                title="Remove only this number from the group"
-                            >
-                                <i class="fa-solid fa-user-minus text-[10px]"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="mt-1 grid grid-cols-1 gap-1 md:grid-cols-3">
-                        ${renderSecondaryMini(line, 1)}
-                        ${renderSecondaryMini(line, 2)}
-                        ${renderSecondaryMini(line, 3)}
-                    </div>
-                </div>
-            `;
+                    '<div class="group-line-actions">' +
+                        '<button type="button" onclick="checkSingleGroupLine(\'' + escapedPhone + '\', this)" class="border border-emerald-700 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-600 hover:text-white" title="Check number">' +
+                            '<i class="fa-solid fa-check text-[10px]"></i>' +
+                        '</button>' +
+                        '<button type="button" onclick="refreshSingleLine(\'' + escapedPhone + '\', this)" class="border border-blue-700 bg-blue-500/10 text-blue-300 hover:bg-blue-600 hover:text-white" title="Refresh number">' +
+                            '<i class="fa-solid fa-rotate text-[10px]"></i>' +
+                        '</button>' +
+                        '<button type="button" onclick="changeLineGroup(\'' + escapedPhone + '\', \'' + escapedGroupId + '\', this)" class="border border-amber-700 bg-amber-500/10 text-amber-300 hover:bg-amber-600 hover:text-white" title="Change group">' +
+                            '<i class="fa-solid fa-pen-to-square text-[10px]"></i>' +
+                        '</button>' +
+                        '<button type="button" onclick="copyLine(\'' + escapedPhone + '\')" class="border border-purple-700 bg-purple-500/10 text-purple-300 hover:bg-purple-600 hover:text-white" title="Copy number">' +
+                            '<i class="fa-solid fa-copy text-[10px]"></i>' +
+                        '</button>' +
+                        '<button type="button" onclick="removeLineFromGroup(\'' + escapedPhone + '\', \'' + escapedGroupId + '\', this)" class="border border-red-700 bg-red-500/10 text-red-300 hover:bg-red-600 hover:text-white" title="Remove from group">' +
+                            '<i class="fa-solid fa-user-minus text-[10px]"></i>' +
+                        '</button>' +
+                    '</div>' +
+                '</div>'
+            );
         }
 
+        function renderSecondaryRowCell(line, index) {
+            const secondary = getSecondaryData(line, index);
+            const number = formatEmptyValue(secondary.number);
+            const status = formatEmptyValue(secondary.status);
+            const usage = formatNumber(secondary.used) + ' / ' +
+                formatNumber(secondary.total) + ' GB';
+
+            return (
+                '<div class="group-line-cell group-line-secondary" title="' +
+                    escapeHtml(number + ' · ' + usage + ' · ' + status) + '">' +
+                    '<span class="secondary-number">' + escapeHtml(number) + '</span>' +
+                    '<span class="secondary-meta">' + escapeHtml(usage) +
+                        ' · ' + escapeHtml(status) + '</span>' +
+                '</div>'
+            );
+        }
 
         function updateSelectedGroupLinesUi() {
             const count = selectedGroupLinePhones.size;
@@ -1102,50 +1265,12 @@
         }
 
 
-        function getGroupDomKey(groupId) {
-            const text = String(groupId ?? '');
-            let hash = 0;
-
-            for (let index = 0; index < text.length; index += 1) {
-                hash = ((hash << 5) - hash) + text.charCodeAt(index);
-                hash |= 0;
-            }
-
-            return `group_${Math.abs(hash)}`;
-        }
-
-        function renderYearControls(groupId, groupLines) {
-            const key = getGroupDomKey(groupId);
-
-            return `
-                <div class="mt-2 rounded-xl border border-green-800 bg-green-900/20 p-2">
-                    <div class="mb-2 flex items-center justify-between gap-2">
-                        <div>
-                            <div class="text-[10px] font-bold uppercase tracking-wide text-green-400">
-                                Create Year
-                            </div>
-                            <div class="mt-0.5 text-xs text-gray-300">
-                                No frontend lock. The server will validate the group rules.
-                            </div>
-                        </div>
-
-                        <button
-                            id="create-year-${key}"
-                            type="button"
-                            onclick="createYearFromGroup('${escapeJsString(groupId)}', this)"
-                            class="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-green-600 px-3 py-2 text-[11px] font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
-                            title="Create a year from this group"
-                        >
-                            <i class="fa-solid fa-calendar-plus"></i>
-                            Create Year
-                        </button>
-                    </div>
-
-                    <div class="text-[10px] text-gray-500">
-                        Current lines: ${groupLines.length}. Any rejected condition will come from the server.
-                    </div>
-                </div>
-            `;
+        function renderYearControls(groupId) {
+            return '<button type="button" onclick="createYearFromGroup(\'' +
+                escapeJsString(groupId) +
+                '\', this)" class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg bg-green-600 px-2 text-[11px] font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50" title="Create a year from this group">' +
+                '<i class="fa-solid fa-calendar-plus"></i> Create Year' +
+                '</button>';
         }
 
         async function createYearFromGroup(groupId, buttonElement) {
