@@ -2349,10 +2349,18 @@
                 case 'primaryUser':
                     return getSortNumber(line.primary_user);
 
-                case 'totalShared':
-                    return getSortNumber(
-                        getTotalSharedBundleParts(line).used
-                    );
+                case 'totalShared': {
+                    const { used, total } =
+                        getTotalSharedBundleParts(line);
+                    const usedNumber = Number.parseFloat(used);
+                    const totalNumber = Number.parseFloat(total);
+
+                    return Number.isFinite(usedNumber) &&
+                        Number.isFinite(totalNumber) &&
+                        totalNumber > 0
+                        ? (usedNumber / totalNumber) * 100
+                        : 0;
+                }
 
                 case 'serviceDate':
                     return getSortDate(
