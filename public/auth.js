@@ -15,7 +15,7 @@ const AUTH_BASE_PATH = "/auth";
 function getApiBaseUrl() {
   return (
     window.APP_CONFIG?.API_BASE_URL ||
-    "https://api.zouzouamhaz.com/"
+    "https://api.zouzouamhaz.com"
   );
 }
 
