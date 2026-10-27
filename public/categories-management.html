@@ -260,56 +260,6 @@
     </div>
   </main>
 
-  <div id="item-type-modal" class="fixed inset-0 z-[95] hidden items-center justify-center bg-black/55 p-4 backdrop-blur-sm">
-    <div class="w-full max-w-2xl rounded-3xl border border-gray-700 bg-gray-800 p-5 shadow-2xl">
-      <input id="item-type-childcategory-id" type="hidden">
-
-      <div class="mb-5 flex items-start justify-between gap-4">
-        <div>
-          <h3 class="text-xl font-black text-white">Choose Item Type</h3>
-          <p id="item-type-subtitle" class="mt-1 text-sm text-gray-500">Select the item you want to add.</p>
-        </div>
-        <button type="button" onclick="closeItemTypeModal()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-gray-700 transition hover:bg-gray-600">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <button type="button" onclick="chooseItemType('package')" class="rounded-2xl border border-cyan-200 bg-cyan-50 p-5 text-left transition hover:border-cyan-500 hover:shadow-lg">
-          <span class="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-600 text-white">
-            <i class="fa-solid fa-box"></i>
-          </span>
-          <strong class="block text-cyan-800">Package Item</strong>
-          <span class="mt-2 block text-xs leading-5 text-gray-500">Fixed package with price, value and validity days.</span>
-        </button>
-
-        <button type="button" onclick="chooseItemType('counter')" class="rounded-2xl border border-green-200 bg-green-50 p-5 text-left transition hover:border-green-500 hover:shadow-lg">
-          <span class="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-green-600 text-white">
-            <i class="fa-solid fa-calculator"></i>
-          </span>
-          <strong class="block text-green-800">Counter Item</strong>
-          <span class="mt-2 block text-xs leading-5 text-gray-500">Quantity-based item with minimum, maximum and step.</span>
-        </button>
-
-        <button type="button" onclick="chooseItemType('balance')" class="rounded-2xl border border-purple-200 bg-purple-50 p-5 text-left transition hover:border-purple-500 hover:shadow-lg">
-          <span class="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-purple-600 text-white">
-            <i class="fa-solid fa-scale-balanced"></i>
-          </span>
-          <strong class="block text-purple-800">Balance Item</strong>
-          <span class="mt-2 block text-xs leading-5 text-gray-500">Dollar balance item with message limits and pricing.</span>
-        </button>
-
-        <button type="button" onclick="chooseItemType('days')" class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-left transition hover:border-amber-500 hover:shadow-lg">
-          <span class="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-amber-600 text-white">
-            <i class="fa-solid fa-calendar-day"></i>
-          </span>
-          <strong class="block text-amber-800">Days Item</strong>
-          <span class="mt-2 block text-xs leading-5 text-gray-500">Days-based item with card price, base values and balance pricing.</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
   <div id="entity-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
     <div class="w-full max-w-lg overflow-hidden rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
       <div class="flex items-center justify-between border-b border-gray-700 px-5 py-4">
@@ -364,7 +314,7 @@
     <div class="max-h-[94vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-gray-700 bg-gray-800 shadow-2xl">
       <div class="sticky top-0 z-10 flex items-center justify-between border-b border-gray-700 bg-gray-800 px-5 py-4">
         <div>
-          <h3 id="item-modal-title" class="text-lg font-black text-white">Add Package Item</h3>
+          <h3 id="item-modal-title" class="text-lg font-black text-white">Add Item</h3>
           <p id="item-modal-subtitle" class="mt-1 text-xs text-gray-400"></p>
         </div>
         <button type="button" onclick="closeItemModal()" class="rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-gray-300 transition hover:bg-gray-600 hover:text-white">
@@ -448,7 +398,7 @@
 
           <label class="block">
             <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Unit</span>
-            <input id="item-unit" type="text" placeholder="GB, USD, days..." class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500">
+            <input id="item-unit" type="text" required placeholder="balance, card, GB..." class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none focus:border-cyan-500">
           </label>
 
           <label class="block">
@@ -477,6 +427,11 @@
             </select>
           </label>
 
+<label class="block"><span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Minimum Amount</span><input id="item-minimum-amount" type="number" step="any" min="0" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white"></label>
+<label class="block"><span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Maximum Amount</span><input id="item-maximum-amount" type="number" step="any" min="0" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white"></label>
+<label class="block"><span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Step Amount</span><input id="item-step-amount" type="number" step="any" min="0" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white"></label>
+<label class="block"><span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Message Cost</span><input id="item-message-cost" type="number" step="any" min="0" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white"></label>
+<label class="block"><span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Maximum Per Message</span><input id="item-maximum-per-message" type="number" step="any" min="0" value="0" required class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white"></label>
           <label id="item-api-function-wrapper" class="hidden md:col-span-2">
             <span class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">API Function Name</span>
             <input id="item-api-function" type="text" autocomplete="off" placeholder="topUpRechargeCard" class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none focus:border-cyan-500">
@@ -847,9 +802,9 @@
       CREATE_CHILDCATEGORY: "/category/createChildcategory",
       EDIT_CHILDCATEGORY: "/category/editChildCategory",
       EDIT_IS_ACTIVE: "/category/editIsActive",
-      GET_ITEMS_PACKAGE: "/category/getAllItemsPackage",
-      EDIT_ITEM_PACKAGE: "/category/editItemPakage",
-      ADD_ITEM_PACKAGE: "/category/addItemPackage",
+      GET_ITEMS_PACKAGE: "/category/getAllItemsAdmin",
+      EDIT_ITEM_PACKAGE: "/category/editItem",
+      ADD_ITEM_PACKAGE: "/category/addItem",
       GET_ITEMS_COUNTER: "/category/getAllItemsCounter",
       ADD_ITEMS_COUNTER: "/category/addItemsCounter",
       EDIT_ITEMS_COUNTER: "/category/editItemsCounter",
@@ -1040,6 +995,11 @@
           retail_price_usd: toNumericValue(item.retail_price_usd),
           package_value: toNumericValue(item.package_value ?? item.value ?? 0),
           unit: String(item.unit ?? ""),
+          minimum_amount: toNumericValue(item.minimum_amount),
+          maximum_amount: toNumericValue(item.maximum_amount),
+          step_amount: toNumericValue(item.step_amount),
+          message_cost: toNumericValue(item.message_cost),
+          maximum_per_message: toNumericValue(item.maximum_per_message),
           validity_days: Math.max(0, Math.trunc(toNumericValue(item.validity_days ?? 0))),
           is_active: toBoolean(item.is_active, true),
           // New server field is auto_api; api_auto is kept only as a legacy GET fallback.
@@ -1596,7 +1556,7 @@
             </div>
 
             ${isSuperAdmin ? `
-              <button type="button" onclick="openEditItemModal('${escapeJsString(item.id)}')" class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-cyan-800 bg-cyan-950/30 px-3 text-xs font-bold text-cyan-300 transition hover:bg-cyan-900/50" title="Edit package item">
+              <button type="button" onclick="openEditItemModal('${escapeJsString(item.id)}')" class="flex h-9 shrink-0 items-center justify-center gap-2 rounded-lg border border-cyan-800 bg-cyan-950/30 px-3 text-xs font-bold text-cyan-300 transition hover:bg-cyan-900/50" title="Edit item">
                 <i class="fa-solid fa-pen"></i>
                 Edit
               </button>
@@ -1749,12 +1709,13 @@
 
       return `
         <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
-          <button type="button" onclick="openItemTypeModal('${escapeJsString(childcategory.id)}')" class="rounded-lg bg-cyan-600 px-3 py-2 text-xs font-black text-white transition hover:bg-cyan-700" title="Choose and add an item">
+          <button type="button" onclick="openCreateItemModal('${escapeJsString(childcategory.id)}')" class="rounded-lg bg-cyan-600 px-3 py-2 text-xs font-black text-white transition hover:bg-cyan-700" title="Add item">
             <i class="fa-solid fa-plus mr-1"></i>Add Item
           </button>
           <button type="button" onclick="openEditEntityModal('childcategory', '${escapeJsString(childcategory.id)}')" class="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-600 bg-gray-700 text-xs text-gray-200 transition hover:bg-gray-600" title="Edit child category">
             <i class="fa-solid fa-pen"></i>
           </button>
+          <button type="button" onclick="openDaysModal('create', '${escapeJsString(childcategory.id)}')" class="rounded-lg bg-amber-600 px-3 py-2 text-xs font-black text-white">Add Days Item</button>
           ${renderActiveButton("Childcategory", childcategory, true)}
         </div>
       `;
@@ -1816,45 +1777,7 @@
       );
     }
 
-    function openItemTypeModal(childcategoryId) {
-      if (!isSuperAdmin) return;
-
-      const childcategory = findEntity("childcategory", childcategoryId);
-
-      document.getElementById("item-type-childcategory-id").value =
-        childcategoryId;
-      document.getElementById("item-type-subtitle").textContent =
-        childcategory
-          ? `Add an item inside "${childcategory.name}".`
-          : "Select the item type you want to add.";
-
-      const modal = document.getElementById("item-type-modal");
-      modal.classList.remove("hidden");
-      modal.classList.add("flex");
-    }
-
-    function closeItemTypeModal() {
-      const modal = document.getElementById("item-type-modal");
-      modal.classList.add("hidden");
-      modal.classList.remove("flex");
-    }
-
-    function chooseItemType(type) {
-      const childcategoryId =
-        getInputValue("item-type-childcategory-id");
-
-      closeItemTypeModal();
-
-      if (type === "package") {
-        openCreateItemModal(childcategoryId);
-      } else if (type === "counter") {
-        openCounterModal("create", "", childcategoryId);
-      } else if (type === "balance") {
-        openBalanceModal("create", childcategoryId);
-      } else if (type === "days") {
-        openDaysModal("create", childcategoryId);
-      }
-    }
+    function closeItemTypeModal() {}
 
     function openCreateItemModal(childcategoryId) {
       if (!isSuperAdmin) return;
@@ -1866,7 +1789,7 @@
 
       const item = findPackageItem(id);
       if (!item) {
-        showStatus("The selected package item was not found.", "error");
+        showStatus("The selected item was not found.", "error");
         return;
       }
 
@@ -1880,11 +1803,8 @@
       document.getElementById("item-name").value = item?.name ?? "";
       document.getElementById("item-company").value = item?.company ?? "";
       document.getElementById("item-description").value = item?.description ?? "";
-      document.getElementById("item-sms").value = item?.SMS ?? "";
-      document.getElementById("item-sms-wrapper").classList.toggle(
-        "hidden",
-        mode !== "edit"
-      );
+      document.getElementById("item-sms").value = item?.SMS ?? item?.sms ?? "";
+      document.getElementById("item-sms-wrapper").classList.remove("hidden");
       document.getElementById("item-image-url").value = item?.image_url ?? "";
       document.getElementById("item-cost-lbp").value = item?.cost_lbp ?? 0;
       document.getElementById("item-price-lbp").value = item?.price_lbp ?? 0;
@@ -1899,13 +1819,18 @@
       document.getElementById("item-is-active").value = String(item?.is_active ?? true);
       document.getElementById("item-auto-api").value = String(item?.auto_api ?? false);
       document.getElementById("item-api-function").value = item?.api_function ?? "";
+      document.getElementById("item-minimum-amount").value = item?.minimum_amount ?? 0;
+      document.getElementById("item-maximum-amount").value = item?.maximum_amount ?? 0;
+      document.getElementById("item-step-amount").value = item?.step_amount ?? 0;
+      document.getElementById("item-message-cost").value = item?.message_cost ?? 0;
+      document.getElementById("item-maximum-per-message").value = item?.maximum_per_message ?? 0;
       toggleItemApiFunctionField();
 
       fillItemChildcategorySelect(childcategoryId);
       updateItemImagePreview();
 
       document.getElementById("item-modal-title").textContent =
-        mode === "create" ? "Add Package Item" : "Edit Package Item";
+        mode === "create" ? "Add Item" : "Edit Item";
       document.getElementById("item-modal-subtitle").textContent =
         mode === "create"
           ? "Create a new item under the selected child category."
@@ -2036,7 +1961,27 @@
         return;
       }
 
+      const limits = {};
+      for (const field of ["minimum_amount", "maximum_amount", "step_amount", "message_cost", "maximum_per_message"]) {
+        const value = Number(getInputValue(`item-${field.replaceAll("_", "-")}`));
+        if (!Number.isFinite(value) || value < 0) {
+          showStatus(`${field} must be a non-negative number.`, "error");
+          return;
+        }
+        limits[field] = value;
+      }
+      if (!unit.trim()) {
+        showStatus("Unit is required.", "error");
+        return;
+      }
+      if (unit.trim().toLowerCase() === "balance" &&
+          (limits.minimum_amount <= 0 || limits.maximum_amount < limits.minimum_amount || limits.step_amount <= 0)) {
+        showStatus("Balance requires minimum > 0, maximum >= minimum and step > 0.", "error");
+        return;
+      }
       const body = {
+        ...limits,
+        sms: SMS || null,
         childcategory_id,
         name,
         company,
@@ -2059,7 +2004,7 @@
 
       if (mode === "edit") {
         body.id = id;
-        body.SMS = SMS || null;
+
       }
 
       submitButton.disabled = true;
@@ -2076,8 +2021,8 @@
         closeItemModal();
         showStatus(
           mode === "create"
-            ? "Package item created successfully."
-            : "Package item updated successfully.",
+            ? "Item created successfully."
+            : "Item updated successfully.",
           "success"
         );
         await loadCategoriesTree();
@@ -2941,8 +2886,6 @@
 
     async function initializePage() {
       await loadCategoriesTree();
-      await loadCounterItems();
-      await loadBalanceItems();
       await loadDaysItems();
     }
 
