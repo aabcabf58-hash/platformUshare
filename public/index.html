@@ -480,6 +480,17 @@
 
             <div class="mt-4 flex flex-col gap-3 border-t border-gray-700 pt-4 lg:flex-row lg:items-center lg:justify-between">
                 <div class="flex flex-wrap items-center gap-3">
+                    <button
+                        id="reload-database-button"
+                        type="button"
+                        onclick="reloadDatabaseData(this)"
+                        title="Reload database information while keeping current filters"
+                        class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        <i class="fa-solid fa-rotate-right"></i>
+                        Refresh
+                    </button>
+
                     <label
                         for="rows-per-page"
                         class="text-sm font-semibold text-gray-300"
@@ -1993,6 +2004,23 @@
             restoreSelectedPhoneSet(selectedPhones);
 
             return freshLine;
+        }
+
+        async function reloadDatabaseData(button) {
+            if (button.disabled) return;
+
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Refreshing...';
+
+            try {
+                // Reuse the database loader without resetting filters, search,
+                // sorting, rows per page, or the current page.
+                await loadTableData();
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalContent;
+            }
         }
 
         async function loadTableData() {

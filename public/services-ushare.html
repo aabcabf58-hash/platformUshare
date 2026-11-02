@@ -5,6 +5,33 @@
   <title>Zouzou App - U-Share Services</title>
   <script src="./theme.js"></script><script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><link rel="stylesheet" href="./theme.css">
+
+  <style>
+    .compact-editor{padding:12px 14px}
+    .editor-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+    .editor-heading h2{font-size:13px;line-height:20px;margin:0}
+    .editor-close{display:grid;place-items:center;width:28px;height:28px;border:1px solid #4b5563;border-radius:8px;color:inherit;background:transparent;cursor:pointer}
+    .compact-editor form{display:flex;align-items:flex-end;gap:7px;overflow-x:auto;padding-bottom:4px}
+    .primary-row,.secondary-row,.secondary-pair{display:contents}
+    .compact-editor label{flex:1 0 100px;min-width:100px;gap:4px;font-size:10px;line-height:14px}
+    .compact-editor label input{height:32px;min-width:0;border-radius:7px;padding:5px 7px;font-size:12px;line-height:20px}
+    .compact-editor .bundle-field{flex:0.6 0 62px;min-width:62px}
+    .compact-editor .service-date{flex:0 0 120px;min-width:120px}
+    .compact-editor .btn{height:32px;padding:5px 9px;border-radius:7px;font-size:11px;justify-content:center}
+    .editor-actions{display:flex;gap:5px;align-items:center;order:2;flex:0 0 auto}
+    .pair-index{display:none}
+    @media(max-width:700px){.compact-editor{padding:10px}.compact-editor label{flex:0 0 105px}.compact-editor .bundle-field{flex:0 0 65px}.compact-editor .service-date{flex:0 0 120px}}
+
+    .compact-editor .bundle-field,
+    .compact-editor label:has(input[name="primary_bundle"]){flex:0 0 62px;min-width:62px;width:62px}
+    .compact-editor input[name="primary_bundle"],
+    .compact-editor input[name="b1"],
+    .compact-editor input[name="b2"],
+    .compact-editor input[name="b3"]{width:62px;font-variant-numeric:tabular-nums;appearance:textfield;-moz-appearance:textfield}
+    .compact-editor input[type="number"]::-webkit-inner-spin-button,
+    .compact-editor input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+
+  </style>
 </head>
 <body class="min-h-screen bg-gray-900 text-gray-100">
   <header class="sticky top-0 z-50 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
@@ -16,11 +43,22 @@
   <main class="w-full px-2 py-4 sm:px-4">
     <div id="msg" class="mb-4 hidden rounded-2xl border px-4 py-3"></div>
     <section class="mb-4 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl"><div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 class="text-lg font-bold text-white"><i class="fa-solid fa-signal mr-2 text-purple-400"></i>U-Share Services</h2><p class="text-sm text-gray-400">Add, edit, and delete saved service details.</p></div><div class="flex gap-2"><button onclick="newRow()" class="btn bg-green-600"><i class="fa-solid fa-plus mr-2"></i>Add service</button><button onclick="load()" class="btn bg-blue-600"><i class="fa-solid fa-arrows-rotate mr-2"></i>Refresh</button></div></div></section>
-    <section id="editor" class="mb-4 hidden rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl"><div class="mb-4 flex justify-between"><div><h2 class="font-bold text-white" id="editorTitle">Add U-Share service</h2><p class="text-sm text-gray-400">The existing number will be updated.</p></div><button onclick="closeEditor()" class="btn bg-gray-700"><i class="fa-solid fa-xmark"></i></button></div><form id="form"><div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <label>Number phone *<input name="numberphone" required placeholder="03123456"></label><label>Primary bundle<input name="primary_bundle" type="number" step="any"></label><label>Service started at<input name="service_started_at" type="date"></label>
-      <label>Secondary 1 number<input name="n1"></label><label>Secondary 1 bundle<input name="b1" type="number" step="any"></label><label>Secondary 2 number<input name="n2"></label><label>Secondary 2 bundle<input name="b2" type="number" step="any"></label>
-      <label>Secondary 3 number<input name="n3"></label><label>Secondary 3 bundle<input name="b3" type="number" step="any"></label>
-    </div><div class="mt-5 flex gap-2"><button class="btn bg-purple-600" type="submit"><i class="fa-solid fa-floppy-disk mr-2"></i>Save service</button><button class="btn bg-gray-700" type="button" onclick="closeEditor()">Cancel</button></div></form></section>
+    <section id="editor" class="mb-4 hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl compact-editor">
+      <div class="editor-heading"><h2 class="font-bold text-white" id="editorTitle">Add U-Share service</h2><button type="button" onclick="closeEditor()" class="editor-close" aria-label="Close editor"><i class="fa-solid fa-xmark"></i></button></div>
+      <form id="form">
+        <div class="primary-row">
+          <label>Primary number *<input name="numberphone" required placeholder="03123456" inputmode="tel" autocomplete="off"></label>
+          <label>Primary bundle<input name="primary_bundle" type="number" step="any" placeholder="0"></label>
+          <label class="service-date">Service started<input name="service_started_at" type="date"></label>
+          <div class="editor-actions"><button class="btn bg-purple-600" type="submit"><i class="fa-solid fa-check"></i>Save</button><button class="btn bg-gray-700" type="button" onclick="closeEditor()">Cancel</button></div>
+        </div>
+        <div class="secondary-row">
+          <div class="secondary-pair"><span class="pair-index">1</span><label>Secondary 1<input name="n1" inputmode="tel" autocomplete="off" placeholder="Number"></label><label class="bundle-field">Bundle<input name="b1" type="number" step="any" placeholder="0"></label></div>
+          <div class="secondary-pair"><span class="pair-index">2</span><label>Secondary 2<input name="n2" inputmode="tel" autocomplete="off" placeholder="Number"></label><label class="bundle-field">Bundle<input name="b2" type="number" step="any" placeholder="0"></label></div>
+          <div class="secondary-pair"><span class="pair-index">3</span><label>Secondary 3<input name="n3" inputmode="tel" autocomplete="off" placeholder="Number"></label><label class="bundle-field">Bundle<input name="b3" type="number" step="any" placeholder="0"></label></div>
+        </div>
+      </form>
+    </section>
     <section class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl"><div class="flex flex-col gap-3 border-b border-gray-700 p-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 class="font-bold text-white">Saved services <span class="text-orange-400" id="count"></span></h2><p class="text-sm text-gray-400">Edit loads the selected row into the form.</p></div><input id="search" oninput="draw()" class="search" placeholder="Search number..."></div><div class="overflow-x-auto"><table class="min-w-[900px] w-full text-left text-sm"><thead class="bg-gray-900/60 text-xs uppercase text-gray-300"><tr><th>Number</th><th>Primary</th><th>N1 / B1</th><th>N2 / B2</th><th>N3 / B3</th><th>Service started</th><th>Actions</th></tr></thead><tbody id="tbody" class="divide-y divide-gray-700/60"></tbody></table></div></section>
   </main>
   <style>.nav,.btn{display:flex;align-items:center;gap:.5rem;border-radius:.75rem;padding:.65rem .9rem;color:#fff;font-size:.875rem;font-weight:600;white-space:nowrap}.btn:hover{filter:brightness(1.1)}label{display:grid;gap:.42rem;color:#9ca3af;font-size:.78rem;font-weight:600}label input,.search{width:100%;border:1px solid #4b5563;border-radius:.75rem;background:#111827;padding:.65rem .75rem;color:#fff;outline:none}label input:focus,.search:focus{border-color:#f97316}th,td{padding:.85rem 1rem;white-space:nowrap}th{font-weight:600}</style>
