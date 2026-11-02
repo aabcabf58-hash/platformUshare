@@ -171,7 +171,7 @@
                         Service status filter
                     </div>
                     <p class="mt-1 text-xs text-gray-500">
-                        Queue all numbers, only numbers with active services, or only numbers whose services are expired.
+                        Filter service status and activation date (subscription_date), using Lebanon time.
                     </p>
 
                     <select
@@ -182,7 +182,25 @@
                         <option value="all" selected>All numbers</option>
                         <option value="active">Active services only</option>
                         <option value="expired">Expired services only</option>
+                        <option value="active_today">Active services — activated today</option>
+                        <option value="active_today_yesterday">Active services — activated today or yesterday</option>
+                        <option value="active_range">Active services — activation date range</option>
                     </select>
+                    <div id="subscription-date-range" class="mt-3 hidden grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <span class="mb-1 block text-xs text-gray-400">From date (inclusive)</span>
+                            <input id="subscription-from-date" type="date" aria-label="Activation from date"
+                                onchange="applyConditions()"
+                                class="w-full rounded-xl border border-gray-600 bg-gray-900 px-3 py-2 text-white outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <span class="mb-1 block text-xs text-gray-400">To date (inclusive)</span>
+                            <input id="subscription-to-date" type="date" aria-label="Activation to date"
+                                onchange="applyConditions()"
+                                class="w-full rounded-xl border border-gray-600 bg-gray-900 px-3 py-2 text-white outline-none focus:border-cyan-500">
+                        </div>
+                    </div>
+                    <p id="subscription-range-error" role="status" class="mt-2 hidden text-xs text-red-400"></p>
                 </label>
 
                 <label class="rounded-xl border border-gray-700 bg-gray-900/50 p-4">
@@ -378,12 +396,21 @@
             getElement('include-prefix-enabled').checked = false;
             getElement('included-prefixes-input').value = '';
             getElement('service-filter-select').value = 'all';
+            getElement('subscription-from-date').value = '';
+            getElement('subscription-to-date').value = '';
             getElement('check-result-filter-select').value = 'all';
             applyConditions();
         }
 
         function applyConditions() {
             const conditions = readConditions();
+            const rangeSelected = conditions.serviceFilter === 'active_range';
+            const rangeContainer = getElement('subscription-date-range');
+            rangeContainer.classList.toggle('hidden', !rangeSelected);
+            rangeContainer.classList.toggle('grid', rangeSelected);
+            const rangeError = getElement('subscription-range-error');
+            rangeError.textContent = conditions.subscriptionRangeError;
+            rangeError.classList.toggle('hidden', !conditions.subscriptionRangeError);
 
             evaluatedLines = linesData.map((line) => {
                 const reasons = getExclusionReasons(line, conditions);
@@ -415,7 +442,28 @@
                     ? 'hours'
                     : 'minutes';
 
+            const serviceModes = ['active', 'expired', 'active_today', 'active_today_yesterday', 'active_range'];
+            const selectedMode = getElement('service-filter-select')?.value;
+            const serviceFilter = serviceModes.includes(selectedMode) ? selectedMode : 'all';
+            const subscriptionFrom = normalizeCalendarDate(getElement('subscription-from-date')?.value);
+            const subscriptionTo = normalizeCalendarDate(getElement('subscription-to-date')?.value);
+            let subscriptionRangeError = '';
+            if (serviceFilter === 'active_range') {
+                if (!subscriptionFrom || !subscriptionTo) {
+                    subscriptionRangeError = 'Choose both activation dates.';
+                } else if (subscriptionFrom > subscriptionTo) {
+                    subscriptionRangeError = 'From date must be on or before To date.';
+                }
+            }
+            const subscriptionToday = getLebanonDateKey(new Date());
+            const subscriptionYesterday = shiftCalendarDate(subscriptionToday, -1);
+
             return {
+                subscriptionFrom,
+                subscriptionTo,
+                subscriptionRangeError,
+                subscriptionToday,
+                subscriptionYesterday,
                 excludeRecent:
                     getElement('exclude-recent-enabled')?.checked === true,
                 recentValue,
@@ -428,11 +476,7 @@
                 prefixes: parsePrefixes(
                     getElement('included-prefixes-input')?.value
                 ),
-                serviceFilter: ['active', 'expired'].includes(
-                    getElement('service-filter-select')?.value
-                )
-                    ? getElement('service-filter-select').value
-                    : 'all',
+                serviceFilter,
                 checkResultFilter:
                     getElement('check-result-filter-select')?.value === 'failed'
                         ? 'failed'
@@ -490,12 +534,32 @@
 
             const expired = isExpiredServiceLine(line);
 
-            if (conditions.serviceFilter === 'active' && expired) {
+            if (['active', 'active_today', 'active_today_yesterday', 'active_range'].includes(conditions.serviceFilter) && expired) {
                 reasons.push('Service is expired');
             }
 
             if (conditions.serviceFilter === 'expired' && !expired) {
                 reasons.push('Service is active');
+            }
+
+            const datedModes = ['active_today', 'active_today_yesterday', 'active_range'];
+            if (datedModes.includes(conditions.serviceFilter)) {
+                const subscriptionDate = getSubscriptionDateKey(line?.subscription_date);
+                if (conditions.subscriptionRangeError) {
+                    reasons.push(conditions.subscriptionRangeError);
+                } else if (!subscriptionDate) {
+                    reasons.push('Missing or invalid activation date (subscription_date)');
+                } else if (conditions.serviceFilter === 'active_today' &&
+                           subscriptionDate !== conditions.subscriptionToday) {
+                    reasons.push('Service was not activated today (Lebanon time)');
+                } else if (conditions.serviceFilter === 'active_today_yesterday' &&
+                           subscriptionDate !== conditions.subscriptionToday &&
+                           subscriptionDate !== conditions.subscriptionYesterday) {
+                    reasons.push('Service was not activated today or yesterday (Lebanon time)');
+                } else if (conditions.serviceFilter === 'active_range' &&
+                           (subscriptionDate < conditions.subscriptionFrom || subscriptionDate > conditions.subscriptionTo)) {
+                    reasons.push('Activation date is outside the selected range');
+                }
             }
 
             if (
@@ -692,6 +756,8 @@
                 return;
             }
 
+            // Re-evaluate dates and filters immediately before queuing.
+            applyConditions();
             const numberphones = Array.from(
                 new Set(
                     evaluatedLines
@@ -839,6 +905,8 @@
                 'recent-unit-select',
                 'include-prefix-enabled',
                 'included-prefixes-input',
+                'subscription-from-date',
+                'subscription-to-date',
                 'service-filter-select',
                 'check-result-filter-select'
             ].forEach((id) => {
@@ -994,6 +1062,45 @@
                 serviceDatesAreEmpty &&
                 secondaryLinesAreEmpty
             );
+        }
+
+        function normalizeCalendarDate(value) {
+            const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value ?? '').trim());
+            if (!match) return null;
+            const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+            const date = new Date(Date.UTC(year, month - 1, day));
+            if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+            return match[0];
+        }
+
+        function getLebanonDateKey(date) {
+            if (Number.isNaN(date.getTime())) return null;
+            const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+                timeZone: 'Asia/Beirut', year: 'numeric', month: '2-digit', day: '2-digit'
+            }).formatToParts(date).filter(part => part.type !== 'literal').map(part => [part.type, part.value]));
+            return `${parts.year}-${parts.month}-${parts.day}`;
+        }
+
+        function shiftCalendarDate(key, days) {
+            const date = new Date(`${key}T00:00:00Z`);
+            date.setUTCDate(date.getUTCDate() + days);
+            return date.toISOString().slice(0, 10);
+        }
+
+        function getSubscriptionDateKey(value) {
+            const text = String(value ?? '').trim();
+            const calendarDate = normalizeCalendarDate(text);
+            if (calendarDate) return calendarDate;
+            // Date-only values are calendar dates, not UTC instants.
+            const dmy = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(text);
+            if (dmy) return normalizeCalendarDate(`${dmy[3]}-${dmy[2].padStart(2, '0')}-${dmy[1].padStart(2, '0')}`);
+            const iso = /^(\d{4}-\d{2}-\d{2})[T ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(Z|[+-]\d{2}(?::?\d{2})?)?$/i.exec(text);
+            if (!iso || !normalizeCalendarDate(iso[1])) return null;
+            // Timestamps without an offset preserve their stored calendar day.
+            if (!iso[2]) return iso[1];
+            let timestamp = text.replace(' ', 'T');
+            if (/[+-]\d{2}$/.test(timestamp)) timestamp += ':00';
+            return getLebanonDateKey(new Date(timestamp));
         }
 
         function getUpdatedAtValue(line) {
