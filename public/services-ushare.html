@@ -43,6 +43,13 @@
   <main class="w-full px-2 py-4 sm:px-4">
     <div id="msg" class="mb-4 hidden rounded-2xl border px-4 py-3"></div>
     <section class="mb-4 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl"><div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 class="text-lg font-bold text-white"><i class="fa-solid fa-signal mr-2 text-purple-400"></i>U-Share Services</h2><p class="text-sm text-gray-400">Add, edit, and delete saved service details.</p></div><div class="flex gap-2"><button onclick="newRow()" class="btn bg-green-600"><i class="fa-solid fa-plus mr-2"></i>Add service</button><button onclick="load()" class="btn bg-blue-600"><i class="fa-solid fa-arrows-rotate mr-2"></i>Refresh</button></div></div></section>
+    <section aria-labelledby="availabilityTitle" class="mb-4 rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 id="availabilityTitle" class="font-bold text-white">Available U-Share slots</h2>
+        <p id="availabilityStatus" role="status" class="text-sm text-gray-400">Loading availability...</p>
+      </div>
+      <ul id="availabilityBundles" class="mt-3 hidden grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6"></ul>
+    </section>
     <section id="editor" class="mb-4 hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl compact-editor">
       <div class="editor-heading"><h2 class="font-bold text-white" id="editorTitle">Add U-Share service</h2><button type="button" onclick="closeEditor()" class="editor-close" aria-label="Close editor"><i class="fa-solid fa-xmark"></i></button></div>
       <form id="form">
@@ -60,16 +67,112 @@
       </form>
     </section>
     <section class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl"><div class="flex flex-col gap-3 border-b border-gray-700 p-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 class="font-bold text-white">Saved services <span class="text-orange-400" id="count"></span></h2><p class="text-sm text-gray-400">Edit loads the selected row into the form.</p></div><input id="search" oninput="draw()" class="search" placeholder="Search number..."></div><div class="overflow-x-auto"><table class="min-w-[900px] w-full text-left text-sm"><thead class="bg-gray-900/60 text-xs uppercase text-gray-300"><tr><th>Number</th><th>Primary</th><th>N1 / B1</th><th>N2 / B2</th><th>N3 / B3</th><th>Service started</th><th>Actions</th></tr></thead><tbody id="tbody" class="divide-y divide-gray-700/60"></tbody></table></div></section>
+    <section aria-labelledby="workersTitle" class="mt-4 overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-700 p-4">
+        <h2 id="workersTitle" class="font-bold text-white"><i aria-hidden="true" class="fa-solid fa-server mr-2 text-purple-400"></i>U-Share Workers</h2>
+        <div class="flex flex-wrap gap-2">
+          <button id="addWorker" class="btn bg-green-600 disabled:opacity-50" type="button">Add worker</button>
+          <button id="refreshWorkers" class="btn bg-blue-600 disabled:opacity-50" type="button">Refresh workers</button>
+        </div>
+      </div>
+      <form id="workerForm" aria-labelledby="workerEditorTitle" class="hidden border-b border-gray-700 p-4">
+        <h3 id="workerEditorTitle" class="mb-3 font-semibold text-white">Add worker</h3>
+        <div class="flex flex-wrap items-end gap-3">
+          <label class="w-full sm:max-w-md">Worker API URL
+            <input name="api" type="url" required autocomplete="off" placeholder="https://worker.example.com">
+          </label>
+          <label class="w-36">Cooldown (minutes)
+            <input name="cooldown_minutes" type="number" required min="0" max="2147483647" step="1" value="15">
+          </label>
+          <label class="flex min-h-10 items-center gap-2">
+            <input name="is_available" type="checkbox" checked style="width:auto">
+            Enabled
+          </label>
+          <div class="flex gap-2">
+            <button class="btn bg-purple-600 disabled:opacity-50" type="submit">Save worker</button>
+            <button id="cancelWorker" class="btn bg-gray-700 disabled:opacity-50" type="button">Cancel</button>
+          </div>
+        </div>
+      </form>
+      <p id="workersMessage" role="status" class="hidden px-4 py-3 text-sm"></p>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[680px] text-left text-sm">
+          <thead class="bg-gray-900/60 text-xs uppercase text-gray-300">
+            <tr><th scope="col">API URL</th><th scope="col">Status</th><th scope="col">Last dispatch</th><th scope="col">Cooldown</th><th scope="col">Actions</th></tr>
+          </thead>
+          <tbody id="workersBody" class="divide-y divide-gray-700/60"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
   <style>.nav,.btn{display:flex;align-items:center;gap:.5rem;border-radius:.75rem;padding:.65rem .9rem;color:#fff;font-size:.875rem;font-weight:600;white-space:nowrap}.btn:hover{filter:brightness(1.1)}label{display:grid;gap:.42rem;color:#9ca3af;font-size:.78rem;font-weight:600}label input,.search{width:100%;border:1px solid #4b5563;border-radius:.75rem;background:#111827;padding:.65rem .75rem;color:#fff;outline:none}label input:focus,.search:focus{border-color:#f97316}th,td{padding:.85rem 1rem;white-space:nowrap}th{font-weight:600}</style>
   <script src="./config.js"></script>
   <script src="./auth.js"></script>
   <script>
-    const BASE=window.APP_CONFIG?.API_BASE_URL||"https://api.zouzouamhaz.com",API={save:"/api/ushare/upsertServiceUshare",all:"/api/ushare/getAllServicesUshare",del:"/api/ushare/deleteServiceUshare"};let list=[];const form=document.getElementById("form"),tbody=document.getElementById("tbody"),msg=document.getElementById("msg");
+    const BASE=window.APP_CONFIG?.API_BASE_URL||"https://api.zouzouamhaz.com",API={save:"/api/ushare/upsertServiceUshare",all:"/api/ushare/getAllServicesUshare",total:"/api/ushare/totalServiseUshare",del:"/api/ushare/deleteServiceUshare"};let list=[];const form=document.getElementById("form"),tbody=document.getElementById("tbody"),msg=document.getElementById("msg");
     const esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"),nul=v=>v===""?null:v,num=v=>v===""?null:Number(v),date=v=>{if(!v)return"—";const d=new Date(v);return Number.isNaN(d)?"—":d.toLocaleString()},dateIn=v=>{if(!v)return"";const d=new Date(v);return Number.isNaN(d)?"":d.toISOString().slice(0,16)};
     function theme(){document.documentElement.classList.toggle("light-mode");const light=document.documentElement.classList.contains("light-mode");document.getElementById("themeIcon").className=`fa-solid fa-${light?"moon":"sun"}`;document.getElementById("themeText").textContent=light?"Dark Mode":"Light Mode"}function note(t,bad=false){msg.textContent=t;msg.className=`mb-4 rounded-2xl border px-4 py-3 ${bad?"border-red-500 bg-red-900/30 text-red-200":"border-green-500 bg-green-900/30 text-green-200"}`}
     async function call(path,opt={}){const headers={...authHeaders()};if(opt.body)headers["Content-Type"]="application/json";const r=await fetch(BASE+path,{method:opt.method||"GET",headers,body:opt.body?JSON.stringify(opt.body):undefined}),raw=await r.text();let x={};try{x=raw?JSON.parse(raw):{}}catch{x={message:raw}}if(r.status===401)logout();if(!r.ok||x.success===false)throw Error(x.message||`Server returned ${r.status}`);return x}
-    async function load(){tbody.innerHTML='<tr><td colspan="7" class="py-8 text-center text-gray-400">Loading...</td></tr>';try{const x=await call(API.all);list=Array.isArray(x)?x:(Array.isArray(x.data)?x.data:(x.services||[]));draw()}catch(e){tbody.innerHTML=`<tr><td colspan="7" class="py-8 text-center text-red-300">${esc(e.message)}</td></tr>`}}
+    const availabilityStatus = document.getElementById("availabilityStatus");
+    const availabilityBundles = document.getElementById("availabilityBundles");
+    const numberFormat = new Intl.NumberFormat(document.documentElement.lang, {
+      maximumFractionDigits: 20,
+    });
+    let availabilityRequest = 0;
+
+    async function loadAvailability() {
+      const request = ++availabilityRequest;
+      availabilityStatus.textContent = "Loading availability...";
+      availabilityStatus.classList.remove("text-red-300");
+      availabilityBundles.classList.add("hidden");
+      availabilityBundles.classList.remove("grid");
+      availabilityBundles.replaceChildren();
+
+      try {
+        const response = await call(API.total);
+        if (request !== availabilityRequest) return;
+        if (!Array.isArray(response.data)) {
+          throw new Error("Invalid availability response");
+        }
+
+        const bundles = response.data.map(row => {
+          const size = Number(row.package_value);
+          const count = Number(row.available_count);
+          if (!Number.isFinite(size) || size <= 0 || !Number.isSafeInteger(count) || count <= 0) {
+            throw new Error("Invalid U-Share bundle or slot count");
+          }
+          return { size, count };
+        });
+        const total = bundles.reduce((sum, bundle) => sum + bundle.count, 0);
+        availabilityStatus.textContent = total
+          ? `${numberFormat.format(total)} available in total`
+          : "No slots available.";
+
+        if (!bundles.length) return;
+        const cards = bundles.map(({ size, count }) => {
+          const card = document.createElement("li");
+          card.className = "flex items-center justify-between gap-2 rounded-xl border border-gray-700 bg-gray-900/35 px-3 py-2";
+          const label = document.createElement("span");
+          label.className = "text-sm text-gray-300";
+          label.textContent = `${numberFormat.format(size)} GB`;
+          const value = document.createElement("strong");
+          value.className = "text-sm text-purple-300";
+          value.textContent = `${numberFormat.format(count)} ${count === 1 ? "slot" : "slots"}`;
+          card.append(label, value);
+          return card;
+        });
+        availabilityBundles.replaceChildren(...cards);
+        availabilityBundles.classList.remove("hidden");
+        availabilityBundles.classList.add("grid");
+      } catch (error) {
+        if (request !== availabilityRequest) return;
+        availabilityStatus.textContent = "Could not load availability. Use Refresh to retry.";
+        availabilityStatus.classList.add("text-red-300");
+        console.error("U-Share availability:", error.message);
+      }
+    }
+
+    async function load(){void loadAvailability();tbody.innerHTML='<tr><td colspan="7" class="py-8 text-center text-gray-400">Loading...</td></tr>';try{const x=await call(API.all);list=Array.isArray(x)?x:(Array.isArray(x.data)?x.data:(x.services||[]));draw()}catch(e){tbody.innerHTML=`<tr><td colspan="7" class="py-8 text-center text-red-300">${esc(e.message)}</td></tr>`}}
     function draw(){const q=document.getElementById("search").value.toLowerCase(),rows=list.filter(s=>String(s.numberphone||"").toLowerCase().includes(q));document.getElementById("count").textContent=`(${rows.length})`;if(!rows.length){tbody.innerHTML='<tr><td colspan="7" class="py-8 text-center text-gray-400">No services found.</td></tr>';return}tbody.innerHTML=rows.map(s=>{const i=list.indexOf(s),p=String(s.numberphone??"").replaceAll("'","\\'");return `<tr class="bg-gray-800 hover:bg-gray-700/40"><td class="font-bold text-orange-300">${esc(s.numberphone)}</td><td>${esc(s.primary_bundle)}</td><td>${esc(s.n1)} / ${esc(s.b1)}</td><td>${esc(s.n2)} / ${esc(s.b2)}</td><td>${esc(s.n3)} / ${esc(s.b3)}</td><td class="text-gray-400">${esc(date(s.service_started_at))}</td><td><div class="flex gap-2"><button onclick="edit(${i})" class="btn bg-blue-600"><i class="fa-solid fa-pen"></i></button><button onclick="removeRow('${p}')" class="btn bg-red-600"><i class="fa-solid fa-trash"></i></button></div></td></tr>`}).join("")}
     function newRow()
     {form.reset();document.getElementById("editorTitle").textContent="Add U-Share service";
@@ -91,7 +194,170 @@
 
 
 
-    form.onsubmit=async e=>{e.preventDefault();const f=form.elements,p={numberphone:f.numberphone.value.trim(),primary_bundle:num(f.primary_bundle.value),n1:nul(f.n1.value.trim()),b1:num(f.b1.value),n2:nul(f.n2.value.trim()),b2:num(f.b2.value),n3:nul(f.n3.value.trim()),b3:num(f.b3.value),service_started_at:nul(f.service_started_at.value)};try{await call(API.save,{method:"POST",body:p});note("Service saved successfully.");closeEditor();load()}catch(e){note(e.message,true)}};async function removeRow(numberphone){if(!confirm(`Delete service for ${numberphone}?`))return;try{await call(API.del,{method:"DELETE",body:{numberphone}});note("Service deleted successfully.");load()}catch(e){note(e.message,true)}}if(requireRole(["admin","super_admin"]))load();
+    form.onsubmit=async e=>{e.preventDefault();const f=form.elements,p={numberphone:f.numberphone.value.trim(),primary_bundle:num(f.primary_bundle.value),n1:nul(f.n1.value.trim()),b1:num(f.b1.value),n2:nul(f.n2.value.trim()),b2:num(f.b2.value),n3:nul(f.n3.value.trim()),b3:num(f.b3.value),service_started_at:nul(f.service_started_at.value)};try{await call(API.save,{method:"POST",body:p});note("Service saved successfully.");closeEditor();load()}catch(e){note(e.message,true)}};async function removeRow(numberphone){if(!confirm(`Delete service for ${numberphone}?`))return;try{await call(API.del,{method:"DELETE",body:{numberphone}});note("Service deleted successfully.");load()}catch(e){note(e.message,true)}}
+
+    const workerApi = {
+      list: "/api/ushare/getAllServerUshare",
+      add: "/api/ushare/addServerUshare",
+      edit: "/api/ushare/editServerUshare",
+      delete: "/api/ushare/deleteServerUshare",
+    };
+    const workersBody = document.getElementById("workersBody");
+    const workersMessage = document.getElementById("workersMessage");
+    const workerForm = document.getElementById("workerForm");
+    const workerFields = workerForm.elements;
+    const addWorkerButton = document.getElementById("addWorker");
+    const refreshWorkersButton = document.getElementById("refreshWorkers");
+    const cancelWorkerButton = document.getElementById("cancelWorker");
+    let workers = [];
+    let currentWorkerApi = null;
+    let workersBusy = false;
+
+    function showWorkerMessage(message, error = false) {
+      workersMessage.textContent = message;
+      workersMessage.className = message
+        ? `px-4 py-3 text-sm ${error ? "text-red-300" : "text-green-300"}`
+        : "hidden";
+    }
+
+    function setWorkersBusy(busy) {
+      workersBusy = busy;
+      for (const button of [addWorkerButton, refreshWorkersButton, ...workerFields, ...workersBody.querySelectorAll("button")]) {
+        button.disabled = busy;
+      }
+    }
+
+    function renderWorkers() {
+      if (!workers.length) {
+        workersBody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-gray-400">No workers configured.</td></tr>';
+        return;
+      }
+      workersBody.innerHTML = workers.map((worker, index) => {
+        const enabled = worker.is_available === true;
+        return `
+          <tr class="hover:bg-gray-700/40">
+            <td class="font-medium text-white"><span class="block max-w-xs truncate" title="${esc(worker.api)}">${esc(worker.api)}</span></td>
+            <td class="${enabled ? "text-green-300" : "text-gray-400"}">${enabled ? "Enabled" : "Disabled"}</td>
+            <td class="text-gray-400">${esc(date(worker.last_work))}</td>
+            <td>${esc(worker.cooldown_minutes)} min</td>
+            <td><div class="flex gap-2">
+              <button type="button" data-worker-action="edit" data-worker-index="${index}" class="btn bg-blue-600 disabled:opacity-50">Edit</button>
+              <button type="button" data-worker-action="delete" data-worker-index="${index}" class="btn bg-red-600 disabled:opacity-50">Delete</button>
+            </div></td>
+          </tr>`;
+      }).join("");
+    }
+
+    async function loadWorkers() {
+      const response = await call(workerApi.list);
+      const rows = Array.isArray(response) ? response : response?.data ?? response?.servers ?? response?.workers;
+      if (!Array.isArray(rows) || rows.some(worker => typeof worker?.api !== "string" ||
+          typeof worker.is_available !== "boolean" || worker.cooldown_minutes == null)) {
+        throw new Error("Invalid worker list received.");
+      }
+      workers = rows;
+      renderWorkers();
+    }
+
+    async function refreshWorkers() {
+      if (workersBusy) return;
+      setWorkersBusy(true);
+      showWorkerMessage("Loading workers…");
+      try {
+        await loadWorkers();
+        showWorkerMessage("");
+      } catch (error) {
+        showWorkerMessage(error.message, true);
+      } finally {
+        setWorkersBusy(false);
+      }
+    }
+
+    function openWorkerForm(worker) {
+      workerForm.reset();
+      currentWorkerApi = worker?.api ?? null;
+      document.getElementById("workerEditorTitle").textContent = worker ? "Edit worker" : "Add worker";
+      if (worker) {
+        workerFields.api.value = worker.api;
+        workerFields.cooldown_minutes.value = worker.cooldown_minutes;
+        workerFields.is_available.checked = worker.is_available === true;
+      }
+      showWorkerMessage("");
+      workerForm.classList.remove("hidden");
+      workerFields.api.focus();
+    }
+
+    function closeWorkerForm() {
+      workerForm.classList.add("hidden");
+      currentWorkerApi = null;
+    }
+
+    async function saveWorkerChange(path, method, body, message) {
+      setWorkersBusy(true);
+      showWorkerMessage("");
+      let saved = false;
+      try {
+        await call(path, { method, body });
+        saved = true;
+        if (method !== "DELETE" || body.api === currentWorkerApi) closeWorkerForm();
+        await loadWorkers();
+        showWorkerMessage(message);
+      } catch (error) {
+        if (saved) {
+          workers = [];
+          workersBody.replaceChildren();
+        }
+        showWorkerMessage(saved ? `${message} Use Refresh workers to reload the list.` : error.message, true);
+      } finally {
+        setWorkersBusy(false);
+      }
+    }
+
+    addWorkerButton.addEventListener("click", () => openWorkerForm());
+    refreshWorkersButton.addEventListener("click", refreshWorkers);
+    cancelWorkerButton.addEventListener("click", () => {
+      closeWorkerForm();
+      addWorkerButton.focus();
+    });
+    workerForm.addEventListener("submit", event => {
+      event.preventDefault();
+      if (workersBusy) return;
+      const api = workerFields.api.value.trim();
+      const url = URL.canParse(api) ? new URL(api) : null;
+      if (!url || !["http:", "https:"].includes(url.protocol) || url.username || url.password ||
+          url.search || url.hash || !["", "/api/ushare/add"].includes(url.pathname.replace(/\/+$/, ""))) {
+        showWorkerMessage("Enter the worker base URL or its full /api/ushare/add URL.", true);
+        workerFields.api.focus();
+        return;
+      }
+      const body = {
+        api,
+        cooldown_minutes: workerFields.cooldown_minutes.valueAsNumber,
+        is_available: workerFields.is_available.checked,
+      };
+      if (currentWorkerApi !== null) {
+        body.current_api = currentWorkerApi;
+        void saveWorkerChange(workerApi.edit, "PATCH", body, "Worker updated.");
+      } else {
+        void saveWorkerChange(workerApi.add, "POST", body, "Worker added.");
+      }
+    });
+    workersBody.addEventListener("click", event => {
+      const button = event.target.closest("button[data-worker-action]");
+      if (!button || workersBusy) return;
+      const worker = workers[Number(button.dataset.workerIndex)];
+      if (!worker) return;
+      if (button.dataset.workerAction === "edit") {
+        openWorkerForm(worker);
+      } else if (confirm(`Delete worker ${worker.api}?`)) {
+        void saveWorkerChange(workerApi.delete, "DELETE", { api: worker.api }, "Worker deleted.");
+      }
+    });
+
+    if (requireRole(["admin","super_admin"])) {
+      load();
+      void refreshWorkers();
+    }
   </script>
 </body>
 </html>
