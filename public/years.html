@@ -18,140 +18,164 @@
 </head>
 
 <body class="min-h-screen bg-gray-900 font-sans text-gray-100">
-    <header class="sticky top-0 z-50 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
-        <div class="flex w-full flex-col items-center justify-between gap-4 sm:flex-row">
-            <div class="flex items-center gap-3">
-                <div class="rounded-lg bg-green-600 p-2 text-white">
-                    <i class="fa-solid fa-calendar-days text-xl"></i>
-                </div>
+    <div class="sticky top-0 z-50 bg-gray-900">
+        <header class="relative z-10 border-b border-gray-700 bg-gray-800 px-2 py-2.5 shadow-md sm:px-4">
+            <div class="grid items-center gap-3 lg:grid-cols-[minmax(15rem,17rem)_minmax(0,1fr)_auto] lg:gap-4">
+                <div class="w-full max-w-xs space-y-2">
+                    <div class="flex items-center gap-2">
+                        <div class="rounded-lg bg-green-600 p-2 text-white">
+                            <i class="fa-solid fa-calendar-days text-xl"></i>
+                        </div>
 
-                <h1 class="text-xl font-bold text-green-400">
-                    Zouzou App
-                    <span class="text-base font-normal text-white">
-                        | Years View
-                    </span>
-                </h1>
-            </div>
-
-            <div class="site-navigation-header">
-              <nav class="site-navigation" aria-label="Page navigation">
-                <div class="site-navigation-primary">
-                  <a href="./index.html"><i class="fa-solid fa-table" aria-hidden="true"></i><span>Main</span></a>
-                  <a href="./admin-center.html"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i><span>Admin Center</span></a>
-                  <a href="./services-ushare.html"><i class="fa-solid fa-signal" aria-hidden="true"></i><span>U-Share Services</span></a>
-                  <details class="site-navigation-more">
-                    <summary>More</summary>
-                    <div class="site-navigation-list">
-                      <a href="./groups.html"><i class="fa-solid fa-object-group" aria-hidden="true"></i><span>Groups</span></a>
-                      <a href="./years.html" aria-current="page"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Years</span></a>
-                      <a href="./my-years.html"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i><span>Order Year</span></a>
-                      <a href="./group-builder.html"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>Auto Group Builder</span></a>
-                      <a href="./refresh-all.html"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i><span>Refresh All</span></a>
-                      <a href="./users-management.html"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Users Management</span></a>
-                      <a href="./categories-management.html"><i class="fa-solid fa-list" aria-hidden="true"></i><span>Categories Management</span></a>
-                      <a href="./recharge-cards.html"><i class="fa-solid fa-credit-card" aria-hidden="true"></i><span>Recharge Cards</span></a>
-                      <a href="./all-orders.html"><i class="fa-solid fa-receipt" aria-hidden="true"></i><span>All Orders</span></a>
-                      <a href="./orders.html"><i class="fa-solid fa-clock" aria-hidden="true"></i><span>Pending Orders</span></a>
-                      <a href="./activity.html"><i class="fa-solid fa-list-check" aria-hidden="true"></i><span>All Activity</span></a>
-                      <a href="./lines-management.html"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i><span>Balance Lines</span></a>
-                      <a href="./reseller-client-rates.html" data-nav-super-admin hidden><i class="fa-solid fa-percent" aria-hidden="true"></i><span>Reseller Client Rates</span></a>
+                        <h1 class="text-xl font-bold text-green-400">
+                            Zouzou App
+                            <span class="text-base font-normal text-white">
+                                | Years View
+                            </span>
+                        </h1>
                     </div>
-                  </details>
-                </div>
-              </nav>
-              <div class="site-navigation-actions">
-                <button
-                    data-theme-toggle
-                    type="button"
-                    onclick="toggleTheme()"
-                    class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-200 shadow transition-all hover:bg-gray-600"
-                >
-                    <i data-theme-icon class="fa-solid fa-sun"></i>
-                    <span data-theme-label>Light Mode</span>
-                </button>
-                <button
-                    type="button"
-                    onclick="loadYearsData()"
-                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-blue-700"
-                >
-                    <i class="fa-solid fa-rotate"></i>
-                    Refresh Years
-                </button>
-                <button
-                    type="button"
-                    onclick="logout()"
-                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-red-700"
-                >
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    Logout
-                </button>
-              </div>
-            </div>
-        </div>
-    </header>
+                    <section aria-label="Year statistics" class="grid grid-cols-3 items-center divide-x divide-gray-700 rounded-lg border border-gray-700 bg-gray-900 px-1 py-1.5">
+                        <div class="min-w-0 px-2 text-center">
+                            <div class="text-[10px] font-semibold uppercase leading-tight text-gray-400">
+                                Total Years
+                            </div>
+                            <div id="total-years" class="text-base leading-tight tabular-nums font-bold text-green-300">
+                                0
+                            </div>
+                        </div>
 
-    <main class="w-full max-w-none px-2 py-4 sm:px-4">
-        <div
-            id="global-status"
-            class="mb-4 hidden rounded-xl border p-3 text-sm"
-        ></div>
+                        <div class="min-w-0 px-2 text-center">
+                            <div class="text-[10px] font-semibold uppercase leading-tight text-gray-400">
+                                Visible Years
+                            </div>
+                            <div id="visible-years" class="text-base leading-tight tabular-nums font-bold text-blue-300">
+                                0
+                            </div>
+                        </div>
 
-        <section class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
-                <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Total Years
+                        <div class="min-w-0 px-2 text-center">
+                            <div class="text-[10px] font-semibold uppercase leading-tight text-gray-400">
+                                Total Numbers
+                            </div>
+                            <div id="total-year-numbers" class="text-base leading-tight tabular-nums font-bold text-indigo-300">
+                                0
+                            </div>
+                        </div>
+                    </section>
                 </div>
-                <div id="total-years" class="mt-2 text-3xl font-bold text-green-300">
-                    0
-                </div>
-            </div>
 
-            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
-                <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Visible Years
-                </div>
-                <div id="visible-years" class="mt-2 text-3xl font-bold text-blue-300">
-                    0
-                </div>
-            </div>
+                <section aria-label="Search and filter years" class="min-w-0 rounded-xl border border-gray-700 bg-gray-800 p-2">
+                    <div class="flex items-center gap-2">
+                        <div class="relative min-w-0 flex-1">
+                            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
 
-            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
-                <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Total Numbers
-                </div>
-                <div id="total-year-numbers" class="mt-2 text-3xl font-bold text-indigo-300">
-                    0
-                </div>
-            </div>
-        </section>
+                            <input
+                                id="years-search-input"
+                                type="search"
+                                aria-label="Search years"
+                                oninput="applyYearsSearch()"
+                                placeholder="Search year, group, status, split text, phone number, or balance..."
+                                class="w-full rounded-xl border border-gray-600 bg-gray-900 py-2 pl-11 pr-4 text-sm text-white outline-none transition focus:border-green-500"
+                            >
+                        </div>
 
-        <section class="mb-4 rounded-xl border border-gray-700 bg-gray-800 p-3 shadow-lg">
-            <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
-                <div class="relative flex-1">
-                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <button
+                            id="clear-years-search-button"
+                            type="button"
+                            onclick="clearYearsSearch()"
+                            disabled
+                            class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-700 px-3 py-2 text-sm font-medium text-white transition hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <i class="fa-solid fa-xmark"></i>
+                            Clear
+                        </button>
+                    </div>
 
-                    <input
-                        id="years-search-input"
-                        type="search"
-                        oninput="applyYearsSearch()"
-                        placeholder="Search year, group, status, split text, phone number, or balance..."
-                        class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-11 pr-4 text-sm text-white outline-none transition focus:border-green-500"
+                    <div class="mt-2 flex items-center gap-2">
+                        <label for="year-status-filter" class="text-[10px] font-bold uppercase tracking-wide text-gray-400">
+                            Status
+                        </label>
+
+                        <select
+                            id="year-status-filter"
+                            onchange="loadYearsData()"
+                            class="min-w-0 flex-1 cursor-pointer rounded-xl border border-gray-600 bg-gray-900 px-3 py-1.5 text-sm font-bold text-white outline-none focus:border-green-500"
+                        >
+                            <option value="all" selected>All</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="COMPLETE">Complete</option>
+                            <option value="CHECKING">Checking</option>
+                            <option value="CREATED">Created</option>
+                        </select>
+                    </div>
+                </section>
+
+                <div class="site-navigation-header">
+                  <nav class="site-navigation" aria-label="Page navigation">
+                    <div class="site-navigation-primary">
+                      <a href="./index.html"><i class="fa-solid fa-table" aria-hidden="true"></i><span>Main</span></a>
+                      <a href="./admin-center.html"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i><span>Admin Center</span></a>
+                      <a href="./services-ushare.html"><i class="fa-solid fa-signal" aria-hidden="true"></i><span>U-Share Services</span></a>
+                      <details class="site-navigation-more">
+                        <summary>More</summary>
+                        <div class="site-navigation-list">
+                          <a href="./groups.html"><i class="fa-solid fa-object-group" aria-hidden="true"></i><span>Groups</span></a>
+                          <a href="./years.html" aria-current="page"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Years</span></a>
+                          <a href="./my-years.html"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i><span>Order Year</span></a>
+                          <a href="./group-builder.html"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>Auto Group Builder</span></a>
+                          <a href="./refresh-all.html"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i><span>Refresh All</span></a>
+                          <a href="./users-management.html"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Users Management</span></a>
+                          <a href="./categories-management.html"><i class="fa-solid fa-list" aria-hidden="true"></i><span>Categories Management</span></a>
+                          <a href="./recharge-cards.html"><i class="fa-solid fa-credit-card" aria-hidden="true"></i><span>Recharge Cards</span></a>
+                          <a href="./all-orders.html"><i class="fa-solid fa-receipt" aria-hidden="true"></i><span>All Orders</span></a>
+                          <a href="./orders.html"><i class="fa-solid fa-clock" aria-hidden="true"></i><span>Pending Orders</span></a>
+                          <a href="./activity.html"><i class="fa-solid fa-list-check" aria-hidden="true"></i><span>All Activity</span></a>
+                          <a href="./lines-management.html"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i><span>Balance Lines</span></a>
+                          <a href="./reseller-client-rates.html" data-nav-super-admin hidden><i class="fa-solid fa-percent" aria-hidden="true"></i><span>Reseller Client Rates</span></a>
+                        </div>
+                      </details>
+                    </div>
+                  </nav>
+                  <div class="site-navigation-actions">
+                    <button
+                        data-theme-toggle
+                        type="button"
+                        onclick="toggleTheme()"
+                        class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-200 shadow transition-all hover:bg-gray-600"
                     >
+                        <i data-theme-icon class="fa-solid fa-sun"></i>
+                        <span data-theme-label>Light Mode</span>
+                    </button>
+                    <button
+                        type="button"
+                        onclick="loadYearsData()"
+                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-blue-700"
+                    >
+                        <i class="fa-solid fa-rotate"></i>
+                        Refresh Years
+                    </button>
+                    <button
+                        type="button"
+                        onclick="logout()"
+                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-red-700"
+                    >
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Logout
+                    </button>
+                  </div>
                 </div>
-
-                <button
-                    id="clear-years-search-button"
-                    type="button"
-                    onclick="clearYearsSearch()"
-                    disabled
-                    class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-700 px-4 py-3 text-sm font-medium text-white transition hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                    <i class="fa-solid fa-xmark"></i>
-                    Clear
-                </button>
             </div>
-        </section>
+        </header>
 
+        <div class="px-2 pt-2 sm:px-4">
+            <div
+                id="global-status"
+                class="hidden rounded-xl border px-3 py-2 text-sm"
+            ></div>
+        </div>
+    </div>
+
+    <main class="w-full max-w-none px-2 pb-4 pt-2 sm:px-4">
         <section id="years-grid" class="space-y-4">
             <div class="rounded-2xl border border-gray-700 bg-gray-800 p-10 text-center text-gray-500">
                 <i class="fa-solid fa-spinner fa-spin mb-3 text-3xl text-green-400"></i>
@@ -196,7 +220,8 @@
         const CHECK_TIMEOUT_MS = 300000;
 
         let yearsData = [];
-        let yearsSearchQuery = '';
+        let yearsSearchTimer;
+        let yearsLoadController;
 
         function getJsonHeaders() {
             if (typeof authHeaders === 'function') {
@@ -209,7 +234,17 @@
         }
 
         async function loadYearsData() {
+            clearTimeout(yearsSearchTimer);
+            yearsLoadController?.abort();
+            const controller = new AbortController();
+            yearsLoadController = controller;
+
             const grid = document.getElementById('years-grid');
+            const search = document.getElementById('years-search-input').value.trim();
+            const status = document.getElementById('year-status-filter').value;
+            const url = new URL(GET_ALL_YEARS_API, window.location.href);
+            if (search) url.searchParams.set('search', search);
+            if (status !== 'all') url.searchParams.set('status', status);
 
             showStatus('Loading years from the server...', 'info');
 
@@ -222,13 +257,15 @@
 
             try {
                 const response = await fetch(
-                    GET_ALL_YEARS_API,
+                    url.href,
                     {
-                        headers: getJsonHeaders()
+                        headers: getJsonHeaders(),
+                        signal: controller.signal
                     }
                 );
 
                 const result = await readJsonResponse(response);
+                if (controller.signal.aborted) return;
 
                 if (!response.ok || result.success === false) {
                     throw new Error(
@@ -252,6 +289,7 @@
                     'success'
                 );
             } catch (error) {
+                if (controller.signal.aborted) return;
                 console.error('Years loading error:', error);
 
                 yearsData = [];
@@ -272,71 +310,42 @@
             }
         }
 
-        function applyYearsSearch() {
+        function applyYearsSearch(immediate = false) {
             const input = document.getElementById('years-search-input');
-            const clearButton = document.getElementById('clear-years-search-button');
+            document.getElementById('clear-years-search-button').disabled = !input.value.trim();
 
-            yearsSearchQuery = String(input?.value ?? '')
-                .trim()
-                .toLowerCase();
-
-            if (clearButton) {
-                clearButton.disabled = yearsSearchQuery.length === 0;
+            clearTimeout(yearsSearchTimer);
+            yearsLoadController?.abort();
+            if (immediate) {
+                loadYearsData();
+                return;
             }
-
-            renderYears();
+            yearsSearchTimer = setTimeout(loadYearsData, 300);
         }
 
         function clearYearsSearch() {
             const input = document.getElementById('years-search-input');
-
-            if (input) {
-                input.value = '';
-            }
-
-            yearsSearchQuery = '';
-            renderYears();
-            input?.focus();
-        }
-
-        function getVisibleYears() {
-            if (!yearsSearchQuery) {
-                return yearsData;
-            }
-
-            return yearsData.filter((year) => {
-                const searchableText = JSON.stringify(year).toLowerCase();
-                return searchableText.includes(yearsSearchQuery);
-            });
+            input.value = '';
+            applyYearsSearch(true);
+            input.focus();
         }
 
         function renderYears() {
             const grid = document.getElementById('years-grid');
-            const visibleYears = getVisibleYears();
 
-            updateSummary(visibleYears);
+            updateSummary(yearsData);
 
             if (yearsData.length === 0) {
                 grid.innerHTML = `
                     <div class="rounded-xl border border-gray-700 bg-gray-800 p-8 text-center text-gray-500">
                         <i class="fa-solid fa-calendar-days mb-3 text-3xl text-green-400"></i>
-                        <p>No years are available.</p>
+                        <p class="font-semibold">No years match the current search and status.</p>
                     </div>
                 `;
                 return;
             }
 
-            if (visibleYears.length === 0) {
-                grid.innerHTML = `
-                    <div class="rounded-xl border border-gray-700 bg-gray-800 p-8 text-center text-gray-500">
-                        <i class="fa-solid fa-magnifying-glass mb-3 text-3xl text-green-400"></i>
-                        <p class="font-semibold">No year matches your search.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = visibleYears
+            grid.innerHTML = yearsData
                 .map((year) => renderYearCard(year))
                 .join('');
         }
@@ -360,6 +369,8 @@
             const createdAt = formatDateTime(year.created_at ?? year.createdAt);
             const updatedAt = formatDateTime(year.updated_at ?? year.updatedAt);
             const domKey = getYearDomKey(year);
+            const requester = formatEmptyValue(year.client_numberphone ?? year.clientNumberphone);
+            const recipient = formatEmptyValue(year.target_identifier ?? year.targetIdentifier);
 
             return `
                 <article class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
@@ -407,6 +418,26 @@
                                     <i class="fa-solid fa-rotate"></i>
                                     Check Year
                                 </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                            <div class="min-w-0 rounded-xl border border-gray-700 bg-gray-900/40 p-3">
+                                <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                    Requested by
+                                </div>
+                                <div class="mt-1 break-all font-mono text-base font-bold text-cyan-300">
+                                    ${escapeHtml(requester)}
+                                </div>
+                            </div>
+
+                            <div class="min-w-0 rounded-xl border border-gray-700 bg-gray-900/40 p-3">
+                                <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                                    Renewed for
+                                </div>
+                                <div class="mt-1 break-all font-mono text-base font-bold text-violet-300">
+                                    ${escapeHtml(recipient)}
+                                </div>
                             </div>
                         </div>
 
@@ -1118,7 +1149,7 @@
         function showStatus(message, type) {
             const status = document.getElementById('global-status');
 
-            status.className = 'mb-4 block rounded-xl border p-3 text-sm';
+            status.className = 'block rounded-xl border px-3 py-2 text-sm';
 
             if (type === 'info') {
                 status.classList.add(

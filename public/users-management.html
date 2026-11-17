@@ -495,8 +495,9 @@
           <span id="modal-input-label" class="mb-2 block text-xs font-bold uppercase tracking-wide text-gray-400">Amount</span>
           <input
             id="modal-value"
-            type="number"
-            step="any"
+            type="text"
+            inputmode="decimal"
+            oninput="formatWalletAmountInput(event)"
             required
             autocomplete="off"
             class="w-full rounded-2xl border border-gray-600 bg-gray-900 px-4 py-4 font-mono text-xl font-black text-white outline-none transition focus:border-cyan-500"
@@ -1632,7 +1633,7 @@
         subtitle: numberphone,
         label: isLbp ? "Minimum Balance LBP" : "Minimum Balance USD",
         value: currentValue,
-        help: "The number may be positive, zero, or negative. Example: -1000000",
+        help: "The number may be positive, zero, or negative. Example: -1,000,000",
         showText: false,
         textValue: "",
         textPlaceholder: "",
@@ -1776,6 +1777,40 @@
       }
     }
 
+    const WALLET_AMOUNT_PATTERN = /^-?(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d*)?|\.\d+)$/;
+
+    function groupWalletAmount(value) {
+      const raw = String(value ?? "").replace(/,/g, "");
+      if (!/^-?\d*(?:\.\d*)?$/.test(raw)) return String(value ?? "");
+      const [whole, fraction] = raw.split(".");
+      const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return fraction === undefined ? grouped : `${grouped}.${fraction}`;
+    }
+
+    function formatWalletAmountInput(event) {
+      const input = event.target;
+      if (input.type === "password" || event.isComposing) return;
+
+      const previous = input.value;
+      const isPaste = event.inputType === "insertFromPaste" || event.inputType === "insertFromDrop";
+      if (isPaste && previous.includes(",") && !WALLET_AMOUNT_PATTERN.test(previous)) return;
+
+      const formatted = groupWalletAmount(previous);
+      if (formatted === previous) return;
+
+      const cursor = input.selectionStart ?? previous.length;
+      const charsBeforeCursor = previous.slice(0, cursor).replace(/,/g, "").length;
+      let nextCursor = 0;
+      let charsSeen = 0;
+      while (nextCursor < formatted.length && charsSeen < charsBeforeCursor) {
+        if (formatted[nextCursor] !== ",") charsSeen += 1;
+        nextCursor += 1;
+      }
+
+      input.value = formatted;
+      input.setSelectionRange(nextCursor, nextCursor);
+    }
+
     function openActionModal(config) {
       document.getElementById("modal-action").value = config.action;
       document.getElementById("modal-numberphone").value = config.numberphone;
@@ -1786,10 +1821,12 @@
       document.getElementById("modal-subtitle").textContent = config.subtitle;
       document.getElementById("modal-input-label").textContent = config.label;
       const valueInput = document.getElementById("modal-value");
-      valueInput.type = config.inputType || "number";
-      valueInput.step = valueInput.type === "number" ? "any" : "";
+      const isPassword = config.inputType === "password";
+      const isBalanceChange = config.action === "CREDIT" || config.action === "DEBIT";
+      valueInput.type = isPassword ? "password" : "text";
+      valueInput.inputMode = isBalanceChange ? "decimal" : "text";
       valueInput.autocomplete = config.inputAutocomplete || "off";
-      valueInput.value = config.value;
+      valueInput.value = isPassword ? config.value : groupWalletAmount(config.value);
       document.getElementById("modal-help").textContent = config.help;
 
       const textWrapper = document.getElementById("modal-text-wrapper");
@@ -1831,7 +1868,7 @@
       ).toUpperCase();
 
       const rawValue = getInputValue("modal-value");
-      const value = Number(rawValue);
+      const value = Number(rawValue.replace(/,/g, ""));
 
       const rawText = String(
         document.getElementById("modal-text")?.value ?? ""
@@ -1851,7 +1888,8 @@
         return;
       }
 
-      if (action !== "EDIT_PASSWORD" && (rawValue === "" || !Number.isFinite(value))) {
+      if (action !== "EDIT_PASSWORD" &&
+          (!WALLET_AMOUNT_PATTERN.test(rawValue) || !Number.isFinite(value))) {
         showStatus("Enter a valid number.", "error");
         return;
       }
