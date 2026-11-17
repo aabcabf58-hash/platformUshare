@@ -371,6 +371,12 @@
             const domKey = getYearDomKey(year);
             const requester = formatEmptyValue(year.client_numberphone ?? year.clientNumberphone);
             const recipient = formatEmptyValue(year.target_identifier ?? year.targetIdentifier);
+            const priceValue = year.final_year_price ?? year.finalYearPrice;
+            const price = Number(priceValue);
+            const currency = String(year.currency ?? '').trim().toUpperCase();
+            const finalYearPrice = !isEmptyValue(priceValue) && Number.isFinite(price)
+                ? price.toLocaleString('en-US', { maximumFractionDigits: 2 }) + (currency ? ` ${currency}` : '')
+                : '-';
 
             return `
                 <article class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
@@ -396,6 +402,10 @@
 
                                     <span class="rounded-lg border ${getStatusClasses(status)} px-2 py-1 font-mono font-bold">
                                         ${escapeHtml(status)}
+                                    </span>
+
+                                    <span class="rounded-lg border border-amber-400 bg-amber-100 px-2 py-1 font-mono font-bold text-amber-900">
+                                        Final Year Price: ${escapeHtml(finalYearPrice)}
                                     </span>
                                 </div>
                             </div>
