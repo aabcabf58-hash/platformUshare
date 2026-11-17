@@ -13,6 +13,8 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     >
     <link rel="stylesheet" href="./theme.css">
+    <link rel="stylesheet" href="./site-navigation.css">
+    <script src="./site-navigation.js" defer></script>
 </head>
 
 <body class="min-h-screen bg-gray-900 font-sans text-gray-100">
@@ -31,9 +33,37 @@
                 </h1>
             </div>
 
-            <nav class="flex flex-wrap items-center justify-center gap-2">
-<button data-theme-toggle type="button" onclick="toggleTheme()" class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600"><i data-theme-icon class="fa-solid fa-sun"></i><span data-theme-label>Light Mode</span></button>
-<a href="./index.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-table"></i>Main Table</a><a href="./groups.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-object-group"></i>Groups</a><a href="./years.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-calendar-days"></i>Years</a><a href="./group-builder.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-layer-group"></i>Group Builder</a><a href="./refresh-all.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition bg-blue-600 text-white"><i class="fa-solid fa-arrows-rotate"></i>Refresh All</a><a href="./admin-center.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-screwdriver-wrench"></i>Admin Center</a><button type="button" onclick="logout()" class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700"><i class="fa-solid fa-right-from-bracket"></i>Logout</button></nav>
+            <div class="site-navigation-header">
+              <nav class="site-navigation" aria-label="Page navigation">
+                <div class="site-navigation-primary">
+                  <a href="./index.html"><i class="fa-solid fa-table" aria-hidden="true"></i><span>Main</span></a>
+                  <a href="./admin-center.html"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i><span>Admin Center</span></a>
+                  <a href="./services-ushare.html"><i class="fa-solid fa-signal" aria-hidden="true"></i><span>U-Share Services</span></a>
+                  <details class="site-navigation-more">
+                    <summary>More</summary>
+                    <div class="site-navigation-list">
+                      <a href="./groups.html"><i class="fa-solid fa-object-group" aria-hidden="true"></i><span>Groups</span></a>
+                      <a href="./years.html"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Years</span></a>
+                      <a href="./my-years.html"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i><span>Order Year</span></a>
+                      <a href="./group-builder.html"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>Auto Group Builder</span></a>
+                      <a href="./refresh-all.html" aria-current="page"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i><span>Refresh All</span></a>
+                      <a href="./users-management.html"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Users Management</span></a>
+                      <a href="./categories-management.html"><i class="fa-solid fa-list" aria-hidden="true"></i><span>Categories Management</span></a>
+                      <a href="./recharge-cards.html"><i class="fa-solid fa-credit-card" aria-hidden="true"></i><span>Recharge Cards</span></a>
+                      <a href="./all-orders.html"><i class="fa-solid fa-receipt" aria-hidden="true"></i><span>All Orders</span></a>
+                      <a href="./orders.html"><i class="fa-solid fa-clock" aria-hidden="true"></i><span>Pending Orders</span></a>
+                      <a href="./activity.html"><i class="fa-solid fa-list-check" aria-hidden="true"></i><span>All Activity</span></a>
+                      <a href="./lines-management.html"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i><span>Balance Lines</span></a>
+                      <a href="./reseller-client-rates.html" data-nav-super-admin hidden><i class="fa-solid fa-percent" aria-hidden="true"></i><span>Reseller Client Rates</span></a>
+                    </div>
+                  </details>
+                </div>
+              </nav>
+              <div class="site-navigation-actions">
+                <button data-theme-toggle type="button" onclick="toggleTheme()" class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600"><i data-theme-icon class="fa-solid fa-sun"></i><span data-theme-label>Light Mode</span></button>
+                <button type="button" onclick="logout()" class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
+              </div>
+            </div>
         </div>
     </header>
 

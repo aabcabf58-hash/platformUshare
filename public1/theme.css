@@ -1,0 +1,486 @@
+/* Shared Light / Dark theme for Zouzou pages */
+:root {
+    color-scheme: dark;
+}
+
+html.light-mode {
+    color-scheme: light;
+}
+
+body,
+header,
+main,
+section,
+article,
+div,
+table,
+thead,
+tbody,
+tr,
+th,
+td,
+input,
+textarea,
+button,
+a,
+span {
+    transition-property: background-color, border-color, color, box-shadow;
+    transition-duration: 180ms;
+    transition-timing-function: ease;
+}
+
+html.light-mode body {
+    background: #eef2f7 !important;
+    color: #0f172a !important;
+}
+
+html.light-mode .bg-gray-900 {
+    background-color: #f1f5f9 !important;
+}
+
+html.light-mode .bg-gray-800 {
+    background-color: #ffffff !important;
+}
+
+html.light-mode .bg-gray-700 {
+    background-color: #e2e8f0 !important;
+}
+
+html.light-mode .bg-gray-600 {
+    background-color: #cbd5e1 !important;
+}
+
+html.light-mode .bg-gray-900\/50,
+html.light-mode .bg-gray-900\/40 {
+    background-color: rgba(241, 245, 249, 0.92) !important;
+}
+
+html.light-mode .bg-gray-700\/40,
+html.light-mode .bg-gray-700\/30 {
+    background-color: rgba(226, 232, 240, 0.78) !important;
+}
+
+html.light-mode .border-gray-700 {
+    border-color: #cbd5e1 !important;
+}
+
+html.light-mode .border-gray-600 {
+    border-color: #94a3b8 !important;
+}
+
+html.light-mode .divide-gray-700\/60 > :not([hidden]) ~ :not([hidden]) {
+    border-color: rgba(203, 213, 225, 0.85) !important;
+}
+
+html.light-mode .text-gray-100,
+html.light-mode .text-gray-200 {
+    color: #0f172a !important;
+}
+
+html.light-mode .text-gray-300 {
+    color: #1f2937 !important;
+}
+
+html.light-mode .text-gray-400 {
+    color: #475569 !important;
+}
+
+html.light-mode .text-gray-500,
+html.light-mode .text-gray-600 {
+    color: #64748b !important;
+}
+
+/* Keep white text on colored action buttons, but darken plain white labels. */
+html.light-mode .text-white:not([class*="bg-orange-"]):not([class*="bg-blue-"]):not([class*="bg-green-"]):not([class*="bg-red-"]):not([class*="bg-purple-"]):not([class*="bg-indigo-"]):not([class*="bg-cyan-"]) {
+    color: #0f172a !important;
+}
+
+html.light-mode input,
+html.light-mode textarea {
+    color: #0f172a !important;
+    caret-color: #f97316;
+}
+
+html.light-mode input::placeholder,
+html.light-mode textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+html.light-mode .hover\:bg-gray-600:hover,
+html.light-mode .hover\:bg-gray-700:hover {
+    background-color: #cbd5e1 !important;
+}
+
+html.light-mode .hover\:bg-gray-700\/30:hover {
+    background-color: rgba(226, 232, 240, 0.72) !important;
+}
+
+html.light-mode .bg-black\/70 {
+    background-color: rgba(15, 23, 42, 0.55) !important;
+}
+
+html.light-mode #floating-table-header {
+    border-bottom-color: #cbd5e1 !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14) !important;
+}
+
+html.light-mode #floating-table-header table,
+html.light-mode #floating-table-header th {
+    background: #ffffff !important;
+}
+
+html.light-mode #table-header,
+html.light-mode #table-header tr,
+html.light-mode #table-header th {
+    background: #ffffff !important;
+}
+
+html.light-mode #page-header,
+html.light-mode body > header {
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.10) !important;
+}
+
+html.light-mode .shadow-xl,
+html.light-mode .shadow-2xl {
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.10) !important;
+}
+
+/* Preserve strong failed-refresh visibility in both themes. */
+html.light-mode .data-warning-box.border-red-400,
+html.light-mode .data-warning-box.border-red-500 {
+    background-color: rgba(239, 68, 68, 0.20) !important;
+    border-color: #dc2626 !important;
+    color: #b91c1c !important;
+    box-shadow: 0 8px 18px rgba(220, 38, 38, 0.22) !important;
+}
+
+html.light-mode .data-warning-text.text-red-300,
+html.light-mode .data-warning-text.text-red-400 {
+    color: #b91c1c !important;
+}
+
+html.light-mode tr.bg-red-950\/25 {
+    background-color: rgba(254, 226, 226, 0.72) !important;
+}
+
+html.light-mode tr.ring-red-700\/50 {
+    --tw-ring-color: rgba(220, 38, 38, 0.45) !important;
+}
+
+.theme-toggle-button {
+    min-width: 132px;
+}
+/* ---------------------------------------------------------
+   Light mode readability
+   Use darker text shades on white and light-gray surfaces.
+   --------------------------------------------------------- */
+
+html.light-mode {
+    --light-text-main: #0f172a;
+    --light-text-secondary: #334155;
+    --light-text-muted: #475569;
+}
+
+/* Main page content, tables, cards and dialogs */
+html.light-mode main,
+html.light-mode #lines-table,
+html.light-mode #groups-grid,
+html.light-mode [role="dialog"] {
+    color: var(--light-text-main) !important;
+}
+
+/* Neutral text */
+html.light-mode .text-gray-100,
+html.light-mode .text-gray-200,
+html.light-mode .text-gray-300 {
+    color: var(--light-text-main) !important;
+}
+
+html.light-mode .text-gray-400 {
+    color: var(--light-text-secondary) !important;
+}
+
+html.light-mode .text-gray-500,
+html.light-mode .text-gray-600 {
+    color: var(--light-text-muted) !important;
+}
+
+/* Dark, readable versions of the colored text utilities */
+html.light-mode .text-blue-300 {
+    color: #1d4ed8 !important;
+}
+
+html.light-mode .text-cyan-300 {
+    color: #0e7490 !important;
+}
+
+html.light-mode .text-green-300,
+html.light-mode .text-green-400,
+html.light-mode .text-green-500 {
+    color: #166534 !important;
+}
+
+html.light-mode .text-indigo-300,
+html.light-mode .text-indigo-400 {
+    color: #4338ca !important;
+}
+
+html.light-mode .text-orange-300,
+html.light-mode .text-orange-400,
+html.light-mode .text-orange-500 {
+    color: #c2410c !important;
+}
+
+html.light-mode .text-purple-300 {
+    color: #7e22ce !important;
+}
+
+html.light-mode .text-red-300,
+html.light-mode .text-red-400 {
+    color: #b91c1c !important;
+}
+
+/* Plain white text becomes dark in light mode.
+   Text stays white when the same element is a colored action button. */
+html.light-mode .text-white:not([class*="bg-orange-"]):not([class*="bg-blue-"]):not([class*="bg-green-"]):not([class*="bg-red-"]):not([class*="bg-purple-"]):not([class*="bg-indigo-"]):not([class*="bg-cyan-"]) {
+    color: var(--light-text-main) !important;
+}
+
+/* Table headings and ordinary values */
+html.light-mode #lines-table th {
+    color: #1e293b !important;
+}
+
+html.light-mode #lines-table td {
+    border-color: #d8e0ea;
+}
+
+/* Inputs and editable fields */
+html.light-mode input,
+html.light-mode textarea,
+html.light-mode select {
+    color: #0f172a !important;
+    background-color: #ffffff !important;
+    border-color: #94a3b8 !important;
+}
+
+html.light-mode input::placeholder,
+html.light-mode textarea::placeholder {
+    color: #64748b !important;
+    opacity: 1;
+}
+
+/* Theme button itself must also be readable */
+html.light-mode .theme-toggle-button {
+    color: #0f172a !important;
+    background-color: #e2e8f0 !important;
+    border-color: #94a3b8 !important;
+}
+
+/* Keep text white on solid colored buttons and links */
+html.light-mode button[class*="bg-orange-"],
+html.light-mode button[class*="bg-blue-"],
+html.light-mode button[class*="bg-green-"],
+html.light-mode button[class*="bg-red-"],
+html.light-mode button[class*="bg-purple-"],
+html.light-mode button[class*="bg-indigo-"],
+html.light-mode a[class*="bg-orange-"],
+html.light-mode a[class*="bg-blue-"],
+html.light-mode a[class*="bg-green-"],
+html.light-mode a[class*="bg-red-"],
+html.light-mode a[class*="bg-purple-"],
+html.light-mode a[class*="bg-indigo-"] {
+    color: #ffffff !important;
+}
+
+/* Ensure icons and labels inside solid action buttons inherit white */
+html.light-mode button[class*="bg-orange-"] *,
+html.light-mode button[class*="bg-blue-"] *,
+html.light-mode button[class*="bg-green-"] *,
+html.light-mode button[class*="bg-red-"] *,
+html.light-mode button[class*="bg-purple-"] *,
+html.light-mode button[class*="bg-indigo-"] *,
+html.light-mode a[class*="bg-orange-"] *,
+html.light-mode a[class*="bg-blue-"] *,
+html.light-mode a[class*="bg-green-"] *,
+html.light-mode a[class*="bg-red-"] *,
+html.light-mode a[class*="bg-purple-"] *,
+html.light-mode a[class*="bg-indigo-"] * {
+    color: inherit !important;
+}
+
+/* Failed and successful data status remain clear in light mode */
+html.light-mode .data-warning-box.border-red-400,
+html.light-mode .data-warning-box.border-red-500 {
+    color: #991b1b !important;
+}
+
+html.light-mode .data-warning-text.text-red-300,
+html.light-mode .data-warning-text.text-red-400 {
+    color: #991b1b !important;
+}
+
+html.light-mode .data-warning-box.border-green-700 {
+    color: #166534 !important;
+    background-color: rgba(34, 197, 94, 0.13) !important;
+    border-color: #15803d !important;
+}
+
+html.light-mode .data-warning-text.text-green-500 {
+    color: #166534 !important;
+}
+
+/* Selection, hover and disabled text stay visible */
+html.light-mode button:disabled,
+html.light-mode a[aria-disabled="true"] {
+    color: #475569 !important;
+}
+
+html.light-mode button:disabled[class*="bg-orange-"],
+html.light-mode button:disabled[class*="bg-blue-"],
+html.light-mode button:disabled[class*="bg-green-"],
+html.light-mode button:disabled[class*="bg-red-"],
+html.light-mode button:disabled[class*="bg-purple-"],
+html.light-mode button:disabled[class*="bg-indigo-"] {
+    color: #ffffff !important;
+}
+/* ---------------------------------------------------------
+   Main table columns: Type through Total Shared Bundle
+   Columns 3 to 10 are 25% larger in both themes.
+   --------------------------------------------------------- */
+
+/* Header labels */
+#lines-table th:nth-child(n+3):nth-child(-n+10),
+#floating-table-header th:nth-child(n+3):nth-child(-n+10) {
+    font-size: 1.09375rem !important;
+    line-height: 1.35 !important;
+}
+
+#lines-table th:nth-child(n+3):nth-child(-n+10) button,
+#floating-table-header th:nth-child(n+3):nth-child(-n+10) button {
+    font-size: inherit !important;
+    line-height: inherit !important;
+}
+
+/* Cell text and values */
+#lines-table td:nth-child(n+3):nth-child(-n+10) {
+    font-size: 1.09375rem !important;
+    line-height: 1.45 !important;
+}
+
+/* Override Tailwind text-xs / text-sm inside these columns */
+#lines-table td:nth-child(n+3):nth-child(-n+10) .text-xs,
+#lines-table td:nth-child(n+3):nth-child(-n+10) .text-sm,
+#lines-table td:nth-child(n+3):nth-child(-n+10) [class*="text-[10px]"],
+#lines-table td:nth-child(n+3):nth-child(-n+10) [class*="text-[11px]"] {
+    font-size: 0.9375rem !important;
+    line-height: 1.35 !important;
+}
+
+/* Icons grow slightly, but not as much as the text */
+#lines-table td:nth-child(n+3):nth-child(-n+10) i,
+#lines-table th:nth-child(n+3):nth-child(-n+10) i,
+#floating-table-header th:nth-child(n+3):nth-child(-n+10) i {
+    font-size: 1em !important;
+}
+
+/* ---------------------------------------------------------
+   Strong dark colors for these columns in Light Mode.
+   --------------------------------------------------------- */
+
+/* Header labels: Type, Group ID, Actions, Emergency, Balance,
+   Validity, Primary User, Total Shared Bundle */
+html.light-mode #lines-table th:nth-child(n+3):nth-child(-n+10),
+html.light-mode #lines-table th:nth-child(n+3):nth-child(-n+10) button,
+html.light-mode #floating-table-header th:nth-child(n+3):nth-child(-n+10),
+html.light-mode #floating-table-header th:nth-child(n+3):nth-child(-n+10) button {
+    color: #111827 !important;
+}
+
+/* Default content color for the same columns */
+html.light-mode #lines-table td:nth-child(n+3):nth-child(-n+10) {
+    color: #111827 !important;
+}
+
+/* TYPE column */
+html.light-mode #lines-table td:nth-child(3) .text-blue-300,
+html.light-mode #lines-table td:nth-child(3) span {
+    color: #1e3a8a !important;
+}
+
+/* GROUP ID column */
+html.light-mode #lines-table td:nth-child(4) .text-indigo-300,
+html.light-mode #lines-table td:nth-child(4) span {
+    color: #312e81 !important;
+}
+
+/* ACTIONS column */
+html.light-mode #lines-table td:nth-child(5) button {
+    font-weight: 700 !important;
+}
+
+html.light-mode #lines-table td:nth-child(5) button:not(:hover) {
+    color: #111827 !important;
+}
+
+html.light-mode #lines-table td:nth-child(5) button:first-child:not(:hover) {
+    color: #6b21a8 !important;
+}
+
+/* Keep action button labels white on their colored hover state */
+html.light-mode #lines-table td:nth-child(5) button:hover,
+html.light-mode #lines-table td:nth-child(5) button:hover * {
+    color: #ffffff !important;
+}
+
+/* EMERGENCY column */
+html.light-mode #lines-table td:nth-child(6) .text-green-400,
+html.light-mode #lines-table td:nth-child(6) .text-green-300 {
+    color: #14532d !important;
+}
+
+html.light-mode #lines-table td:nth-child(6) .text-red-400,
+html.light-mode #lines-table td:nth-child(6) .text-red-300 {
+    color: #991b1b !important;
+}
+
+/* BALANCE column */
+html.light-mode #lines-table td:nth-child(7).text-green-400,
+html.light-mode #lines-table td:nth-child(7) .text-green-400 {
+    color: #14532d !important;
+}
+
+html.light-mode #lines-table td:nth-child(7).text-red-400,
+html.light-mode #lines-table td:nth-child(7) .text-red-400 {
+    color: #991b1b !important;
+}
+
+/* VALIDITY column */
+html.light-mode #lines-table td:nth-child(8) {
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+
+/* PRIMARY USER column */
+html.light-mode #lines-table td:nth-child(9) .text-purple-300,
+html.light-mode #lines-table td:nth-child(9) div {
+    color: #581c87 !important;
+}
+
+/* TOTAL SHARED BUNDLE column */
+html.light-mode #lines-table td:nth-child(10) .text-cyan-300,
+html.light-mode #lines-table td:nth-child(10) div {
+    color: #164e63 !important;
+}
+
+/* Sort icons stay visible in light mode */
+html.light-mode #lines-table th:nth-child(n+3):nth-child(-n+10) i,
+html.light-mode #floating-table-header th:nth-child(n+3):nth-child(-n+10) i {
+    color: #475569 !important;
+}
+
+html.light-mode #lines-table th:nth-child(n+3):nth-child(-n+10) i.text-orange-400,
+html.light-mode #floating-table-header th:nth-child(n+3):nth-child(-n+10) i.text-orange-400 {
+    color: #c2410c !important;
+}

@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Zouzou App - Login</title>
+
+  <script src="./theme.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  >
+
+  <link rel="stylesheet" href="./theme.css">
+</head>
+
+<body class="min-h-screen bg-gray-900 font-sans text-gray-100">
+  <main class="flex min-h-screen items-center justify-center px-4 py-8">
+    <section class="w-full max-w-md rounded-2xl border border-gray-700 bg-gray-800 p-6 shadow-2xl">
+      <div class="mb-6 text-center">
+        <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-orange-500 text-white">
+          <i class="fa-solid fa-lock text-2xl"></i>
+        </div>
+
+        <h1 class="text-2xl font-bold text-orange-400">
+          Zouzou Admin Login
+        </h1>
+
+        <p class="mt-2 text-sm text-gray-400">
+          Login with password or OTP
+        </p>
+      </div>
+
+      <div class="mb-5 grid grid-cols-2 rounded-xl bg-gray-900 p-1">
+        <button
+          id="password-tab-button"
+          type="button"
+          onclick="switchLoginMode('password')"
+          class="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white"
+        >
+          <i class="fa-solid fa-key mr-1"></i>
+          Password
+        </button>
+
+        <button
+          id="otp-tab-button"
+          type="button"
+          onclick="switchLoginMode('otp')"
+          class="rounded-lg px-4 py-2 text-sm font-semibold text-gray-400 transition hover:text-white"
+        >
+          <i class="fa-solid fa-message mr-1"></i>
+          OTP
+        </button>
+      </div>
+
+      <form
+        id="password-login-form"
+        onsubmit="handlePasswordLogin(event)"
+        class="space-y-4"
+      >
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-300">
+            Phone Number
+          </label>
+
+          <input
+            id="password-numberphone-input"
+            type="text"
+            inputmode="numeric"
+            placeholder="Example: 70123456"
+            autocomplete="username"
+            class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-orange-500"
+          >
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-300">
+            Password
+          </label>
+
+          <input
+            id="password-input"
+            type="password"
+            placeholder="Password"
+            autocomplete="current-password"
+            class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-white outline-none transition focus:border-orange-500"
+          >
+        </div>
+
+        <button
+          id="password-login-button"
+          type="submit"
+          class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 py-3 font-bold text-white transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <i class="fa-solid fa-right-to-bracket"></i>
+          Login With Password
+        </button>
+      </form>
+
+      <form
+        id="otp-login-form"
+        onsubmit="handleOtpVerify(event)"
+        class="hidden space-y-4"
+      >
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-300">
+            Phone Number
+          </label>
+
+          <input
+            id="otp-numberphone-input"
+            type="text"
+            inputmode="numeric"
+            placeholder="Example: 70123456"
+            autocomplete="username"
+            class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 font-mono text-white outline-none transition focus:border-orange-500"
+          >
+        </div>
+
+        <button
+          id="send-otp-button"
+          type="button"
+          onclick="handleSendOtp()"
+          class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <i class="fa-solid fa-paper-plane"></i>
+          Send OTP
+        </button>
+
+        <div id="otp-code-section" class="hidden space-y-4">
+          <div>
+            <label class="mb-2 block text-sm font-semibold text-gray-300">
+              OTP Code
+            </label>
+
+            <input
+              id="otp-code-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="Enter OTP"
+              autocomplete="one-time-code"
+              class="w-full rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-center font-mono text-xl tracking-widest text-white outline-none transition focus:border-green-500"
+            >
+          </div>
+
+          <button
+            id="verify-otp-button"
+            type="submit"
+            class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 font-bold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <i class="fa-solid fa-check"></i>
+            Verify OTP & Login
+          </button>
+        </div>
+      </form>
+
+      <div
+        id="login-message"
+        class="mt-4 hidden rounded-xl border p-3 text-sm"
+      ></div>
+
+      <p class="mt-5 rounded-xl border border-blue-800 bg-blue-900/20 p-3 text-xs leading-5 text-blue-300">
+        Forgot password? Use OTP login. After successful login, only admin and super_admin can open this dashboard.
+      </p>
+    </section>
+  </main>
+
+  <script src="./config.js"></script>
+  <script src="./auth.js"></script>
+
+  <script>
+    let currentLoginMode = "password";
+    let otpWasSent = false;
+
+    function setButtonLoading(button, label) {
+      if (!button) return;
+
+      button.dataset.originalHtml = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML =
+        `<i class="fa-solid fa-spinner fa-spin"></i> ${label}`;
+    }
+
+    function resetButton(button) {
+      if (!button) return;
+
+      button.disabled = false;
+
+      if (button.dataset.originalHtml) {
+        button.innerHTML = button.dataset.originalHtml;
+      }
+    }
+
+    function showLoginMessage(message, type) {
+      const box = document.getElementById("login-message");
+
+      box.className =
+        type === "error"
+          ? "mt-4 rounded-xl border border-red-800 bg-red-900/20 p-3 text-sm text-red-300"
+          : "mt-4 rounded-xl border border-green-800 bg-green-900/20 p-3 text-sm text-green-300";
+
+      box.textContent = message;
+      box.classList.remove("hidden");
+    }
+
+    function hideLoginMessage() {
+      document
+        .getElementById("login-message")
+        ?.classList.add("hidden");
+    }
+
+    function switchLoginMode(mode) {
+      currentLoginMode = mode;
+      hideLoginMessage();
+
+      const passwordForm = document.getElementById("password-login-form");
+      const otpForm = document.getElementById("otp-login-form");
+      const passwordTab = document.getElementById("password-tab-button");
+      const otpTab = document.getElementById("otp-tab-button");
+
+      if (mode === "password") {
+        passwordForm.classList.remove("hidden");
+        otpForm.classList.add("hidden");
+
+        passwordTab.className =
+          "rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white";
+        otpTab.className =
+          "rounded-lg px-4 py-2 text-sm font-semibold text-gray-400 transition hover:text-white";
+
+        setTimeout(() => {
+          document.getElementById("password-numberphone-input")?.focus();
+        }, 50);
+      } else {
+        otpForm.classList.remove("hidden");
+        passwordForm.classList.add("hidden");
+
+        otpTab.className =
+          "rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white";
+        passwordTab.className =
+          "rounded-lg px-4 py-2 text-sm font-semibold text-gray-400 transition hover:text-white";
+
+        const passwordPhone = document
+          .getElementById("password-numberphone-input")
+          ?.value
+          ?.trim();
+
+        const otpPhoneInput = document.getElementById("otp-numberphone-input");
+
+        if (passwordPhone && otpPhoneInput && !otpPhoneInput.value.trim()) {
+          otpPhoneInput.value = passwordPhone;
+        }
+
+        setTimeout(() => {
+          otpPhoneInput?.focus();
+        }, 50);
+      }
+    }
+
+    function ensureAdminRole(result) {
+      const role = result.user?.role;
+
+      if (
+        role !== "admin" &&
+        role !== "super_admin"
+      ) {
+        clearAuth();
+        throw new Error(
+          "This page is only for admin and super_admin users"
+        );
+      }
+    }
+
+    function goToDashboard() {
+      window.location.href = "./index.html";
+    }
+
+    async function handlePasswordLogin(event) {
+      event.preventDefault();
+
+      const numberphone = document
+        .getElementById("password-numberphone-input")
+        .value
+        .trim();
+
+      const password = document
+        .getElementById("password-input")
+        .value
+        .trim();
+
+      const button = document.getElementById("password-login-button");
+
+      if (!numberphone || !password) {
+        showLoginMessage(
+          "Phone number and password are required",
+          "error"
+        );
+        return;
+      }
+
+      setButtonLoading(button, "Logging in...");
+
+      try {
+        const result = await loginWithPassword(
+          numberphone,
+          password
+        );
+
+        ensureAdminRole(result);
+
+        showLoginMessage(
+          "Login successful",
+          "success"
+        );
+
+        goToDashboard();
+      } catch (error) {
+        console.error("Password login error:", error);
+
+        showLoginMessage(
+          error.message || "Login failed",
+          "error"
+        );
+      } finally {
+        resetButton(button);
+      }
+    }
+
+    async function handleSendOtp() {
+      const numberphone = document
+        .getElementById("otp-numberphone-input")
+        .value
+        .trim();
+
+      const button = document.getElementById("send-otp-button");
+      const otpSection = document.getElementById("otp-code-section");
+
+      if (!numberphone) {
+        showLoginMessage(
+          "Phone number is required",
+          "error"
+        );
+        return;
+      }
+
+      setButtonLoading(button, "Sending OTP...");
+
+      try {
+        await requestLoginOtp(numberphone);
+
+        otpWasSent = true;
+        otpSection.classList.remove("hidden");
+
+        showLoginMessage(
+          "OTP sent successfully. Enter the code to login.",
+          "success"
+        );
+
+        setTimeout(() => {
+          document.getElementById("otp-code-input")?.focus();
+        }, 50);
+      } catch (error) {
+        console.error("Send OTP error:", error);
+
+        showLoginMessage(
+          error.message || "Failed to send OTP",
+          "error"
+        );
+      } finally {
+        resetButton(button);
+      }
+    }
+
+    async function handleOtpVerify(event) {
+      event.preventDefault();
+
+      const numberphone = document
+        .getElementById("otp-numberphone-input")
+        .value
+        .trim();
+
+      const otp = document
+        .getElementById("otp-code-input")
+        .value
+        .trim();
+
+      const button = document.getElementById("verify-otp-button");
+
+      if (!numberphone) {
+        showLoginMessage(
+          "Phone number is required",
+          "error"
+        );
+        return;
+      }
+
+      if (!otpWasSent) {
+        showLoginMessage(
+          "Send OTP first",
+          "error"
+        );
+        return;
+      }
+
+      if (!otp) {
+        showLoginMessage(
+          "OTP code is required",
+          "error"
+        );
+        return;
+      }
+
+      setButtonLoading(button, "Verifying...");
+
+      try {
+        const result = await verifyLoginOtp(
+          numberphone,
+          otp
+        );
+
+        ensureAdminRole(result);
+
+        showLoginMessage(
+          "OTP verified. Login successful.",
+          "success"
+        );
+
+        goToDashboard();
+      } catch (error) {
+        console.error("Verify OTP error:", error);
+
+        showLoginMessage(
+          error.message || "OTP verification failed",
+          "error"
+        );
+      } finally {
+        resetButton(button);
+      }
+    }
+  </script>
+</body>
+</html>

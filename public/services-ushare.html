@@ -32,13 +32,39 @@
     .compact-editor input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
 
   </style>
+    <link rel="stylesheet" href="./site-navigation.css">
+    <script src="./site-navigation.js" defer></script>
 </head>
 <body class="min-h-screen bg-gray-900 text-gray-100">
   <header class="sticky top-0 z-50 border-b border-gray-700 bg-gray-800 p-4 shadow-md">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div class="flex items-center gap-3"><div class="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-500 text-xl"><i class="fa-solid fa-mobile-screen-button"></i></div><div><h1 class="text-xl font-bold text-white">Zouzou App</h1><p class="text-sm text-gray-400">U-Share Services</p></div></div>
-      <div class="flex w-full flex-col gap-2 sm:w-auto"><nav class="flex max-w-full gap-2 overflow-x-auto rounded-2xl border border-gray-700 bg-gray-900/35 p-2">
-        <a href="./index.html" class="nav bg-orange-500"><i class="fa-solid fa-table"></i>Table</a><a href="./groups.html" class="nav bg-gray-700"><i class="fa-solid fa-layer-group"></i>Groups</a><a href="./group-builder.html" class="nav bg-teal-600"><i class="fa-solid fa-diagram-project"></i>Builder</a><a href="./admin-center.html" class="nav bg-cyan-600"><i class="fa-solid fa-user-shield"></i>Admin</a><a href="./refresh-all.html" class="nav bg-blue-600"><i class="fa-solid fa-arrows-rotate"></i>Refresh</a><a href="./services-ushare.html" class="nav bg-purple-600"><i class="fa-solid fa-signal"></i>Services</a>
-      </nav><div class="flex gap-2"><button onclick="theme()" class="nav bg-gray-700"><i class="fa-solid fa-sun" id="themeIcon"></i><span id="themeText">Light Mode</span></button><button onclick="logout()" class="nav bg-red-600"><i class="fa-solid fa-right-from-bracket"></i>Logout</button></div></div></div>
+      <div class="flex w-full flex-col gap-2 sm:w-auto"><div class="site-navigation-header">
+        <nav class="site-navigation" aria-label="Page navigation">
+          <div class="site-navigation-primary">
+            <a href="./index.html"><i class="fa-solid fa-table" aria-hidden="true"></i><span>Main</span></a>
+            <a href="./admin-center.html"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i><span>Admin Center</span></a>
+            <a href="./services-ushare.html" aria-current="page"><i class="fa-solid fa-signal" aria-hidden="true"></i><span>U-Share Services</span></a>
+            <details class="site-navigation-more">
+              <summary>More</summary>
+              <div class="site-navigation-list">
+                <a href="./groups.html"><i class="fa-solid fa-object-group" aria-hidden="true"></i><span>Groups</span></a>
+                <a href="./years.html"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Years</span></a>
+                <a href="./my-years.html"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i><span>Order Year</span></a>
+                <a href="./group-builder.html"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>Auto Group Builder</span></a>
+                <a href="./refresh-all.html"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i><span>Refresh All</span></a>
+                <a href="./users-management.html"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Users Management</span></a>
+                <a href="./categories-management.html"><i class="fa-solid fa-list" aria-hidden="true"></i><span>Categories Management</span></a>
+                <a href="./recharge-cards.html"><i class="fa-solid fa-credit-card" aria-hidden="true"></i><span>Recharge Cards</span></a>
+                <a href="./all-orders.html"><i class="fa-solid fa-receipt" aria-hidden="true"></i><span>All Orders</span></a>
+                <a href="./orders.html"><i class="fa-solid fa-clock" aria-hidden="true"></i><span>Pending Orders</span></a>
+                <a href="./activity.html"><i class="fa-solid fa-list-check" aria-hidden="true"></i><span>All Activity</span></a>
+                <a href="./lines-management.html"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i><span>Balance Lines</span></a>
+                <a href="./reseller-client-rates.html" data-nav-super-admin hidden><i class="fa-solid fa-percent" aria-hidden="true"></i><span>Reseller Client Rates</span></a>
+              </div>
+            </details>
+          </div>
+        </nav>
+      </div><div class="flex gap-2"><button onclick="theme()" class="nav bg-gray-700"><i class="fa-solid fa-sun" id="themeIcon"></i><span id="themeText">Light Mode</span></button><button onclick="logout()" class="nav bg-red-600"><i class="fa-solid fa-right-from-bracket"></i>Logout</button></div></div></div>
   </header>
   <main class="w-full px-2 py-4 sm:px-4">
     <div id="msg" class="mb-4 hidden rounded-2xl border px-4 py-3"></div>

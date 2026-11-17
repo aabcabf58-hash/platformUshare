@@ -168,6 +168,8 @@
     </style>
 
     <link rel="stylesheet" href="./theme.css">
+    <link rel="stylesheet" href="./site-navigation.css">
+    <script src="./site-navigation.js" defer></script>
 </head>
 
 <body class="min-h-screen bg-gray-900 font-sans text-gray-100">
@@ -190,56 +192,20 @@
 
             <div class="flex w-full min-w-0 flex-col gap-2 sm:flex-1 sm:items-end">
                 <!-- Page navigation buttons -->
-                <nav
-                    aria-label="Page navigation"
-                    class="header-button-row flex w-full flex-nowrap gap-2 overflow-hidden rounded-2xl border border-gray-700 bg-gray-900/35 p-2"
-                >
-                    <a
-                        id="table-view-button"
-                        href="./index.html"
-                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-orange-600"
-                    >
-                        <i class="fa-solid fa-table"></i>
-                        Table View
-                    </a>
-
-                    <a
-                        id="groups-view-button"
-                        href="./groups.html"
-                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-200 shadow transition-all hover:bg-gray-600"
-                    >
-                        <i class="fa-solid fa-object-group"></i>
-                        Groups View
-                    </a>
-
-                    <a
-                        id="group-builder-view-button"
-                        href="./group-builder.html"
-                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-teal-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-teal-700"
-                    >
-                        <i class="fa-solid fa-layer-group"></i>
-                        Auto Group Builder
-                    </a>
-
-                    <a
-                        id="admin-center-view-button"
-                        href="./admin-center.html"
-                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-cyan-700"
-                    >
-                        <i class="fa-solid fa-screwdriver-wrench"></i>
-                        Admin Center
-                    </a>
-
-                    <a
-                        id="services-ushare-view-button"
-                        href="./services-ushare.html"
-                        class="flex cursor-pointer items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-purple-700"
-                    >
-                        <i class="fa-solid fa-signal"></i>
-                        U-Share Services
-                    </a>
-
-                    <button
+                <div class="site-navigation-header">
+                  <nav class="site-navigation" aria-label="Page navigation">
+                    <div class="site-navigation-primary">
+                      <a href="./index.html" id="table-view-button" aria-current="page"><i class="fa-solid fa-table" aria-hidden="true"></i><span>Main</span></a>
+                      <a href="./admin-center.html" id="admin-center-view-button"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i><span>Admin Center</span></a>
+                      <a href="./services-ushare.html" id="services-ushare-view-button"><i class="fa-solid fa-signal" aria-hidden="true"></i><span>U-Share Services</span></a>
+                      <details class="site-navigation-more">
+                        <summary>More</summary>
+                        <div class="site-navigation-list">
+                          <a href="./groups.html" id="groups-view-button"><i class="fa-solid fa-object-group" aria-hidden="true"></i><span>Groups</span></a>
+                          <a href="./years.html"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i><span>Years</span></a>
+                          <a href="./my-years.html"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i><span>Order Year</span></a>
+                          <a href="./group-builder.html" id="group-builder-view-button"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>Auto Group Builder</span></a>
+                          <button
                         id="refresh-all-button"
                         type="button"
                         onclick="window.location.href='./refresh-all.html'"
@@ -249,7 +215,19 @@
                         <i class="fa-solid fa-arrows-rotate"></i>
                         Refresh All Page
                     </button>
-
+                          <a href="./users-management.html"><i class="fa-solid fa-users" aria-hidden="true"></i><span>Users Management</span></a>
+                          <a href="./categories-management.html"><i class="fa-solid fa-list" aria-hidden="true"></i><span>Categories Management</span></a>
+                          <a href="./recharge-cards.html"><i class="fa-solid fa-credit-card" aria-hidden="true"></i><span>Recharge Cards</span></a>
+                          <a href="./all-orders.html"><i class="fa-solid fa-receipt" aria-hidden="true"></i><span>All Orders</span></a>
+                          <a href="./orders.html"><i class="fa-solid fa-clock" aria-hidden="true"></i><span>Pending Orders</span></a>
+                          <a href="./activity.html"><i class="fa-solid fa-list-check" aria-hidden="true"></i><span>All Activity</span></a>
+                          <a href="./lines-management.html"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i><span>Balance Lines</span></a>
+                          <a href="./reseller-client-rates.html" data-nav-super-admin hidden><i class="fa-solid fa-percent" aria-hidden="true"></i><span>Reseller Client Rates</span></a>
+                        </div>
+                      </details>
+                    </div>
+                  </nav>
+                  <div class="site-navigation-actions">
                     <button
                         type="button"
                         onclick="logout()"
@@ -258,7 +236,8 @@
                         <i class="fa-solid fa-right-from-bracket"></i>
                         Logout
                     </button>
-                </nav>
+                  </div>
+                </div>
 
                 <!-- Current-page action buttons -->
                 <div class="header-button-row flex w-full flex-nowrap gap-2 overflow-hidden rounded-2xl border border-gray-700 bg-gray-900/35 p-2">
