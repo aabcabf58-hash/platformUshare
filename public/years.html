@@ -13,187 +13,6 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     >
     <link rel="stylesheet" href="./theme.css">
-
-    <style>
-        html,
-        body {
-            min-height: 100%;
-            height: auto !important;
-            overflow-y: auto !important;
-        }
-
-        main,
-        #years-grid {
-            max-height: none !important;
-            overflow-y: visible !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) :is(.text-gray-100, .text-gray-200, .text-gray-300) {
-            color: #1f2937 !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) :is(.text-gray-500, .text-gray-600) {
-            color: #374151 !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) .text-green-300,
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) .text-green-400 {
-            color: #166534 !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) .text-blue-300 {
-            color: #1e40af !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) .text-indigo-300 {
-            color: #3730a3 !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) .text-cyan-300 {
-            color: #155e75 !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) :is(.text-violet-300, .text-purple-300) {
-            color: #5b21b6 !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) .text-emerald-300 {
-            color: #065f46 !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) :is(.text-amber-300, .text-amber-500) {
-            color: #92400e !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) .text-orange-300 {
-            color: #9a3412 !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) .text-red-300 {
-            color: #991b1b !important;
-        }
-
-        :is(
-            html[data-theme="light"],
-            body[data-theme="light"],
-            html.light,
-            body.light,
-            html.light-mode,
-            body.light-mode,
-            html.theme-light,
-            body.theme-light
-        ) :is(input, select, textarea) {
-            color: #111827 !important;
-        }
-    </style>
 </head>
 
 <body class="min-h-screen bg-gray-900 font-sans text-gray-100">
@@ -212,9 +31,51 @@
                 </h1>
             </div>
 
-            <nav class="flex flex-wrap items-center justify-center gap-2">
-<button data-theme-toggle type="button" onclick="toggleTheme()" class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-3 py-2 text-sm font-medium text-gray-200 shadow transition hover:bg-gray-600"><i data-theme-icon class="fa-solid fa-sun"></i><span data-theme-label>Light Mode</span></button>
-<a href="./index.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-table"></i>Main Table</a><a href="./groups.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-object-group"></i>Groups</a><a href="./years.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition bg-green-600 text-white"><i class="fa-solid fa-calendar-days"></i>Years</a><a href="./my-years.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-emerald-600 bg-emerald-700 text-white hover:bg-emerald-600"><i class="fa-solid fa-cart-plus"></i>Order Year</a><a href="./group-builder.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-layer-group"></i>Group Builder</a><a href="./refresh-all.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-arrows-rotate"></i>Refresh All</a><a href="./admin-center.html" class="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium shadow transition border border-gray-600 bg-gray-700 text-gray-200 hover:bg-gray-600"><i class="fa-solid fa-screwdriver-wrench"></i>Admin Center</a><button type="button" onclick="logout()" class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white shadow transition hover:bg-red-700"><i class="fa-solid fa-right-from-bracket"></i>Logout</button></nav>
+            <nav class="flex flex-wrap gap-2">
+                <button
+                    data-theme-toggle
+                    type="button"
+                    onclick="toggleTheme()"
+                    class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-200 shadow transition-all hover:bg-gray-600"
+                >
+                    <i data-theme-icon class="fa-solid fa-sun"></i>
+                    <span data-theme-label>Light Mode</span>
+                </button>
+
+                <a
+                    href="./index.html"
+                    class="flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-orange-600"
+                >
+                    <i class="fa-solid fa-table"></i>
+                    Main Table
+                </a>
+
+                <a
+                    href="./groups.html"
+                    class="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-indigo-700"
+                >
+                    <i class="fa-solid fa-object-group"></i>
+                    Groups View
+                </a>
+
+                <button
+                    type="button"
+                    onclick="loadYearsData()"
+                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-blue-700"
+                >
+                    <i class="fa-solid fa-rotate"></i>
+                    Refresh Years
+                </button>
+
+                <button
+                    type="button"
+                    onclick="logout()"
+                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow transition hover:bg-red-700"
+                >
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    Logout
+                </button>
+            </nav>
         </div>
     </header>
 
@@ -224,35 +85,59 @@
             class="mb-4 hidden rounded-xl border p-3 text-sm"
         ></div>
 
-        <section class="sticky top-[88px] z-40 mb-4 grid grid-cols-1 gap-3 bg-gray-900/95 py-2 backdrop-blur lg:grid-cols-2">
-            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl"><div class="grid grid-cols-3 divide-x divide-gray-700"><div class="pr-3"><div class="text-[10px] font-semibold uppercase text-gray-500">Total Years</div><div id="total-years" class="mt-1 text-3xl font-bold text-green-300">0</div></div><div class="px-3"><div class="text-[10px] font-semibold uppercase text-gray-500">Visible</div><div id="visible-years" class="mt-1 text-3xl font-bold text-blue-300">0</div></div><div class="pl-3"><div class="text-[10px] font-semibold uppercase text-gray-500">Numbers</div><div id="total-year-numbers" class="mt-1 text-3xl font-bold text-indigo-300">0</div></div></div></div>
-            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-3 shadow-xl">
-                <div class="flex gap-2">
-                    <div class="relative flex-1">
-                        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                        <input id="years-search-input" type="search" oninput="applyYearsSearch()" placeholder="Search year, group, status, split text, phone number, balance, or total received..." class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-11 pr-4 text-sm text-white outline-none focus:border-green-500">
-                    </div>
-                    <button id="clear-years-search-button" type="button" onclick="clearYearsSearch()" disabled class="rounded-xl bg-gray-700 px-4 py-3 text-white disabled:opacity-50"><i class="fa-solid fa-xmark"></i></button>
-                    <button type="button" onclick="loadYearsData()" class="rounded-xl bg-blue-600 px-4 py-3 text-white"><i class="fa-solid fa-rotate"></i></button>
+        <section class="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
+                <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Total Years
                 </div>
+                <div id="total-years" class="mt-2 text-3xl font-bold text-green-300">
+                    0
+                </div>
+            </div>
 
-                <div class="mt-3 border-t border-gray-700 pt-3">
-                    <label for="year-status-filter" class="mb-1 block text-[10px] font-bold uppercase tracking-wide text-gray-500">
-                        Status
-                    </label>
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
+                <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Visible Years
+                </div>
+                <div id="visible-years" class="mt-2 text-3xl font-bold text-blue-300">
+                    0
+                </div>
+            </div>
 
-                    <select
-                        id="year-status-filter"
-                        onchange="renderYears()"
-                        class="w-full cursor-pointer rounded-xl border border-gray-600 bg-gray-900 px-4 py-3 text-sm font-bold text-white outline-none focus:border-green-500"
+            <div class="rounded-2xl border border-gray-700 bg-gray-800 p-4 shadow-xl">
+                <div class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Total Numbers
+                </div>
+                <div id="total-year-numbers" class="mt-2 text-3xl font-bold text-indigo-300">
+                    0
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-4 rounded-xl border border-gray-700 bg-gray-800 p-3 shadow-lg">
+            <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+
+                    <input
+                        id="years-search-input"
+                        type="search"
+                        oninput="applyYearsSearch()"
+                        placeholder="Search year, group, status, split text, phone number, or balance..."
+                        class="w-full rounded-xl border border-gray-600 bg-gray-900 py-3 pl-11 pr-4 text-sm text-white outline-none transition focus:border-green-500"
                     >
-                        <option value="all" selected>All</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="COMPLETE">Complete</option>
-                        <option value="CHECKING">Checking</option>
-                        <option value="CREATED">Created</option>
-                    </select>
                 </div>
+
+                <button
+                    id="clear-years-search-button"
+                    type="button"
+                    onclick="clearYearsSearch()"
+                    disabled
+                    class="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-gray-700 px-4 py-3 text-sm font-medium text-white transition hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                    Clear
+                </button>
             </div>
         </section>
 
@@ -275,7 +160,7 @@
     <script>
         const API_BASE_URL =
             window.APP_CONFIG?.API_BASE_URL ||
-            'https://api.zouzouamhaz.com';
+            'https://abdd-production.up.railway.app';
 
         const GET_ALL_YEARS_API =
             `${API_BASE_URL}/api/ushare/getAllYears`;
@@ -286,17 +171,14 @@
         const EDIT_SPLIT_TEXT_YEARS_API =
             `${API_BASE_URL}/api/ushare/editsplitTextYears`;
 
-        const CHECK_YEAR_API =
-            `${API_BASE_URL}/api/ushare/chekyear`;
-
         const REFRESH_ALFA_API =
             `${API_BASE_URL}/api/ushare/check-number`;
 
         const STATUS_OPTIONS = [
             'PENDING',
-            'CREATED',
-            'CHECKING',
-            'COMPLETE'
+            'created',
+            'cheking',
+            'comlpete'
         ];
 
         const CHECK_CONCURRENCY = 2;
@@ -407,39 +289,13 @@
         }
 
         function getVisibleYears() {
-            const selectedStatus = String(
-                document.getElementById('year-status-filter')?.value ??
-                'all'
-            )
-                .trim()
-                .toUpperCase();
+            if (!yearsSearchQuery) {
+                return yearsData;
+            }
 
             return yearsData.filter((year) => {
-                if (yearsSearchQuery) {
-                    const searchableText = JSON.stringify(year).toLowerCase();
-
-                    if (!searchableText.includes(yearsSearchQuery)) {
-                        return false;
-                    }
-                }
-
-                if (selectedStatus !== 'ALL') {
-                    const yearStatus = String(year.status ?? '')
-                        .trim()
-                        .toUpperCase();
-
-                    const statusMatches =
-                        selectedStatus === 'CHEKING'
-                            ? yearStatus === 'CHEKING' ||
-                              yearStatus === 'CHECKING'
-                            : yearStatus === selectedStatus;
-
-                    if (!statusMatches) {
-                        return false;
-                    }
-                }
-
-                return true;
+                const searchableText = JSON.stringify(year).toLowerCase();
+                return searchableText.includes(yearsSearchQuery);
             });
         }
 
@@ -490,44 +346,9 @@
             const status = formatEmptyValue(year.status ?? '-');
             const numbers = getYearNumbers(year);
             const realNumbers = numbers.filter((item) => isValidYearNumber(item.number));
-            const createdAt = formatDateTime(
-                year.created_at ??
-                year.createdAt
-            );
-            const checkedAt = formatDateTime(
-                year.checked_at ??
-                year.checkedAt ??
-                year.check_at ??
-                year.checkAt ??
-                year.last_checked_at ??
-                year.lastCheckedAt ??
-                year.updated_at ??
-                year.updatedAt
-            );
+            const createdAt = formatDateTime(year.created_at ?? year.createdAt);
+            const updatedAt = formatDateTime(year.updated_at ?? year.updatedAt);
             const domKey = getYearDomKey(year);
-            const totalReceived = toNumber(year.total_received ?? year.totalReceived ?? 0);
-            const clientNumberphone = formatEmptyValue(
-                year.client_numberphone ??
-                year.clientNumberphone ??
-                '-'
-            );
-            const targetIdentifier = formatEmptyValue(
-                year.target_identifier ??
-                year.targetIdentifier ??
-                '-'
-            );
-            const finalYearPriceValue =
-                year.final_year_price ??
-                year.finalYearPrice;
-            const finalYearCurrency = String(
-                year.currency ?? ''
-            ).trim().toUpperCase();
-            const finalYearPrice =
-                finalYearPriceValue === null ||
-                finalYearPriceValue === undefined ||
-                String(finalYearPriceValue).trim() === ''
-                    ? '-'
-                    : `${formatMoney(toNumber(finalYearPriceValue))}${finalYearCurrency ? ` ${finalYearCurrency}` : ''}`;
 
             return `
                 <article class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
@@ -551,8 +372,9 @@
                                         ID: ${escapeHtml(yearId)}
                                     </span>
 
-                                    <span class="rounded-lg border ${getStatusClasses(status)} px-2 py-1 font-mono font-bold">${escapeHtml(status)}</span>
-                                    <span class="rounded-lg border border-emerald-700 bg-emerald-500/10 px-2 py-1 font-mono font-bold text-emerald-300" title="PostgreSQL total_received">Total Received: $${formatMoney(totalReceived)}</span>
+                                    <span class="rounded-lg border ${getStatusClasses(status)} px-2 py-1 font-mono font-bold">
+                                        ${escapeHtml(status)}
+                                    </span>
                                 </div>
                             </div>
 
@@ -564,16 +386,6 @@
                                 >
                                     <i class="fa-solid fa-copy"></i>
                                     Copy Year
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onclick="copyYearShortcut('${escapeJsString(yearId)}')"
-                                    class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-cyan-600 px-3 py-2 text-xs font-bold text-white transition hover:bg-cyan-700"
-                                    title="Copy number, balance before, balance after, returned split amount, and total received"
-                                >
-                                    <i class="fa-solid fa-bolt"></i>
-                                    Copy Shortcut
                                 </button>
 
                                 <button
@@ -599,10 +411,10 @@
 
                             <div class="rounded-xl border border-gray-700 bg-gray-900/40 p-3">
                                 <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
-                                    Last Checked
+                                    Updated
                                 </div>
                                 <div class="mt-1 font-mono text-xs font-bold text-orange-300">
-                                    ${escapeHtml(checkedAt)}
+                                    ${escapeHtml(updatedAt)}
                                 </div>
                             </div>
 
@@ -612,35 +424,6 @@
                                 </div>
                                 <div class="mt-1 font-mono text-xs font-bold text-green-300">
                                     ${realNumbers.length} / 4
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
-                            <div class="min-w-0 rounded-xl border border-gray-700 bg-gray-900/40 p-3">
-                                <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
-                                    Client Number
-                                </div>
-                                <div class="mt-1 whitespace-normal break-all font-mono text-base font-bold text-cyan-300" title="${escapeHtml(clientNumberphone)}">
-                                    ${escapeHtml(clientNumberphone)}
-                                </div>
-                            </div>
-
-                            <div class="min-w-0 rounded-xl border border-gray-700 bg-gray-900/40 p-3">
-                                <div class="text-[10px] font-bold uppercase tracking-wide text-gray-500">
-                                    Target Identifier
-                                </div>
-                                <div class="mt-1 whitespace-normal break-all font-mono text-base font-bold text-violet-300" title="${escapeHtml(targetIdentifier)}">
-                                    ${escapeHtml(targetIdentifier)}
-                                </div>
-                            </div>
-
-                            <div class="min-w-0 rounded-xl border border-amber-700 bg-amber-500/10 p-3 sm:col-span-2 xl:col-span-1">
-                                <div class="text-[10px] font-bold uppercase tracking-wide text-amber-500">
-                                    Final Year Price
-                                </div>
-                                <div class="mt-1 whitespace-normal break-all font-mono text-base font-bold text-amber-300" title="${escapeHtml(finalYearPrice)}">
-                                    ${escapeHtml(finalYearPrice)}
                                 </div>
                             </div>
                         </div>
@@ -744,9 +527,9 @@
                     </div>
 
                     <div class="mt-3 grid grid-cols-3 gap-2">
-                        ${renderMoneyBox('Balance Before', item.balanceBefore, 'text-blue-300')}
-                        ${renderMoneyBox('Balance After', item.balanceAfter, 'text-orange-300')}
-                        ${renderMoneyBox('Amount Arrived', delivered, delivered >= 0 ? 'text-green-300' : 'text-red-300')}
+                        ${renderMoneyBox('Before', item.balanceBefore, 'text-blue-300')}
+                        ${renderMoneyBox('After', item.balanceAfter, 'text-orange-300')}
+                        ${renderMoneyBox('Arrived', delivered, delivered >= 0 ? 'text-green-300' : 'text-red-300')}
                     </div>
                 </div>
             `;
@@ -939,7 +722,7 @@
             }
 
             const confirmed = confirm(
-                `Check year "${getYearTitle(year)}" using the server year check API?`
+                `Check all ${numbers.length} number(s) in year "${getYearTitle(year)}"?`
             );
 
             if (!confirmed) {
@@ -950,35 +733,60 @@
 
             if (buttonElement) {
                 buttonElement.disabled = true;
-                buttonElement.innerHTML = `
-                    <i class="fa-solid fa-spinner fa-spin"></i>
-                    Checking...
-                `;
             }
 
-            showStatus(
-                `Sending year ${getYearTitle(year)} to /api/ushare/chekyear...`,
-                'info'
-            );
+            let completed = 0;
+            let successCount = 0;
+            const failedNumbers = [];
 
             try {
-                const result = await checkYearFromServer(year);
+                for (let start = 0; start < numbers.length; start += CHECK_CONCURRENCY) {
+                    const batch = numbers.slice(start, start + CHECK_CONCURRENCY);
 
-                if (result.success === false) {
-                    throw new Error(
-                        result.message ||
-                        result.error ||
-                        'Failed to check year.'
+                    if (buttonElement) {
+                        buttonElement.innerHTML = `
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            ${completed}/${numbers.length}
+                        `;
+                    }
+
+                    showStatus(
+                        `Checking year ${getYearTitle(year)}: ${completed}/${numbers.length} completed...`,
+                        'info'
                     );
+
+                    const results = await Promise.allSettled(
+                        batch.map(refreshNumber)
+                    );
+
+                    results.forEach((result, index) => {
+                        completed += 1;
+
+                        if (result.status === 'fulfilled') {
+                            successCount += 1;
+                        } else {
+                            failedNumbers.push({
+                                numberphone: batch[index],
+                                message: result.reason?.message || 'Unknown error'
+                            });
+                        }
+                    });
                 }
 
                 await loadYearsData();
 
-                showStatus(
-                    result.message ||
-                    `Year ${getYearTitle(year)} checked successfully.`,
-                    'success'
-                );
+                if (failedNumbers.length === 0) {
+                    showStatus(
+                        `Year ${getYearTitle(year)} checked successfully: ${successCount}/${numbers.length}.`,
+                        'success'
+                    );
+                } else {
+                    console.error('Year check failures:', failedNumbers);
+                    showStatus(
+                        `Year ${getYearTitle(year)}: ${successCount} checked, ${failedNumbers.length} failed. Check console for details.`,
+                        successCount > 0 ? 'info' : 'error'
+                    );
+                }
             } catch (error) {
                 console.error('Check whole year error:', error);
                 showStatus(`Unable to check year: ${error.message}`, 'error');
@@ -987,61 +795,6 @@
                     buttonElement.disabled = false;
                     buttonElement.innerHTML = originalHtml;
                 }
-            }
-        }
-
-        async function checkYearFromServer(year) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), CHECK_TIMEOUT_MS);
-            const yearId = getYearId(year);
-
-            try {
-                const response = await fetch(
-                    CHECK_YEAR_API,
-                    {
-                        method: 'POST',
-                        headers: getJsonHeaders(),
-                        body: JSON.stringify({
-                            id: yearId,
-                            year_id: yearId,
-                            yearId: yearId,
-                            source_group_id:
-                                year.source_group_id ??
-                                year.group_id ??
-                                null,
-                            group_id:
-                                year.group_id ??
-                                year.source_group_id ??
-                                null,
-                            year_name:
-                                year.year_name ??
-                                year.yearName ??
-                                getYearTitle(year)
-                        }),
-                        signal: controller.signal
-                    }
-                );
-
-                const result = await readJsonResponse(response);
-
-                if (!response.ok || result.success === false) {
-                    throw new Error(
-                        [result.message, result.error]
-                            .filter(Boolean)
-                            .join(': ') ||
-                        `Server returned ${response.status}`
-                    );
-                }
-
-                return result;
-            } catch (error) {
-                if (error.name === 'AbortError') {
-                    throw new Error(`Year check timed out for ${getYearTitle(year)}.`);
-                }
-
-                throw error;
-            } finally {
-                clearTimeout(timeoutId);
             }
         }
 
@@ -1129,116 +882,6 @@
             );
         }
 
-        async function copyYearShortcut(yearId) {
-            const year = findYearById(yearId);
-
-            if (!year) {
-                showStatus('Year not found.', 'error');
-                return;
-            }
-
-            const text = formatYearShortcutText(year);
-            const copied = await copyText(text);
-
-            showStatus(
-                copied
-                    ? `Year ${getYearTitle(year)} shortcut copied.`
-                    : 'Unable to copy the year shortcut.',
-                copied ? 'success' : 'error'
-            );
-        }
-
-        function formatYearShortcutText(year) {
-            const splitAmounts = parseYearSplitAmounts(
-                year.split_text ??
-                year.splitText ??
-                ''
-            );
-
-            const lines = getYearNumbers(year).map((item, index) => {
-                const parts = [
-                    String(item.number ?? '0').trim() || '0',
-                    `${formatMoney(item.balanceBefore)}$`,
-                    `${formatMoney(item.balanceAfter)}$`
-                ];
-
-                // An unclear split text never blocks copying.
-                // "returned" is added only when the complete split format is understood.
-                if (splitAmounts !== null) {
-                    parts.push(
-                        `returned ${formatMoney(splitAmounts[index] ?? 0)}$`
-                    );
-                }
-
-                return parts.join(' | ');
-            });
-
-            const totalReceived = toNumber(
-                year.total_received ??
-                year.totalReceived ??
-                0
-            );
-
-            lines.push(`Total Received: $${formatMoney(totalReceived)}`);
-
-            return lines.join('\n');
-        }
-
-        function parseYearSplitAmounts(value) {
-            const rawText = String(value ?? '').trim();
-
-            if (
-                rawText === '' ||
-                rawText === '-' ||
-                rawText.toLowerCase() === 'null' ||
-                rawText.toLowerCase() === 'undefined'
-            ) {
-                return null;
-            }
-
-            /*
-             * Accepted examples:
-             * 31,31,11.5
-             * 31 | 31 | 11.5
-             * 31$ 31$ 11.5$
-             * returned 31, returned 31, returned 11.5
-             *
-             * Any unclear text returns null. Copying still continues without
-             * the returned amounts.
-             */
-            const cleanedText = rawText
-                .replace(/\b(?:returned|return|retuned)\b/gi, ' ')
-                .replace(/\$/g, ' ')
-                .trim();
-
-            const tokens = cleanedText
-                .split(/[\s,;|/]+/)
-                .map((token) => token.trim())
-                .filter(Boolean);
-
-            if (tokens.length === 0 || tokens.length > 4) {
-                return null;
-            }
-
-            const amounts = [];
-
-            for (const token of tokens) {
-                if (!/^[+-]?(?:\d+(?:\.\d+)?|\.\d+)$/.test(token)) {
-                    return null;
-                }
-
-                const amount = Number(token);
-
-                if (!Number.isFinite(amount)) {
-                    return null;
-                }
-
-                amounts.push(amount);
-            }
-
-            return amounts;
-        }
-
         function formatYearCopyText(year) {
             const title = getYearTitle(year);
             const sourceGroupId = formatEmptyValue(
@@ -1252,25 +895,6 @@
                 '-'
             );
             const status = formatEmptyValue(year.status ?? '-');
-            const totalReceived = toNumber(
-                year.total_received ??
-                year.totalReceived ??
-                0
-            );
-            const createdAt = formatDateTime(
-                year.created_at ??
-                year.createdAt
-            );
-            const checkedAt = formatDateTime(
-                year.checked_at ??
-                year.checkedAt ??
-                year.check_at ??
-                year.checkAt ??
-                year.last_checked_at ??
-                year.lastCheckedAt ??
-                year.updated_at ??
-                year.updatedAt
-            );
             const lines = getYearNumbers(year)
                 .filter((item) => isValidYearNumber(item.number))
                 .map((item, index) => formatYearNumberLine(item, index + 1));
@@ -1280,9 +904,6 @@
                 `Group: ${sourceGroupId}`,
                 `Status: ${status}`,
                 `Split Text: ${splitText}`,
-                `Created At: ${createdAt}`,
-                `Last Checked: ${checkedAt}`,
-                `Total Received: $${formatMoney(totalReceived)}`,
                 '',
                 ...lines
             ].join('\n');
@@ -1514,15 +1135,15 @@
         function getStatusClasses(status) {
             const text = String(status ?? '').trim().toLowerCase();
 
-            if (text === 'COMPLETE' || text === 'COMPLETE') {
+            if (text === 'comlpete' || text === 'complete') {
                 return 'border-green-700 bg-green-500/10 text-green-300';
             }
 
-            if (text === 'CHECKING' || text === 'CHECKING') {
+            if (text === 'cheking' || text === 'checking') {
                 return 'border-blue-700 bg-blue-500/10 text-blue-300';
             }
 
-            if (text === 'PENDING') {
+            if (text === 'pending') {
                 return 'border-amber-700 bg-amber-500/10 text-amber-300';
             }
 
