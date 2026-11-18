@@ -206,6 +206,9 @@
         const EDIT_SPLIT_TEXT_YEARS_API =
             `${API_BASE_URL}/api/ushare/editsplitTextYears`;
 
+        const CHECK_YEAR_API =
+            `${API_BASE_URL}/api/ushare/chekyear`;
+
         const REFRESH_ALFA_API =
             `${API_BASE_URL}/api/ushare/check-number`;
 
@@ -216,7 +219,6 @@
             'comlpete'
         ];
 
-        const CHECK_CONCURRENCY = 2;
         const CHECK_TIMEOUT_MS = 300000;
 
         let yearsData = [];
@@ -766,93 +768,52 @@
         }
 
         async function checkWholeYear(yearId, buttonElement) {
-            const year = findYearById(yearId);
+            if (buttonElement?.disabled) return;
 
+            const year = findYearById(yearId);
             if (!year) {
                 showStatus('Year not found.', 'error');
                 return;
             }
 
-            const numbers = getYearNumbers(year)
-                .map((item) => item.number)
-                .filter(isValidYearNumber);
+            const title = getYearTitle(year);
+            if (!confirm(`Check year "${title}"?`)) return;
 
-            if (numbers.length === 0) {
-                showStatus('This year has no valid numbers to check.', 'error');
-                return;
-            }
-
-            const confirmed = confirm(
-                `Check all ${numbers.length} number(s) in year "${getYearTitle(year)}"?`
-            );
-
-            if (!confirmed) {
-                return;
-            }
-
-            const originalHtml = buttonElement?.innerHTML || '';
-
+            const originalHtml = buttonElement?.innerHTML;
             if (buttonElement) {
                 buttonElement.disabled = true;
+                buttonElement.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking...';
             }
+            showStatus(`Checking year ${title}...`, 'info');
 
-            let completed = 0;
-            let successCount = 0;
-            const failedNumbers = [];
-
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), CHECK_TIMEOUT_MS);
             try {
-                for (let start = 0; start < numbers.length; start += CHECK_CONCURRENCY) {
-                    const batch = numbers.slice(start, start + CHECK_CONCURRENCY);
-
-                    if (buttonElement) {
-                        buttonElement.innerHTML = `
-                            <i class="fa-solid fa-spinner fa-spin"></i>
-                            ${completed}/${numbers.length}
-                        `;
-                    }
-
-                    showStatus(
-                        `Checking year ${getYearTitle(year)}: ${completed}/${numbers.length} completed...`,
-                        'info'
+                const response = await fetch(CHECK_YEAR_API, {
+                    method: 'POST',
+                    headers: getJsonHeaders(),
+                    body: JSON.stringify({ year_id: getYearId(year) }),
+                    signal: controller.signal
+                });
+                const result = await readJsonResponse(response);
+                if (!response.ok || result.success === false) {
+                    throw new Error(
+                        [result.message, result.error].filter(Boolean).join(': ') ||
+                        `Server returned ${response.status}`
                     );
-
-                    const results = await Promise.allSettled(
-                        batch.map(refreshNumber)
-                    );
-
-                    results.forEach((result, index) => {
-                        completed += 1;
-
-                        if (result.status === 'fulfilled') {
-                            successCount += 1;
-                        } else {
-                            failedNumbers.push({
-                                numberphone: batch[index],
-                                message: result.reason?.message || 'Unknown error'
-                            });
-                        }
-                    });
                 }
 
                 await loadYearsData();
-
-                if (failedNumbers.length === 0) {
-                    showStatus(
-                        `Year ${getYearTitle(year)} checked successfully: ${successCount}/${numbers.length}.`,
-                        'success'
-                    );
-                } else {
-                    console.error('Year check failures:', failedNumbers);
-                    showStatus(
-                        `Year ${getYearTitle(year)}: ${successCount} checked, ${failedNumbers.length} failed. Check console for details.`,
-                        successCount > 0 ? 'info' : 'error'
-                    );
-                }
+                showStatus(result.message || `Year ${title} checked successfully.`, 'success');
             } catch (error) {
                 console.error('Check whole year error:', error);
-                showStatus(`Unable to check year: ${error.message}`, 'error');
-
-                if (buttonElement && buttonElement.isConnected) {
+                const message = error.name === 'AbortError'
+                    ? 'The server did not respond before the timeout.'
+                    : error.message;
+                showStatus(`Unable to check year: ${message}`, 'error');
+            } finally {
+                clearTimeout(timeoutId);
+                if (buttonElement?.isConnected) {
                     buttonElement.disabled = false;
                     buttonElement.innerHTML = originalHtml;
                 }
