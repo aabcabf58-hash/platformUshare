@@ -377,6 +377,11 @@
             const finalYearPrice = !isEmptyValue(priceValue) && Number.isFinite(price)
                 ? price.toLocaleString('en-US', { maximumFractionDigits: 2 }) + (currency ? ` ${currency}` : '')
                 : '-';
+            const receivedValue = year.total_received ?? year.totalReceived;
+            const received = Number(receivedValue);
+            const totalReceived = !isEmptyValue(receivedValue) && Number.isFinite(received)
+                ? `$${formatMoney(received)}`
+                : '-';
 
             return `
                 <article class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
@@ -406,6 +411,10 @@
 
                                     <span class="rounded-lg border border-amber-400 bg-amber-100 px-2 py-1 font-mono font-bold text-amber-900">
                                         Final Year Price: ${escapeHtml(finalYearPrice)}
+                                    </span>
+
+                                    <span class="rounded-lg border border-emerald-400 bg-emerald-100 px-2 py-1 font-mono font-bold text-emerald-900">
+                                        Total Received: ${escapeHtml(totalReceived)}
                                     </span>
                                 </div>
                             </div>
