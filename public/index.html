@@ -228,6 +228,16 @@
                     </div>
                   </nav>
                   <div class="site-navigation-actions">
+                <button
+                    data-theme-toggle
+                    type="button"
+                    onclick="toggleTheme()"
+                    class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-200 shadow transition-all hover:bg-gray-600"
+                >
+                    <i data-theme-icon class="fa-solid fa-sun"></i>
+                    <span data-theme-label>Light Mode</span>
+                </button>
+
                     <button
                         type="button"
                         onclick="logout()"
@@ -242,16 +252,6 @@
                 <!-- Current-page action buttons -->
                 <div class="header-button-row flex w-full flex-nowrap gap-2 overflow-hidden rounded-2xl border border-gray-700 bg-gray-900/35 p-2">
                 <button
-                    data-theme-toggle
-                    type="button"
-                    onclick="toggleTheme()"
-                    class="theme-toggle-button flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-gray-600 bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-200 shadow transition-all hover:bg-gray-600"
-                >
-                    <i data-theme-icon class="fa-solid fa-sun"></i>
-                    <span data-theme-label>Light Mode</span>
-                </button>
-
-                <button
                     id="add-numbers-button"
                     type="button"
                     onclick="openAddNumbersModal()"
@@ -259,6 +259,11 @@
                 >
                     <i class="fa-solid fa-plus"></i>
                     Add Number(s)
+                </button>
+
+                <button id="topup-wallet-button" type="button" onclick="openTopUpWalletModal()"
+                    class="flex cursor-pointer items-center gap-2 rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-medium text-white shadow transition-all hover:bg-cyan-700">
+                    <i class="fa-solid fa-wallet"></i> Balance TOPUP
                 </button>
 
                 <button
@@ -680,6 +685,28 @@
 </main>
 
 
+    <!-- TOPUP provider wallet -->
+    <div id="topup-wallet-modal" role="dialog" aria-modal="true" aria-labelledby="topup-wallet-title" tabindex="-1"
+         class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+         onclick="if(event.target === this) closeTopUpWalletModal()">
+      <div class="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-3xl border border-gray-700 bg-gray-800 p-5 shadow-2xl">
+        <div class="flex items-center justify-between gap-3">
+          <h2 id="topup-wallet-title" class="text-lg font-bold">Balance TOPUP</h2>
+          <button type="button" onclick="closeTopUpWalletModal()" aria-label="Close TOPUP wallet" class="rounded-xl bg-gray-700 p-3"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <label class="mt-5 flex items-center justify-between gap-3">Currency
+          <select id="topup-wallet-currency" onchange="loadTopUpWallet()" class="rounded-xl border border-gray-600 bg-gray-900 p-2"><option value="USD">USD</option><option value="LBP">LBP</option></select>
+        </label>
+        <dl class="mt-5 space-y-3">
+          <div class="flex items-center justify-between gap-4 rounded-xl bg-gray-900 p-3"><dt>Balance</dt><dd id="topup-balance" class="font-mono font-bold">—</dd></div>
+          <div class="flex items-center justify-between gap-4 rounded-xl bg-gray-900 p-3"><dt>Credit Limit</dt><dd id="topup-credit-limit" class="font-mono font-bold">—</dd></div>
+          <div class="flex items-center justify-between gap-4 rounded-xl bg-gray-900 p-3"><dt>Available Balance</dt><dd id="topup-available-balance" class="font-mono font-bold text-emerald-400">—</dd></div>
+        </dl>
+        <p id="topup-wallet-message" role="status" aria-live="polite" class="mt-4 text-sm text-gray-400"></p>
+        <button id="topup-wallet-refresh" type="button" onclick="loadTopUpWallet()" class="mt-5 w-full rounded-xl bg-cyan-600 p-3 font-bold text-white disabled:opacity-50"><i class="fa-solid fa-rotate"></i> Refresh Balance</button>
+      </div>
+    </div>
+
     <!-- Total Ushare Balance Modal -->
     <div
         id="total-balance-modal"
@@ -993,6 +1020,93 @@
 
         const TOTAL_BALANCE_API =
             `${API_BASE_URL}/api/ushare/getTotalBalance`;
+
+        const TOPUP_WALLET_API = `${API_BASE_URL}/api/ushare/getTopUpWalletTopUP`;
+        let topUpWalletController = null;
+        let topUpWalletFocus = null;
+
+        function openTopUpWalletModal() {
+            topUpWalletFocus = document.activeElement;
+            const modal = document.getElementById('topup-wallet-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.classList.add('overflow-hidden');
+            modal.focus();
+            loadTopUpWallet();
+        }
+
+        function closeTopUpWalletModal() {
+            topUpWalletController?.abort();
+            topUpWalletController = null;
+            const modal = document.getElementById('topup-wallet-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.classList.remove('overflow-hidden');
+            topUpWalletFocus?.focus();
+        }
+
+        async function loadTopUpWallet() {
+            topUpWalletController?.abort();
+            const controller = new AbortController();
+            topUpWalletController = controller;
+            const timeout = setTimeout(() => controller.abort(), 35000);
+            const refresh = document.getElementById('topup-wallet-refresh');
+            const message = document.getElementById('topup-wallet-message');
+            const currency = document.getElementById('topup-wallet-currency').value;
+            const fields = ['topup-balance', 'topup-credit-limit', 'topup-available-balance'];
+            refresh.disabled = true;
+            fields.forEach(id => document.getElementById(id).textContent = '—');
+            message.className = 'mt-4 text-sm text-gray-400';
+            message.textContent = 'Loading TOPUP wallet...';
+            try {
+                const response = await fetch(`${TOPUP_WALLET_API}?currency=${encodeURIComponent(currency)}`, {
+                    method: 'GET', headers: authHeaders(), signal: controller.signal
+                });
+                const result = await readJsonResponse(response);
+                if (topUpWalletController !== controller) return;
+                if (!response.ok || result.success !== true || !result.data) {
+                    throw new Error(result.message || `Could not load wallet (HTTP ${response.status}).`);
+                }
+                const wallet = result.data;
+                const returnedCurrency = String(wallet.currency || '').toUpperCase();
+                if (!['USD', 'LBP'].includes(returnedCurrency)) throw new Error('Invalid wallet currency.');
+                const values = [wallet.balance, wallet.credit_limit, wallet.available_balance];
+                if (values.some(value => value === null || value === undefined ||
+                        !['number', 'string'].includes(typeof value) || String(value).trim() === '' || !Number.isFinite(Number(value)))) {
+                    throw new Error('The server returned invalid wallet amounts.');
+                }
+                fields.forEach((id, index) => {
+                    document.getElementById(id).textContent = new Intl.NumberFormat('en-US', {
+                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                    }).format(Number(values[index])) + ' ' + returnedCurrency;
+                });
+                message.className = 'mt-4 text-sm text-emerald-400';
+                message.textContent = 'TOPUP wallet loaded successfully.';
+            } catch (error) {
+                if (topUpWalletController !== controller) return;
+                message.className = 'mt-4 text-sm text-red-400';
+                message.textContent = error.name === 'AbortError'
+                    ? 'The request timed out. Please try again.' : error.message;
+            } finally {
+                clearTimeout(timeout);
+                if (topUpWalletController === controller) refresh.disabled = false;
+            }
+        }
+
+        document.addEventListener('keydown', event => {
+            const modal = document.getElementById('topup-wallet-modal');
+            if (modal.classList.contains('hidden')) return;
+            if (event.key === 'Escape') closeTopUpWalletModal();
+            if (event.key === 'Tab') {
+                const controls = [...modal.querySelectorAll('button:not(:disabled), select')];
+                const first = controls[0], last = controls[controls.length - 1];
+                if (event.shiftKey && (document.activeElement === first || document.activeElement === modal)) {
+                    event.preventDefault(); last.focus();
+                } else if (!event.shiftKey && (document.activeElement === last || document.activeElement === modal)) {
+                    event.preventDefault(); first.focus();
+                }
+            }
+        });
 
         function getCurrentNumbersApi() {
             if (serviceStatusFilter === 'active') {
