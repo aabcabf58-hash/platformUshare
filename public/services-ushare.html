@@ -363,7 +363,7 @@
       };
       if (currentWorkerApi !== null) {
         body.current_api = currentWorkerApi;
-        void saveWorkerChange(workerApi.edit, "PATCH", body, "Worker updated.");
+        void saveWorkerChange(workerApi.edit, "PUT", body, "Worker updated.");
       } else {
         void saveWorkerChange(workerApi.add, "POST", body, "Worker added.");
       }
