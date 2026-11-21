@@ -2962,7 +2962,12 @@
                 `;
             }
 
-            const percentage = calculatePercentage(secondary.used, secondary.total);
+            const hasUsage = secondary.used !== null && secondary.used !== undefined &&
+                String(secondary.used).trim() !== '';
+            const percentage = hasUsage ? calculatePercentage(secondary.used, secondary.total) : null;
+            const statusClass = secondary.status === 'Active'
+                ? 'text-green-400' : secondary.status === 'Requested'
+                ? 'text-amber-400' : 'text-gray-400';
 
             return `
                 <td class="p-4">
@@ -2982,21 +2987,19 @@
                             <div>
                                 Used:
                                 <span class="font-semibold text-orange-300">
-                                    ${escapeHtml(formatNumber(secondary.used))} GB
+                                    ${hasUsage ? `${escapeHtml(formatNumber(secondary.used))} GB` : '—'}
                                 </span>
                             </div>
 
-                            ${secondary.status ? `
-                                <div>
-                                    Status:
-                                    <span class="font-semibold text-gray-200">
-                                        ${escapeHtml(secondary.status)}
-                                    </span>
-                                </div>
-                            ` : ''}
+                            <div>
+                                Status:
+                                <span class="font-semibold ${statusClass}">
+                                    ${escapeHtml(secondary.status)}
+                                </span>
+                            </div>
                         </div>
 
-                        <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-gray-700">
+                        ${hasUsage ? `<div class="mt-3 h-1.5 overflow-hidden rounded-full bg-gray-700">
                             <div
                                 class="h-full rounded-full bg-orange-500 transition-all"
                                 style="width: ${percentage}%"
@@ -3005,10 +3008,17 @@
 
                         <div class="mt-1 text-right text-[10px] text-gray-500">
                             ${percentage}%
-                        </div>
+                        </div>` : ''}
                     </div>
                 </td>
             `;
+        }
+
+        function getSecondaryStatusLabel(value) {
+            if (value === null || value === undefined || String(value).trim() === '') return '—';
+            if (String(value).trim() === '3') return 'Active';
+            if (String(value).trim() === '0') return 'Requested';
+            return '—';
         }
 
         function getSecondaryData(line, index) {
@@ -3020,10 +3030,10 @@
                     '',
 
                 used:
-                    line[`secondary_used_${index}`] ??
-                    line[`secondary${index}_used`] ??
-                    line[`secondary_${index}_used`] ??
-                    0,
+                    Object.hasOwn(line, `secondary_used_${index}`)
+                        ? line[`secondary_used_${index}`]
+                        : line[`secondary${index}_used`] ??
+                          line[`secondary_${index}_used`] ?? null,
 
                 total:
                     line[`secondary_total_${index}`] ??
@@ -3032,10 +3042,7 @@
                     0,
 
                 status:
-                    line[`secondary_status_${index}`] ??
-                    line[`secondary${index}_status`] ??
-                    line[`secondary_${index}_status`] ??
-                    ''
+                    getSecondaryStatusLabel(line[`seconderystatus${index}`])
             };
         }
 
