@@ -104,8 +104,8 @@
       <form id="workerForm" aria-labelledby="workerEditorTitle" class="hidden border-b border-gray-700 p-4">
         <h3 id="workerEditorTitle" class="mb-3 font-semibold text-white">Add worker</h3>
         <div class="flex flex-wrap items-end gap-3">
-          <label class="w-full sm:max-w-md">Worker API URL
-            <input name="api" type="url" required autocomplete="off" placeholder="https://worker.example.com">
+          <label class="w-full sm:max-w-md">Worker WhatsApp number
+            <input name="api" type="tel" inputmode="tel" dir="ltr" required autocomplete="off" placeholder="96170XXXXXX" aria-describedby="workerPhoneHelp">
           </label>
           <label class="w-36">Cooldown (minutes)
             <input name="cooldown_minutes" type="number" required min="0" max="2147483647" step="1" value="15">
@@ -119,12 +119,13 @@
             <button id="cancelWorker" class="btn bg-gray-700 disabled:opacity-50" type="button">Cancel</button>
           </div>
         </div>
+        <p id="workerPhoneHelp" class="mt-3 text-sm text-gray-400">Enter the machine’s WhatsApp number, e.g. +961 70 123 456 or 70 123 456. The number is saved in the api field.</p>
       </form>
       <p id="workersMessage" role="status" class="hidden px-4 py-3 text-sm"></p>
       <div class="overflow-x-auto">
         <table class="w-full min-w-[680px] text-left text-sm">
           <thead class="bg-gray-900/60 text-xs uppercase text-gray-300">
-            <tr><th scope="col">API URL</th><th scope="col">Status</th><th scope="col">Last dispatch</th><th scope="col">Cooldown</th><th scope="col">Actions</th></tr>
+            <tr><th scope="col">WhatsApp number</th><th scope="col">Status</th><th scope="col">Last dispatch</th><th scope="col">Cooldown</th><th scope="col">Actions</th></tr>
           </thead>
           <tbody id="workersBody" class="divide-y divide-gray-700/60"></tbody>
         </table>
@@ -345,17 +346,27 @@
       closeWorkerForm();
       addWorkerButton.focus();
     });
+    function normalizeWorkerPhone(value) {
+      let phone = String(value ?? "").trim()
+        .replace(/[٠-٩]/g, c => String(c.charCodeAt(0) - 1632))
+        .replace(/[۰-۹]/g, c => String(c.charCodeAt(0) - 1776));
+      if (!/^\+?[\d\s()-]+$/.test(phone)) return "";
+      phone = phone.replace(/\D/g, "");
+      if (phone.startsWith("00")) phone = phone.slice(2);
+      if (/^\d{8}$/.test(phone)) phone = "961" + (phone.startsWith("0") ? phone.slice(1) : phone);
+      if (phone.startsWith("9610")) phone = "961" + phone.slice(4);
+      return /^[1-9]\d{8,14}$/.test(phone) ? phone : "";
+    }
     workerForm.addEventListener("submit", event => {
       event.preventDefault();
       if (workersBusy) return;
-      const api = workerFields.api.value.trim();
-      const url = URL.canParse(api) ? new URL(api) : null;
-      if (!url || !["http:", "https:"].includes(url.protocol) || url.username || url.password ||
-          url.search || url.hash || !["", "/api/ushare/add"].includes(url.pathname.replace(/\/+$/, ""))) {
-        showWorkerMessage("Enter the worker base URL or its full /api/ushare/add URL.", true);
+      const api = normalizeWorkerPhone(workerFields.api.value);
+      if (!api) {
+        showWorkerMessage("Enter a valid worker WhatsApp number, e.g. 96170123456. لا تدخل رابطًا؛ أدخل رقم واتساب المكنة.", true);
         workerFields.api.focus();
         return;
       }
+      workerFields.api.value = api;
       const body = {
         api,
         cooldown_minutes: workerFields.cooldown_minutes.valueAsNumber,

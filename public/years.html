@@ -103,7 +103,7 @@
                         >
                             <option value="all" selected>All</option>
                             <option value="PENDING">Pending</option>
-                            <option value="COMPLETE">Complete</option>
+                            <option value="COMPLETE">COMPLETE</option>
                             <option value="CHECKING">Checking</option>
                             <option value="CREATED">Created</option>
                         </select>
@@ -214,9 +214,9 @@
 
         const STATUS_OPTIONS = [
             'PENDING',
-            'created',
-            'cheking',
-            'comlpete'
+            'CREATED',
+            'CHECKING',
+            'COMPLETE'
         ];
 
         const CHECK_TIMEOUT_MS = 300000;
@@ -1157,7 +1157,7 @@
         function getStatusClasses(status) {
             const text = String(status ?? '').trim().toLowerCase();
 
-            if (text === 'comlpete' || text === 'complete') {
+            if (text === 'comlpete' || text === 'COMPLETE') {
                 return 'border-green-700 bg-green-500/10 text-green-300';
             }
 
