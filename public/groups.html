@@ -1067,6 +1067,18 @@
 
                                         <button
                                             type="button"
+                                            data-service-group-add
+                                            onclick="openGroupServicePreview(${groupIndex})"
+                                            ${servicePreviewBusy ? 'disabled' : ''}
+                                            class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg bg-emerald-600 px-2 text-[11px] font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+                                            title="Review all group numbers before adding to UShare"
+                                        >
+                                            <i class="fa-solid fa-circle-plus"></i>
+                                            Add to UShare
+                                        </button>
+
+                                        <button
+                                            type="button"
                                             onclick="copyGroup(${groupIndex})"
                                             class="inline-flex h-8 cursor-pointer items-center gap-1 rounded-lg bg-purple-600 px-2 text-[11px] font-semibold text-white transition hover:bg-purple-700"
                                             title="Copy Group"
@@ -1290,9 +1302,16 @@
                 note:!line?'بيانات الرقم غير موجودة؛ عبّي القيم يدويًا':!subscribed?'تاريخ الاشتراك غير واضح؛ حدّد التاريخ يدويًا':!['PRP','DATA'].includes(type)?'نوع الخط غير معروف؛ حدّد التاريخ يدويًا':!split?'لا توجد تقسيمة افتراضية؛ عبّي الباقات يدويًا':'',
                 state:'READY',result:''};
         }
-        function openServicePreview() {
-            if (servicePreviewBusy || !selectedGroupLinePhones.size) return;
-            servicePreviewRows = [...selectedGroupLinePhones].map(phone=>makeServicePreview(
+        function openGroupServicePreview(groupIndex) {
+            if(servicePreviewBusy)return;
+            const group=getVisibleGroups()[groupIndex];
+            if(!group){showStatus('Group not found.','error');return;}
+            const phones=[...new Set(group[1].map(line=>String(line.numberphone??'').trim()).filter(Boolean))];
+            openServicePreview(phones);
+        }
+        function openServicePreview(phones = [...selectedGroupLinePhones]) {
+            if (servicePreviewBusy || !phones.length) return;
+            servicePreviewRows = phones.map(phone=>makeServicePreview(
                 linesData.find(line=>String(line.numberphone??'').trim()===phone),phone));
             renderServicePreview();
             document.getElementById('service-preview-status').textContent = 'راجع وعدّل القيم، ثم اضغط تأكيد الإرسال. كل رقم بطلب مستقل؛ n1 وn2 وn3 دائمًا null.';
@@ -1377,6 +1396,7 @@
             const countEl = document.getElementById('selected-group-lines-count');
             if (countEl) countEl.textContent = String(count);
             ['move-selected-lines-button','remove-selected-lines-button','add-selected-services-button'].forEach((id)=>{ const el=document.getElementById(id); if(el) el.disabled=count===0||servicePreviewBusy; });
+            document.querySelectorAll('[data-service-group-add]').forEach(el=>el.disabled=servicePreviewBusy);
         }
         function toggleGroupLineSelection(phone, checked) { const value=String(phone||'').trim(); if(!value)return; checked?selectedGroupLinePhones.add(value):selectedGroupLinePhones.delete(value); updateSelectedGroupLinesUi(); }
         function clearSelectedGroupLines(){ selectedGroupLinePhones.clear(); document.querySelectorAll('[data-group-line-select]').forEach(el=>el.checked=false); updateSelectedGroupLinesUi(); }
