@@ -424,6 +424,7 @@
                 <button type="button" onclick="loadGroupsData()" class="rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white"><i class="fa-solid fa-rotate mr-1"></i>Refresh Groups</button>
                 <button id="copy-all-groups-button" type="button" onclick="copyAllGroups()" disabled class="rounded-xl bg-purple-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"><i class="fa-solid fa-copy mr-1"></i>Copy All</button>
                 <button id="move-selected-lines-button" type="button" onclick="moveSelectedGroupLines()" disabled class="rounded-xl bg-amber-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"><i class="fa-solid fa-right-left mr-1"></i>Move Selected (<span id="selected-group-lines-count">0</span>)</button>
+                <button id="add-selected-services-button" type="button" onclick="openServicePreview()" disabled class="rounded-xl bg-emerald-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"><i class="fa-solid fa-circle-plus mr-1"></i>Add Selected to UShare</button>
                 <button id="remove-selected-lines-button" type="button" onclick="removeSelectedGroupLines()" disabled class="rounded-xl bg-red-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"><i class="fa-solid fa-user-minus mr-1"></i>Remove Selected</button>
                 <button type="button" onclick="clearSelectedGroupLines()" class="rounded-xl bg-gray-700 px-3 py-2 text-sm font-medium text-white"><i class="fa-solid fa-square-minus mr-1"></i>Clear Selection</button>
             </div>
@@ -439,6 +440,31 @@
             </div>
         </section>
     </main>
+
+    <style>
+      #service-preview-modal[hidden]{display:none}
+      #service-preview-modal{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(0,0,0,.7)}
+      #service-preview-panel{background:#1f2937;color:#f3f4f6;border:1px solid #4b5563;border-radius:1rem;width:min(1400px,100%);max-height:90vh;display:flex;flex-direction:column;padding:1.2rem;box-shadow:0 20px 60px #0008}
+      #service-preview-panel table{width:100%;border-collapse:collapse;white-space:nowrap}
+      #service-preview-panel td,#service-preview-panel th{padding:.7rem;border-bottom:1px solid #4b5563;text-align:start}
+      .service-preview-input{width:6.5rem;background:#111827;color:#fff;border:1px solid #64748b;border-radius:.5rem;padding:.5rem}
+      .service-preview-input[type=date]{width:10rem}.service-preview-note{font-size:.75rem;color:#fbbf24;max-width:17rem;white-space:normal}
+      #service-preview-panel input:disabled{opacity:.65}
+      html.light-mode #service-preview-panel{background:#fff;color:#111827}
+      html.light-mode .service-preview-input{background:#f8fafc;color:#111827}
+    </style>
+    <div id="service-preview-modal" hidden role="dialog" aria-modal="true" aria-labelledby="service-preview-title">
+      <div id="service-preview-panel">
+        <h2 id="service-preview-title" class="mb-2 text-lg font-bold">مراجعة الأرقام قبل إضافتها لخدمات UShare</h2>
+        <p class="mb-2 text-sm">التاريخ الافتراضي من subscription_date بتوقيت لبنان: PRP نفسه، وDATA ناقص يوم. كل القيم المعروضة قابلة للتعديل عدا رقم الأساسي. القيم الفارغة للباقات الفرعية تُرسل null.</p>
+        <div style="overflow:auto;flex:1">
+          <table><thead><tr><th>الأساسي</th><th>نوع الخط</th><th>الباقة الأساسية</th><th>تاريخ الخدمة</th><th>B1</th><th>B2</th><th>B3</th><th>النتيجة</th></tr></thead><tbody id="service-preview-rows"></tbody></table>
+        </div>
+        <p id="service-preview-status" class="my-3 text-sm" role="status" aria-live="polite"></p>
+        <div class="flex gap-2"><button id="service-preview-confirm" type="button" onclick="sendServicePreview()" class="rounded-xl bg-emerald-600 px-4 py-2 text-white disabled:opacity-50">تأكيد الإرسال</button><button id="service-preview-close" type="button" onclick="closeServicePreview()" class="rounded-xl bg-gray-600 px-4 py-2 text-white disabled:opacity-50">إغلاق</button></div>
+      </div>
+    </div>
+
 
     <script src="./config.js"></script>
     <script src="./auth.js"></script>
@@ -1223,11 +1249,134 @@
             );
         }
 
+        // Selected-line service preview: no requests until explicit confirmation.
+        let servicePreviewRows = [];
+        let servicePreviewBusy = false;
+        function serviceCalendarDate(value) {
+            const text = String(value ?? '').trim();
+            if (!text) return '';
+            const plain = /^(\d{4}-\d{2}-\d{2})(?:$|[ T]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$)/.exec(text);
+            if (plain) return validServiceDate(plain[1]) ? plain[1] : '';
+            if (!/^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:?\d{2})$/i.test(text)) return '';
+            if (!validServiceDate(text.slice(0,10))) return '';
+            const instant = new Date(text);
+            if (!Number.isFinite(instant.getTime())) return '';
+            const parts = Object.fromEntries(new Intl.DateTimeFormat('en-GB', {
+                timeZone:'Asia/Beirut',year:'numeric',month:'2-digit',day:'2-digit'
+            }).formatToParts(instant).map(p=>[p.type,p.value]));
+            return `${parts.year}-${parts.month}-${parts.day}`;
+        }
+        function validServiceDate(text) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return false;
+            const d = new Date(text+'T00:00:00Z');
+            return Number.isFinite(d.getTime()) && d.toISOString().slice(0,10) === text;
+        }
+        function previousServiceDay(text) {
+            if (!validServiceDate(text)) return '';
+            const date = new Date(text+'T00:00:00Z');
+            date.setUTCDate(date.getUTCDate()-1);
+            return date.toISOString().slice(0,10);
+        }
+        function makeServicePreview(line, phone) {
+            const amount = line?.total_shared_bundle;
+            const numeric = amount != null && String(amount).trim() !== '' ? Number(amount) : NaN;
+            const type = String(line?.line_type ?? '').trim().toUpperCase();
+            const subscribed = serviceCalendarDate(line?.subscription_date);
+            const split = {22:[5.5,5.5,11],44:[11,11,22],77:[22,22,33],111:[33,33,44]}[numeric];
+            return {numberphone:phone,lineType:type || 'غير معروف',
+                primary_bundle:Number.isFinite(numeric)&&numeric>0?String(numeric):'',
+                service_started_at:type==='PRP'?subscribed:type==='DATA'?previousServiceDay(subscribed):'',
+                b1:split?String(split[0]):'',b2:split?String(split[1]):'',b3:split?String(split[2]):'',
+                note:!line?'بيانات الرقم غير موجودة؛ عبّي القيم يدويًا':!subscribed?'تاريخ الاشتراك غير واضح؛ حدّد التاريخ يدويًا':!['PRP','DATA'].includes(type)?'نوع الخط غير معروف؛ حدّد التاريخ يدويًا':!split?'لا توجد تقسيمة افتراضية؛ عبّي الباقات يدويًا':'',
+                state:'READY',result:''};
+        }
+        function openServicePreview() {
+            if (servicePreviewBusy || !selectedGroupLinePhones.size) return;
+            servicePreviewRows = [...selectedGroupLinePhones].map(phone=>makeServicePreview(
+                linesData.find(line=>String(line.numberphone??'').trim()===phone),phone));
+            renderServicePreview();
+            document.getElementById('service-preview-status').textContent = 'راجع وعدّل القيم، ثم اضغط تأكيد الإرسال. كل رقم بطلب مستقل؛ n1 وn2 وn3 دائمًا null.';
+            document.getElementById('service-preview-modal').hidden=false;
+            document.getElementById('service-preview-close').focus();
+        }
+        function closeServicePreview() {
+            if(servicePreviewBusy)return;
+            document.getElementById('service-preview-modal').hidden=true;
+            document.getElementById('add-selected-services-button').focus();
+        }
+        function setServicePreviewValue(index,field,value) {
+            const row=servicePreviewRows[index];
+            if(!row || servicePreviewBusy || row.state!=='READY' || !['primary_bundle','service_started_at','b1','b2','b3'].includes(field))return;
+            row[field]=value;
+        }
+        function renderServicePreview() {
+            document.getElementById('service-preview-rows').innerHTML=servicePreviewRows.map((row,i)=>{
+                const input=(field,type='number')=>`<input class="service-preview-input" type="${type}" ${type==='number'?'step="any" min="0"':''} aria-label="${field} ${escapeHtml(row.numberphone)}" value="${escapeHtml(row[field])}" ${servicePreviewBusy||row.state!=='READY'?'disabled':''} oninput="setServicePreviewValue(${i},'${field}',this.value)">`;
+                return `<tr><td><strong>${escapeHtml(row.numberphone)}</strong><div class="service-preview-note">${escapeHtml(row.note)}</div></td><td>${escapeHtml(row.lineType)}</td><td>${input('primary_bundle')}</td><td>${input('service_started_at','date')}</td><td>${input('b1')}</td><td>${input('b2')}</td><td>${input('b3')}</td><td id="service-preview-result-${i}" role="status">${escapeHtml(row.result||'بانتظار التأكيد')}</td></tr>`;
+            }).join('');
+            document.getElementById('service-preview-confirm').disabled=servicePreviewBusy||!servicePreviewRows.some(r=>r.state==='READY');
+            document.getElementById('service-preview-close').disabled=servicePreviewBusy;
+        }
+        function servicePreviewPayload(row) {
+            if(!/^\d{8}$/.test(row.numberphone))throw Error('رقم الأساسي يجب أن يتألف من 8 أرقام');
+            const positive=value=>{const n=Number(value);if(String(value).trim()===''||!Number.isFinite(n)||n<=0)throw Error('حجم الباقة يجب أن يكون رقمًا موجبًا');return n;};
+            if(!validServiceDate(row.service_started_at))throw Error('حدّد تاريخ خدمة صحيحًا');
+            const quotas=['b1','b2','b3'].map(key=>String(row[key]).trim()===''?null:positive(row[key]));
+            if(quotas.every(v=>v===null))throw Error('عبّي تقسيمة الباقة قبل التأكيد');
+            return {numberphone:row.numberphone,primary_bundle:positive(row.primary_bundle),
+                n1:null,b1:quotas[0],n2:null,b2:quotas[1],n3:null,b3:quotas[2],service_started_at:row.service_started_at};
+        }
+        async function sendServicePreview() {
+            if(servicePreviewBusy)return;
+            const batch=[];
+            try {
+                servicePreviewRows.forEach((row,index)=>{if(row.state==='READY'){
+                    try {batch.push({row,index,payload:servicePreviewPayload(row)});}
+                    catch(error){throw Error(`${row.numberphone}: ${error.message}`);}
+                }});
+            }catch(error){document.getElementById('service-preview-status').textContent=error.message;return;}
+            if(!batch.length)return;
+            servicePreviewBusy=true;renderServicePreview();updateSelectedGroupLinesUi();
+            let success=0,failed=0,unknown=0;
+            for(const task of batch){
+                const {row,index,payload}=task;
+                row.state='SENDING';row.result='جارٍ الإرسال…';
+                document.getElementById(`service-preview-result-${index}`).textContent=row.result;
+                try{
+                    const response=await fetch(`${API_BASE_URL}/api/ushare/upsertServiceUshare`,{
+                        method:'POST',headers:{...getJsonHeaders(),'Content-Type':'application/json'},
+                        body:JSON.stringify(payload),signal:AbortSignal.timeout(30000)
+                    });
+                    const result=await readJsonResponse(response);
+                    if(!response.ok||result.success===false){
+                        row.state='FAILED';row.result=result.message||result.error||`HTTP ${response.status}`;failed++;
+                    }else{
+                        row.state='SAVED';row.result='تم الحفظ';success++;
+                        selectedGroupLinePhones.delete(row.numberphone);
+                        document.querySelectorAll('[data-group-line-select]').forEach(el=>{if(el.value===row.numberphone)el.checked=false;});
+                    }
+                }catch(error){
+                    row.state='UNKNOWN';row.result='تعذّر تأكيد النتيجة؛ افحص جدول الخدمات قبل إعادة الإرسال';unknown++;
+                }
+                document.getElementById(`service-preview-result-${index}`).textContent=row.result;
+                document.getElementById('service-preview-status').textContent=`تم الحفظ: ${success} | مرفوض: ${failed} | غير مؤكد: ${unknown} | تمت معالجة ${success+failed+unknown} من ${batch.length}`;
+            }
+            servicePreviewBusy=false;
+            servicePreviewRows=servicePreviewRows.filter(row=>row.state!=='SAVED');
+            renderServicePreview();updateSelectedGroupLinesUi();
+            if(!servicePreviewRows.length)closeServicePreview();
+            showStatus(`UShare: saved ${success}, rejected ${failed}, unconfirmed ${unknown}.`,failed||unknown?'error':'success');
+        }
+        document.addEventListener('keydown',event=>{
+            if(event.key==='Escape'&&!document.getElementById('service-preview-modal').hidden)closeServicePreview();
+        });
+        // End selected-line service preview.
+
         function updateSelectedGroupLinesUi() {
             const count = selectedGroupLinePhones.size;
             const countEl = document.getElementById('selected-group-lines-count');
             if (countEl) countEl.textContent = String(count);
-            ['move-selected-lines-button','remove-selected-lines-button'].forEach((id)=>{ const el=document.getElementById(id); if(el) el.disabled=count===0; });
+            ['move-selected-lines-button','remove-selected-lines-button','add-selected-services-button'].forEach((id)=>{ const el=document.getElementById(id); if(el) el.disabled=count===0||servicePreviewBusy; });
         }
         function toggleGroupLineSelection(phone, checked) { const value=String(phone||'').trim(); if(!value)return; checked?selectedGroupLinePhones.add(value):selectedGroupLinePhones.delete(value); updateSelectedGroupLinesUi(); }
         function clearSelectedGroupLines(){ selectedGroupLinePhones.clear(); document.querySelectorAll('[data-group-line-select]').forEach(el=>el.checked=false); updateSelectedGroupLinesUi(); }
