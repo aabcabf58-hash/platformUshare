@@ -92,7 +92,7 @@
         </div>
       </form>
     </section>
-    <section class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl"><div class="flex flex-col gap-3 border-b border-gray-700 p-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 class="font-bold text-white">Saved services <span class="text-orange-400" id="count"></span></h2><p class="text-sm text-gray-400">Edit service details directly in their row. Add service stays in its own form.</p></div><input id="search" oninput="resetServicePage()" class="search" placeholder="Search primary, secondary, bundle, date, or any detail..."></div><div class="overflow-x-auto"><table class="min-w-[900px] w-full text-left text-sm"><thead class="bg-gray-900/60 text-xs uppercase text-gray-300"><tr><th>Number</th><th>Primary</th><th>N1 / B1</th><th>N2 / B2</th><th>N3 / B3</th><th>Service started</th><th>Actions</th></tr></thead><tbody id="tbody" class="divide-y divide-gray-700/60"></tbody></table></div><nav id="servicePagination" aria-label="Saved services pages" class="service-pagination"></nav></section>
+    <section class="overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl"><div class="flex flex-col gap-3 border-b border-gray-700 p-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 class="font-bold text-white">Saved services <span class="text-orange-400" id="count"></span></h2><p class="text-sm text-gray-400">Edit service details directly in their row. Add service stays in its own form.</p></div><div class="flex flex-wrap items-center gap-2"><input id="search" oninput="resetServicePage()" class="search" placeholder="Search primary, secondary, bundle, date, or any detail..."></div></div><div class="overflow-x-auto"><table class="min-w-[900px] w-full text-left text-sm"><thead class="bg-gray-900/60 text-xs uppercase text-gray-300"><tr><th>Number</th><th>Primary</th><th>N1 / B1</th><th>N2 / B2</th><th>N3 / B3</th><th id="serviceDateHeading" aria-sort="ascending">Service started <button id="serviceSortToggle" type="button" onclick="toggleServiceDateSort()" class="service-sort-arrow" aria-label="Show newest services first" title="Show newest services first"><span id="serviceSortArrow" aria-hidden="true">↑</span></button></th><th>Actions</th></tr></thead><tbody id="tbody" class="divide-y divide-gray-700/60"></tbody></table></div><nav id="servicePagination" aria-label="Saved services pages" class="service-pagination"></nav></section>
     <section aria-labelledby="workersTitle" class="mt-4 overflow-hidden rounded-2xl border border-gray-700 bg-gray-800 shadow-xl">
       <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-700 p-4">
         <h2 id="workersTitle" class="font-bold text-white"><i aria-hidden="true" class="fa-solid fa-server mr-2 text-purple-400"></i>U-Share Workers</h2>
@@ -133,6 +133,7 @@
     </section>
   </main>
   <style>
+    .service-sort-arrow{display:inline-flex;align-items:center;justify-content:center;margin-left:4px;width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:inherit;font-size:20px;cursor:pointer;vertical-align:middle}.service-sort-arrow:hover{background:#64748b33}.service-sort-arrow:focus-visible{outline:2px solid #3b82f6;outline-offset:2px}
     .available-only-toggle{display:flex;align-items:center;gap:8px;border:1px solid #64748b;border-radius:10px;padding:9px 12px;color:inherit;font-size:12px;cursor:pointer}
     .available-only-toggle input{width:18px;height:18px;accent-color:#16a34a;flex-shrink:0}
     .service-pagination{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px;padding:14px;border-top:1px solid #374151}
@@ -144,7 +145,7 @@
   <script src="./config.js"></script>
   <script src="./auth.js"></script>
   <script>
-    const BASE=window.APP_CONFIG?.API_BASE_URL||"https://api.zouzouamhaz.com",API={save:"/api/ushare/upsertServiceUshare",edit:"/api/ushare/editServiceUshare",all:"/api/ushare/getAllServicesUshare",total:"/api/ushare/totalServiseUshare",del:"/api/ushare/deleteServiceUshare"};let list=[],inlineDraft=null,inlineSaving=false,servicePage=1;const SERVICE_PAGE_SIZE=10;const form=document.getElementById("form"),tbody=document.getElementById("tbody"),msg=document.getElementById("msg");
+    const BASE=window.APP_CONFIG?.API_BASE_URL||"https://api.zouzouamhaz.com",API={save:"/api/ushare/upsertServiceUshare",edit:"/api/ushare/editServiceUshare",all:"/api/ushare/getAllServicesUshare",total:"/api/ushare/totalServiseUshare",del:"/api/ushare/deleteServiceUshare"};let list=[],inlineDraft=null,inlineSaving=false,servicePage=1,serviceNewestFirst=false;const SERVICE_PAGE_SIZE=10;const form=document.getElementById("form"),tbody=document.getElementById("tbody"),msg=document.getElementById("msg");
     const esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"),nul=v=>v===""?null:v,num=v=>v===""?null:Number(v),date=v=>{if(!v)return"—";const d=new Date(v);return Number.isNaN(d)?"—":d.toLocaleString()},dateIn=v=>{if(!v)return"";const d=new Date(v);return Number.isNaN(d)?"":d.toISOString().slice(0,16)};
     function theme(){document.documentElement.classList.toggle("light-mode");const light=document.documentElement.classList.contains("light-mode");document.getElementById("themeIcon").className=`fa-solid fa-${light?"moon":"sun"}`;document.getElementById("themeText").textContent=light?"Dark Mode":"Light Mode"}function note(t,bad=false){msg.textContent=t;msg.className=`mb-4 rounded-2xl border px-4 py-3 ${bad?"border-red-500 bg-red-900/30 text-red-200":"border-green-500 bg-green-900/30 text-green-200"}`}
     async function call(path,opt={}){const headers={...authHeaders()};if(opt.body)headers["Content-Type"]="application/json";const r=await fetch(BASE+path,{method:opt.method||"GET",headers,body:opt.body?JSON.stringify(opt.body):undefined}),raw=await r.text();let x={};try{x=raw?JSON.parse(raw):{}}catch{x={message:raw}}if(r.status===401)logout();if(!r.ok||x.success===false)throw Error(x.message||`Server returned ${r.status}`);return x}
@@ -224,7 +225,23 @@
         if(onlyAvailable&&[row.n1,row.n2,row.n3].every(n=>n!==null&&n!==undefined&&String(n).trim()!==""))return false;
         const text=serviceSearchText(row)+" "+date(row.service_started_at).toLowerCase();
         return terms.every(term=>text.includes(term));
+      }).sort((a,b)=>{
+        const timestamp=row=>row.service_started_at?Date.parse(row.service_started_at):NaN;
+        const first=timestamp(a),second=timestamp(b);
+        if(!Number.isFinite(first))return Number.isFinite(second)?1:0;
+        if(!Number.isFinite(second))return -1;
+        return serviceNewestFirst?second-first:first-second;
       });
+    }
+    function toggleServiceDateSort(){
+      if(inlineSaving)return;
+      serviceNewestFirst=!serviceNewestFirst;
+      document.getElementById("serviceSortArrow").textContent=serviceNewestFirst?"↓":"↑";
+      document.getElementById("serviceDateHeading").setAttribute("aria-sort",serviceNewestFirst?"descending":"ascending");
+      const label=serviceNewestFirst?"Show oldest services first":"Show newest services first";
+      document.getElementById("serviceSortToggle").setAttribute("aria-label",label);
+      document.getElementById("serviceSortToggle").title=label;
+      resetServicePage();
     }
     function resetServicePage(){servicePage=1;draw();}
     function goServicePage(page){
